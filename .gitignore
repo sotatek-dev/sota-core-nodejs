@@ -1,0 +1,4 @@
+core/node_modules
+config/Config.js
+node_modules
+core/coverage
