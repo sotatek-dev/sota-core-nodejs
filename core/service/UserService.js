@@ -82,7 +82,7 @@ var UserService = BaseService.extend({
         var lastUserId = ret.getLast ? ret.getLast.id : 0;
         var nextUserId = lastUserId + 1;
         UserModel.insert({
-          user_name   : 'user' + nextUserId,
+          username    : 'user' + nextUserId,
           first_name  : 'First ' + nextUserId,
           last_name   : 'Last ' + nextUserId,
         }, next);

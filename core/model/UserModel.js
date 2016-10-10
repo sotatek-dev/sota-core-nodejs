@@ -7,7 +7,7 @@ module.exports = BaseModel.extend({
   $tableName: 'user',
   $Entity: UserEntity,
   $columns: {
-    'user_name'   : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
+    'username'   : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
     'first_name'  : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
     'last_name'   : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
     'last_name'   : {type: 'string', size: 128, version: 1, active: true, isNotNull: false},
@@ -17,11 +17,13 @@ module.exports = BaseModel.extend({
   },
 
   $indexes: {
-    'user_name': ['user_name']
+    'username': ['username'],
+    'email': ['email'],
   },
 
   $uniques: {
-    'user_name': ['user_name']
+    'username': ['username'],
+    'email': ['email'],
   },
 
   dsConfig: {

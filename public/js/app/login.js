@@ -95,6 +95,6 @@ app.controller("home", function($scope, $window, $http) {
 
     self.getDetails = function(user) {
         return "[" + user.userId + "] <" + user.firstName + " " + user.lastName +
-                "> (" + user.userName + ") - updatedAt: " + user.updatedAt;
+                "> (" + user.username + ") - updatedAt: " + user.updatedAt;
     };
 });

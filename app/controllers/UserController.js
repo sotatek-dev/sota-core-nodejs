@@ -11,13 +11,13 @@ module.exports = BaseController.extend({
     var data = {
       title       : 'Profile',
       message     : 'Unauthorized',
-      userName    : null,
+      username    : null,
       isLoggedIn  : false
     };
 
     if (req.user) {
       data.message      = null;
-      data.userName     = req.user.userName;
+      data.username     = req.user.username;
       data.isLoggedIn   = true;
     }
 

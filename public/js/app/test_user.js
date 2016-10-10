@@ -34,7 +34,7 @@ app.controller("home", function($scope, $timeout) {
 
     self.getDetails = function(user) {
         return "[" + user.id + "] <" + user.firstName + " " + user.lastName +
-                "> (" + user.userName + ") - updatedAt: " + user.updatedAt;
+                "> (" + user.username + ") - updatedAt: " + user.updatedAt;
     };
 
     $timeout(self.requestList, 1);

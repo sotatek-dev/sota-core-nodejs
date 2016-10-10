@@ -54,6 +54,10 @@ Utils.nowInMilis = function() {
 };
 
 Utils.now = function() {
+  return Utils.nowInMilis();
+};
+
+Utils.nowInSeconds = function() {
   return Utils.nowInMilis()/1000|0;
 };
 
