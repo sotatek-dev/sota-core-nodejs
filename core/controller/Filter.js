@@ -74,9 +74,6 @@ function extendResponse(res, req) {
 }
 
 function _purifyEntity(data) {
-  if (data instanceof BaseEntity) {
-    return data.toJSON();
-  }
 
   if (typeof data === 'boolean'  ||
       typeof data === 'number'   ||
@@ -84,6 +81,16 @@ function _purifyEntity(data) {
       typeof data === 'function' ||
       typeof data === 'undefined') {
     return data;
+  }
+
+  if (data instanceof BaseEntity) {
+    return data.toJSON();
+  }
+
+  if (_.isArray(data)) {
+    return _.map(data, function(e) {
+      return _purifyEntity(e);
+    });
   }
 
   var ret = {};
