@@ -13,7 +13,6 @@ module.exports = BaseModel.extend({
     'last_name'   : {type: 'string', size: 128, version: 1, active: true, isNotNull: false},
     'email'       : {type: 'string', size: 128, version: 1, active: true, isNotNull: false},
     'password'    : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
-    'salt'        : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
   },
 
   $indexes: {

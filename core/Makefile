@@ -3,6 +3,7 @@ check-syntax:
 	--config="node-style-guide/.eslintrc" \
 	--rule="{'max-len':[1, 100, {'ignoreComments':true}],\
 					'max-depth': [1, 4], \
+					'max-statements': [1, 50], \
 					'camelcase':[1,{'properties': 'never'}]}" \
 	common/ controller/ data/ entity/ error/ model/ service/ util/
 

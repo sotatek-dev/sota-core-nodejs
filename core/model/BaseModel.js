@@ -80,6 +80,13 @@ var BaseModel = BaseClass.extend({
     return this._exSession;
   },
 
+  _getAdapterForSelect: function() {
+    if (this.isUseMasterSelect()) {
+      return this._masterAdapter;
+    }
+    return this._slaveAdapter;
+  },
+
   _constructEntity : function(data) {
     var entity = new this.Entity(this, data);
     return entity;
@@ -166,16 +173,16 @@ var BaseModel = BaseClass.extend({
    */
   findOne : function(id, callback) {
     var options;
-    if (typeof id === 'number') {
+    if (typeof id === 'number' || typeof id === 'string') {
       options = {
         where   : 'id=?',
         params  : [id],
-        limit   : 1,
       };
     } else {
       options = id;
     }
 
+    options.limit = 1;
     this._select(options, function(err, ret) {
       if (err) {
         callback(err);
@@ -251,7 +258,6 @@ var BaseModel = BaseClass.extend({
             callback(err);
             return;
           }
-
           entity.setData(data).save(callback);
         });
       } else {
@@ -263,7 +269,7 @@ var BaseModel = BaseClass.extend({
     }
   },
 
-  delete : function(data, callback) {
+  delete: function(data, callback) {
     var self = this;
     if (typeof data === 'number' && data > 0) {
       self.delete({
@@ -275,6 +281,18 @@ var BaseModel = BaseClass.extend({
     } else {
       self._masterAdapter.deleteBatch(self.tableName, data, callback);
     }
+  },
+
+  count: function(options, callback) {
+    var self = this;
+    var adapter = self._getAdapterForSelect();
+    adapter.count(self.tableName, options, callback);
+  },
+
+  countGroupBy: function(groupCols, options, callback) {
+    var self = this;
+    var adapter = self._getAdapterForSelect();
+    adapter.countGroupBy(self.tableName, groupCols, options, callback);
   },
 
   commit: function(callback) {
@@ -291,6 +309,24 @@ var BaseModel = BaseClass.extend({
 
   singleRollback: function(callback) {
     this._masterAdapter.rollback(callback);
+  },
+
+  $whereIn: function(column, length) {
+    if (!length) {
+      var msg = util.format(
+        'Invalid settings for building where clause: column=%s, length=%d',
+        column, length
+      );
+      // TODO: Just for easier debug in development phase
+      // should log error only instead of throwing error
+      throw new Error(msg);
+    }
+
+    var place = [];
+    for (var i = 0; i < length; i++) {
+        place.push('?');
+    }
+    return '`' + column + '` in (' + place.join(',') + ')';
   },
 
   destroy : function() {

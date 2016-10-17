@@ -67,7 +67,7 @@ var SotaServer = BaseClass.extend({
     app.engine('html', this._config.viewEngine || require('hbs').__express);
     app.use(morgan('dev'));
     app.use(cookieParser());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.urlencoded({extended: true}));
     app.use(session(sessionOpts));
     app.use(express.static(path.join(__dirname, '../public')));
     app.use(passport.initialize());
@@ -93,7 +93,7 @@ var SotaServer = BaseClass.extend({
     this.myServer   = server;
   },
 
-  _loadControllers : function(controllerDir) {
+  _loadControllers : function() {
     var init = require('./initializer/Controller');
     init(this.myApp, ControllerFactory, this._config.controllerDirs);
   },

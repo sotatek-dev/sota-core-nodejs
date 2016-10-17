@@ -12,7 +12,7 @@ module.exports = function(app, factory, serviceDirs) {
     }
 
     _.forEach(files, function(file) {
-      if (file.indexOf('BaseService') > - 1 ||
+      if (file.indexOf('BaseService') > -1 ||
           file.indexOf('ServiceFactory') > -1) {
         // Ignore non-model classes
         return;
@@ -26,4 +26,4 @@ module.exports = function(app, factory, serviceDirs) {
       factory.register(module);
     });
   });
-}
+};

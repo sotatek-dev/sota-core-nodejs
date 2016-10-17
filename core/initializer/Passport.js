@@ -1,6 +1,6 @@
 var LocalStrategy   = require('passport-local').Strategy;
-var JwtStrategy     = require('passport-jwt').Strategy,
-    ExtractJwt      = require('passport-jwt').ExtractJwt;
+var JwtStrategy     = require('passport-jwt').Strategy;
+// var ExtractJwt      = require('passport-jwt').ExtractJwt;
 
 module.exports = function(app, passport) {
 
@@ -32,11 +32,13 @@ module.exports = function(app, passport) {
       return req.params[jwtBodyField];
     }
     return null;
-  }
+  };
 
-  passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+  passport.use(new JwtStrategy(opts, function(jwtPayload, done) {
     var UserModel = ModelFactory.create('UserModel');
-    UserModel.findOne({id: jwt_payload.sub}, function(err, user) {
+    UserModel.findOne({
+      id: jwtPayload.sub
+    }, function(err, user) {
       if (err) {
         return done(err, false);
       }

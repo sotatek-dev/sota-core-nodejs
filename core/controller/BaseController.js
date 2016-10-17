@@ -28,7 +28,7 @@ var BaseController = BaseClass.extend({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
-  $createDefaultFind: function(modelClass, acl) {
+  $createDefaultFind: function(modelClass) {
 
     var baseHandler = function(req, res) {
       var page      = req.params['page'] || 0,
@@ -61,7 +61,7 @@ var BaseController = BaseClass.extend({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
-  $createDefaultFindOne: function(modelClass, acl) {
+  $createDefaultFindOne: function(modelClass) {
 
     var baseHandler = function(req, res) {
       var id = req.params['id'],
@@ -94,10 +94,10 @@ var BaseController = BaseClass.extend({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
-  $createDefaultAdd: function(modelClass, acl) {
+  $createDefaultAdd: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var def = req.body,
+      var def = req.params,
           model = req.getModel(modelClass.classname);
 
       async.auto({
@@ -122,7 +122,7 @@ var BaseController = BaseClass.extend({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
-  $createDefaultUpdate: function(modelClass, acl) {
+  $createDefaultUpdate: function(modelClass) {
 
     var baseHandler = function(req, res) {
       var def   = req.params,
@@ -150,7 +150,7 @@ var BaseController = BaseClass.extend({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
-  $createDefaultDelete: function(modelClass, acl) {
+  $createDefaultDelete: function(modelClass) {
 
     var baseHandler = function(req, res) {
       var id = parseInt(req.params['id']),

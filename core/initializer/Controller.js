@@ -2,7 +2,7 @@ module.exports = function(app, factory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {
     logger.info('SotaServer::_loadControllers controllerDir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {
-      throw new Error('Invalid controller directory: ' + controllerDir)
+      throw new Error('Invalid controller directory: ' + controllerDir);
     }
 
     var files = FileUtils.listFiles(controllerDir, /Controller.js$/i);

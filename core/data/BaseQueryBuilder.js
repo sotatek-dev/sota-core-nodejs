@@ -1,6 +1,10 @@
 var BaseClass         = require('../common/BaseClass');
 var BaseEntity        = require('../entity/BaseEntity');
 
+/**
+ * Based on MySQL syntax.
+ * Other db types should be customized with own query builder classes
+ */
 var BaseQueryBuilder = BaseClass.extend({
   classname : 'QueryBuilder',
 
@@ -137,6 +141,29 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += self._buildWhereClause(options);
 
     logger.info(this.classname + '::deleteBatch query=[' + sql + ']');
+    return sql;
+  },
+
+  count: function(tableName, options) {
+    var self = this;
+
+    var sql = 'SELECT COUNT(1) AS `count` FROM ';
+    sql += tableName;
+    sql += self._buildWhereClause(options);
+
+    logger.info(this.classname + '::count query=[' + sql + ']');
+    return sql;
+  },
+
+  countGroupBy: function(tableName, groupCols, options) {
+    var self = this;
+
+    var sql =   'SELECT ' + _.map(groupCols, self._escapeColumn).join(',') +
+                ', COUNT(1) AS `count` FROM ';
+    sql += tableName;
+    sql += self._buildWhereClause(options);
+
+    logger.info(this.classname + '::count query=[' + sql + ']');
     return sql;
   },
 

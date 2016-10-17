@@ -134,6 +134,7 @@ module.exports = BaseAdapter.extend({
   },
 
   /**
+   * @param {string} tableName - The table that have record to be deleted.
    * @param {object} options - The settings for update query.
    *   Options can contains:
    *   - {string} set   : update clause in statement
@@ -181,6 +182,54 @@ module.exports = BaseAdapter.extend({
     }
 
     this._exec(sqlQuery, params, callback);
+  },
+
+  count: function(tableName, options, callback) {
+    var sqlQuery = QueryBuilder.count(tableName, options);
+    if (!sqlQuery) {
+      callback(this.classname + '::count something went wrong. Couldn\'t build query.');
+      return;
+    }
+
+    var params = [];
+    if (options && options.params && _.isArray(options.params)) {
+      params = options.params;
+    }
+
+    this._exec(sqlQuery, params, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::count TODO implement me.');
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
+      callback(null, 1000); // TODO: remove harded code test
+    });
+  },
+
+  countGroupBy: function(tableName, groupCols, options, callback) {
+    var sqlQuery = QueryBuilder.countGroupBy(tableName, options);
+    if (!sqlQuery) {
+      callback(this.classname + '::countGroupBy something went wrong. Couldn\'t build query.');
+      return;
+    }
+
+    var params = [];
+    if (options && options.params && _.isArray(options.params)) {
+      params = options.params;
+    }
+
+    this._exec(sqlQuery, params, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::countGroupBy TODO implement me.');
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
+      callback(null, []); // TODO: remove harded code test
+    });
   },
 
   commit: function(callback) {

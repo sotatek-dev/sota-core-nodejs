@@ -264,11 +264,7 @@ function auth(req, res, callback) {
 }
 
 function logout(req, res, callback) {
-
-}
-
-function register(req, res, callback) {
-
+  callback();
 }
 
 module.exports = BaseClass.singleton({
@@ -287,15 +283,6 @@ module.exports = BaseClass.singleton({
     return {
       action        : func,
       before        : [extendRequest, auth],
-      after         : [],
-      errorHandler  : errorHandler
-    };
-  },
-
-  defaultRegister: function() {
-    return {
-      action        : register,
-      before        : [extendRequest],
       after         : [],
       errorHandler  : errorHandler
     };

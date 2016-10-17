@@ -24,7 +24,7 @@ module.exports = BaseClass.extend({
 
   getChangedColumns : function() {
     var self = this;
-    return _.select(_.keys(self._model.columns), function(col) {
+    return _.filter(_.keys(self._model.columns), function(col) {
       var prop = Utils.convertToCamelCase(col);
       return self._data[prop] !== self._dataOld[prop];
     }).concat(self._model.predefinedCols);
