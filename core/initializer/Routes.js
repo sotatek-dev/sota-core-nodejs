@@ -6,6 +6,37 @@ module.exports = function(app, config) {
       finalHandler,
       acl; // TODO: add ACL
 
+  // Routes from config
+  var routes = config.routes,
+      requestMethod,
+      routesHash,
+      hasCustomizedRegister = false,
+      hasCustomizedLogin = false,
+      hasCustomizedLogout = false;
+
+  for (requestMethod in routes) {
+    routesHash = routes[requestMethod];
+    for (route in routesHash) {
+      handlerDef = routesHash[route];
+      finalHandler = ControllerFactory.createRequestHandler(handlerDef);
+      app[requestMethod.toLowerCase()](route, finalHandler);
+
+      if (requestMethod.toLowerCase() === 'post') {
+        if (route === '/register') {
+          hasCustomizedRegister = true;
+        }
+
+        if (route === '/login') {
+          hasCustomizedLogin = true;
+        }
+
+        if (route === '/logout') {
+          hasCustomizedLogin = true;
+        }
+      }
+    }
+  }
+
   // Auto-generated routes from models
   var models = ModelFactory.getAll();
   for (var i in models) {
@@ -42,37 +73,6 @@ module.exports = function(app, config) {
     handlerDef = BaseController.createDefaultDelete(model, acl);
     finalHandler = ControllerFactory.createRequestHandler(handlerDef);
     app.delete(route, finalHandler);
-  }
-
-  // Routes from config
-  var routes = config.routes,
-      requestMethod,
-      routesHash,
-      hasCustomizedRegister = false,
-      hasCustomizedLogin = false,
-      hasCustomizedLogout = false;
-
-  for (requestMethod in routes) {
-    routesHash = routes[requestMethod];
-    for (route in routesHash) {
-      handlerDef = routesHash[route];
-      finalHandler = ControllerFactory.createRequestHandler(handlerDef);
-      app[requestMethod.toLowerCase()](route, finalHandler);
-
-      if (requestMethod.toLowerCase() === 'post') {
-        if (route === '/register') {
-          hasCustomizedRegister = true;
-        }
-
-        if (route === '/login') {
-          hasCustomizedLogin = true;
-        }
-
-        if (route === '/logout') {
-          hasCustomizedLogin = true;
-        }
-      }
-    }
   }
 
   // If there's no user-defined register function, use built-int default register
