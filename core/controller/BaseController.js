@@ -82,6 +82,11 @@ var BaseController = BaseClass.extend({
           return;
         }
 
+        if (!ret.find) {
+          res.notFound('Content Not Found.');
+          return;
+        }
+
         res.send(ret.find);
       });
     };
