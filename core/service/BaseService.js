@@ -16,6 +16,14 @@ module.exports = BaseClass.extend({
     return this._exSession.getService(classname);
   },
 
+  // commit: function(callback) {
+  //   this._exSession.commit(callback);
+  // },
+
+  // rollback: function(callback) {
+  //   this._exSession.rollback(callback);
+  // },
+
   destroy : function() {
     delete this._exSession;
   },

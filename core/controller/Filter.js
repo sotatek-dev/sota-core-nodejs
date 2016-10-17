@@ -187,8 +187,17 @@ function extendRequest(req, res, callback) {
   req.getService  = function(name) {
     return req.exSession.getService(name);
   };
+
   req.getModel    = function(name, config) {
     return req.exSession.getModel(name, config);
+  };
+
+  req.commit      = function(callback) {
+    return req.exSession.commit(callback);
+  };
+
+  req.rollback    = function(callback) {
+    return req.exSession.rollback(callback);
   };
 
   extendResponse(res, req);

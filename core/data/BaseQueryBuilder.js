@@ -167,6 +167,18 @@ var BaseQueryBuilder = BaseClass.extend({
     return sql;
   },
 
+  existed: function(tableName, options) {
+    var self = this;
+
+    var sql = util.format(
+                'SELECT if(exists(SELECT 1 FROM %s %s), 1, 0) AS `existed`',
+                tableName,
+                self._buildWhereClause(options));
+
+    logger.info(this.classname + '::existed query=[' + sql + ']');
+    return sql;
+  },
+
   _escapeColumn : function(columnName) {
     return '`' + columnName.toLowerCase() + '`';
   },

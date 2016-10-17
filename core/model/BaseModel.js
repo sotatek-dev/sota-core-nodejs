@@ -295,13 +295,19 @@ var BaseModel = BaseClass.extend({
     adapter.countGroupBy(self.tableName, groupCols, options, callback);
   },
 
-  commit: function(callback) {
-    this._exSession.commit(callback);
+  existed: function(options, callback) {
+    var self = this;
+    var adapter = self._getAdapterForSelect();
+    adapter.existed(self.tableName, options, callback);
   },
 
-  rollback: function(callback) {
-    this._exSession.rollback(callback);
-  },
+  // commit: function(callback) {
+  //   this._exSession.commit(callback);
+  // },
+
+  // rollback: function(callback) {
+  //   this._exSession.rollback(callback);
+  // },
 
   singleCommit: function(callback) {
     this._masterAdapter.commit(callback);
