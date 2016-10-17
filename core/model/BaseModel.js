@@ -97,10 +97,6 @@ var BaseModel = BaseClass.extend({
       return false;
     }
 
-    if (!_.isFunction(data)) {
-      return false;
-    }
-
     return data instanceof this.Entity;
   },
 

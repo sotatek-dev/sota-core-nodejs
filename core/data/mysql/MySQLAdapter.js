@@ -160,12 +160,7 @@ module.exports = BaseAdapter.extend({
       return;
     }
 
-    var params = [];
-    if (options && options.params && _.isArray(options.params)) {
-      params = options.params;
-    }
-
-    this._exec(sqlQuery, params, callback);
+    this._exec(sqlQuery, [], callback);
   },
 
   deleteBatch : function(tableName, options, callback) {
