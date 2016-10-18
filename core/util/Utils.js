@@ -49,6 +49,10 @@ Utils.getRandomByProb = function(probs, propName) {
   return result;
 };
 
+Utils.strToTimeInMillis = function(str) {
+  return (new Date(str)).getTime();
+};
+
 Utils.nowInMilis = function() {
   return Date.now();
 };
