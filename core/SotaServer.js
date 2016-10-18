@@ -1,7 +1,6 @@
 http                = require('http');
 express             = require('express');
 morgan              = require('morgan');
-log4js              = require('log4js');
 cookieParser        = require('cookie-parser');
 cookieSession       = require('cookie-session');
 session             = require('express-session');
@@ -16,7 +15,7 @@ passport            = require('passport');
 flash               = require('connect-flash');
 jwt                 = require('jwt-simple');
 
-logger              = log4js.getLogger();
+logger              = require('log4js').getLogger();
 
 Const               = require('./common/Const');
 BaseClass           = require('./common/BaseClass');
@@ -46,6 +45,7 @@ var SotaServer = BaseClass.extend({
     this._loadServices();
     this._setupPassport();
     this._setupRoutes();
+    this._initSocket();
   },
 
   _initApp : function() {
@@ -62,7 +62,7 @@ var SotaServer = BaseClass.extend({
     app.set('jwtBodyField', this._config.jwtBodyField || 'auth_token');
 
     app.set('port', this._config.port);
-    app.set('views', path.join(__dirname, '../views'));
+    app.set('views', this._config.viewDir);
     app.set('view engine', this._config.viewExtension || 'hbs');
     app.engine('html', this._config.viewEngine || require('hbs').__express);
     app.use(morgan('dev'));
@@ -82,15 +82,22 @@ var SotaServer = BaseClass.extend({
   },
 
   _initServer : function() {
-    logger.info('SotaServer::_initServer creating http server. \
-                Listening on port: ' + this._config.port);
-
+    var self = this;
     var server = http.createServer(this.myApp);
-    server.listen(this._config.port);
+
+    server.listen(this._config.port, function() {
+      logger.info('SotaServer::_initServer creating http server. Listening on port: '
+                    + self._config.port);
+    });
     server.on('error', this.onError.bind(this));
     server.on('listening', this.onListening.bind(this));
 
     this.myServer   = server;
+  },
+
+  _initSocket: function() {
+    var init = require('./initializer/Socket');
+    init(this.myApp, this.myServer, this._config.socketDirs);
   },
 
   _loadControllers : function() {
