@@ -2,6 +2,7 @@ var BadRequestError   = require('./BadRequestError');
 var UnauthorizedError = require('./UnauthorizedError');
 var NotFoundError     = require('./NotFoundError');
 var ConflictError     = require('./ConflictError');
+var ForbiddenError    = require('./ForbiddenError');
 
 module.exports = BaseClass.singleton({
   classname: 'ErrorFactory',
@@ -12,6 +13,10 @@ module.exports = BaseClass.singleton({
 
   unauthorized: function(msg, code) {
     return new UnauthorizedError(msg, code);
+  },
+
+  forbidden: function(msg, code) {
+    return new ForbiddenError(msg, code);
   },
 
   notFound: function(msg, code) {
