@@ -1,12 +1,13 @@
-var BaseClass       = require('../common/BaseClass');
-var Filter        = require('./Filter');
+var BaseClass           = require('../common/BaseClass');
+var Filter              = require('./Filter');
 var ControllerFactory   = require('./ControllerFactory');
 
 var BaseController = BaseClass.extend({
   classname : 'BaseController',
 
   initialize: function() {
-    logger.info('BaseController<' + this.classname + '>::initialize');
+    this.logger = require('log4js').getLogger(this.classname);
+    this.logger.debug('BaseController::initialize');
   },
 
   $createNoCheck: function(funcName) {
@@ -115,7 +116,7 @@ var BaseController = BaseClass.extend({
           return;
         }
 
-        res.resourceCreated(ret.add);
+        res.contentCreated(ret.add);
       });
     };
 

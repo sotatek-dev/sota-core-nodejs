@@ -47,7 +47,7 @@ function extendResponse(res, req) {
   res.ok = function(body) {
     res.status(200).send(body || {});
   };
-  res.resourceCreated = function(body) {
+  res.contentCreated = function(body) {
     res.status(201).send(body || {});
   };
   res.noContent = function(body) {

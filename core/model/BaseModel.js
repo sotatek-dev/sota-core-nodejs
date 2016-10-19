@@ -97,7 +97,7 @@ var BaseModel = BaseClass.extend({
       return false;
     }
 
-    return data instanceof this.Entity;
+    return (data instanceof this.Entity);
   },
 
   _select : function(options, callback) {
@@ -220,20 +220,44 @@ var BaseModel = BaseClass.extend({
     if (self._isEntityObject(data)) {
       data.save(callback);
     } else if (_.isArray(data) && data.length > 0) {
-      // if (_.every(data, self._isEntityObject)) {
-      //   self._masterAdapter.insertBatch(data, callback);
-      // } else {
-      //   self._masterAdapter.insertBatch(_.map(data, function(rawData) {
-      //     return self._constructEntity(rawData);
-      //   }), callback);
-      // }
-      callback('Didn\'t support inserting multi entities yet...');
+      var entities = [];
+      if (_.every(data, self._isEntityObject.bind(self))) {
+        entities = data;
+      } else {
+        entities = _.map(data, function(rawData) {
+          return self._constructEntity(rawData);
+        });
+      }
+
+      self._masterAdapter.insertBatch(entities, function(err, ret) {
+        if (err) {
+          callback(err);
+          return;
+        }
+
+        self._reloadAfterBatchInsert(ret, callback);
+      });
     } else if (typeof data === 'object') {
       self._constructEntity(data).save(callback);
     } else {
       var errMsg = self.classname + '::insert invalid data=' + util.inspect(data);
       callback(errMsg);
     }
+  },
+
+  /**
+   * For purpose to return full objects after batch insert
+   * TODO: Change API for other adapter types
+   * Consider about performance
+   */
+  _reloadAfterBatchInsert: function(ret, callback) {
+    var insertId = ret.insertId,
+        count = ret.affectedRows;
+
+    this.select({
+      where: 'id >= ? and id <= ?',
+      params: [insertId, insertId + count - 1],
+    }, callback);
   },
 
   // Add alias

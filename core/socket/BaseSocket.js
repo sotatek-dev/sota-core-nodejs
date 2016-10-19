@@ -1,4 +1,4 @@
-var SocketIO      = require('socket.io');
+var socketIO      = require('socket.io');
 var BaseClass     = require('../common/BaseClass');
 var logger        = require('log4js').getLogger('BaseSocket');
 
@@ -11,14 +11,14 @@ module.exports = BaseClass.extend({
   initialize: function(server, jwtSecret) {
     // logger.debug(this.classname + '::initialize jwtSecret=' + jwtSecret);
     var self = this,
-        io = SocketIO(server);
+        io = socketIO(server);
 
-    io.of(this._namespace)
-      .use(this._authenticate.bind(this))
-      .on('connection', this._onConnection.bind(this));
+    io.of(self._namespace)
+      .use(self._authenticate.bind(self))
+      .on('connection', self._onConnection.bind(self));
 
-    this._io = io;
-    this._jwtSecret = jwtSecret;
+    self._io = io;
+    self._jwtSecret = jwtSecret;
   },
 
   _onConnection: function(socket) {
@@ -43,12 +43,9 @@ module.exports = BaseClass.extend({
   },
 
   _authenticate: function(socket, next) {
-    var err = null,
-        isOK = true,
-        jwtSecret = this._jwtSecret;
+    var jwtSecret = this._jwtSecret;
 
     try {
-      // var token = socket.handshake.query.auth_token;
       var token = socket.request._query.auth_token;
       var jwtPayload = jwt.decode(token, jwtSecret);
       var UserModel = ModelFactory.create('UserModel');
@@ -69,8 +66,6 @@ module.exports = BaseClass.extend({
       });
     } catch (e) {
       logger.error(e);
-      err = e;
-      isOK = false;
       next(e, false);
     }
   },

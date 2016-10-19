@@ -14,8 +14,9 @@ moment              = require('moment');
 passport            = require('passport');
 flash               = require('connect-flash');
 jwt                 = require('jwt-simple');
+log4js              = require('log4js');
 
-logger              = require('log4js').getLogger();
+logger              = log4js.getLogger();
 
 Const               = require('./common/Const');
 BaseClass           = require('./common/BaseClass');

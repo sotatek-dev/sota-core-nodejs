@@ -1,4 +1,3 @@
-var socketioJwt   = require('socketio-jwt');
 var logger        = require('log4js').getLogger('SocketIO');
 var SocketManager = require('../socket/SocketManager');
 

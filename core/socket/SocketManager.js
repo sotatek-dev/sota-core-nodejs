@@ -6,8 +6,8 @@ module.exports = BaseClass.singleton({
 
   _registers: {},
 
-  create: function(socketClass, server, jwtSecret) {
-    var classname = socketClass.classname;
+  create: function(SocketClass, server, jwtSecret) {
+    var classname = SocketClass.classname;
     if (!classname) {
       throw new Error('Invalid socket classname: ' + classname);
     }
@@ -17,7 +17,7 @@ module.exports = BaseClass.singleton({
       return;
     }
 
-    var socket = new socketClass(server, jwtSecret);
+    var socket = new SocketClass(server, jwtSecret);
     this._registers[classname] = socket;
   }
 

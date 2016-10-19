@@ -105,7 +105,7 @@ module.exports = BaseAdapter.extend({
           callback(self.classname + '::insertBatch something went wrong. Couldn\'t build query.');
         }
 
-        this._exec(sqlQuery, [], next);
+        self._exec(sqlQuery, [], next);
       }],
       afterSave : ['insert', function(ret, next) {
         async.forEach(entities, function(entity, _next) {
@@ -221,8 +221,8 @@ module.exports = BaseAdapter.extend({
         return;
       }
 
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::countGroupBy TODO implement me.');
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::countGroupBy TODO implement me.');
+      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
       callback(null, []); // TODO: remove harded code test
     });
   },
