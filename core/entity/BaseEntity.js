@@ -71,10 +71,20 @@ module.exports = BaseClass.extend({
   },
 
   setData: function(data) {
-    var self = this;
+    var self = this,
+        now = Utils.now(),
+        exSession = this._model.getExSession();
+    var userId = exSession ? exSession.getUserId() : 0;
     _.each(this._model.getColumnNames(), function(p) {
+
       if (data[p] === undefined) {
-        return;
+        if (p === 'created_at' || p === 'updated_at') {
+          data[p] = now;
+        } else if (p === 'created_by' || p === 'updated_by') {
+          data[p] = userId;
+        } else {
+          return;
+        }
       }
 
       // property = p.toLowerCase();
@@ -93,7 +103,11 @@ module.exports = BaseClass.extend({
        */
 
       property = Utils.convertToCamelCase(p.toLowerCase());
-      self._data[property]  = data[p];
+      if (typeof data[p] === 'string' && data[p] === '_NULL') {
+        self._data[property] = null;
+      } else {
+        self._data[property] = data[p];
+      }
 
       /*jshint loopfunc: true */
       self.__defineGetter__(property, function(property) {
@@ -158,16 +172,12 @@ module.exports = BaseClass.extend({
     if (self.isNew()) {
       self.createdAt = now;
       self.createdBy = 0;
-      if (self._model.getExSession().getUserId) {
-        self.createdBy = self._model.getExSession().getUserId();
-      }
+      self.createdBy = self._model.getExSession().getUserId();
     }
 
     self.updatedAt = now;
     self.updatedBy = 0;
-    if (self._model.getExSession().getUserId) {
-      self.updatedBy = self._model.getExSession().getUserId();
-    }
+    self.updatedBy = self._model.getExSession().getUserId();
 
     if (callback && typeof callback === 'function') {
       callback();

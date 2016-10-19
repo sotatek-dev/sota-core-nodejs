@@ -183,7 +183,7 @@ function extendRequest(req, res, callback) {
   res.send        = _sendResponse.bind(res, req);
   res.sendError   = _sendError.bind(res, req);
 
-  req.exSession   = new ExSession();
+  req.exSession   = new ExSession(req);
   req.getService  = function(name) {
     return req.exSession.getService(name);
   };

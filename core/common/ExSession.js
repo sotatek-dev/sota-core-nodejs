@@ -5,6 +5,10 @@ module.exports = BaseClass.extend({
 
   _sessionId : '',
 
+  initialize: function(req) {
+    this._req = req;
+  },
+
   getService : function(classname) {
     if (!this._services) {
       this._services = {};
@@ -27,6 +31,17 @@ module.exports = BaseClass.extend({
     }
 
     return this._models[classname];
+  },
+
+  /**
+   * Return id of current current session's user
+   */
+  getUserId: function() {
+    if (!this._req || !this._req.user) {
+      return 0;
+    }
+
+    return this._req.user.id;
   },
 
   commit: function(callback) {

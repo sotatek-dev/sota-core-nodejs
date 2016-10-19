@@ -147,7 +147,7 @@ var BaseModel = BaseClass.extend({
    */
   _updateBatch : function(options, callback) {
     var now = Utils.now();
-    var userId = this._exSession.user ? this._exSession.user.userId : 0;
+    var userId = this._exSession.getUserId();
     options.set += ', created_at=' + now + ', updated_by=' + userId;
     this._masterAdapter.updateBatch(this.tableName, options, callback);
   },
