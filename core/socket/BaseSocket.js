@@ -22,17 +22,18 @@ module.exports = BaseClass.extend({
   },
 
   _onConnection: function(socket) {
-    logger.debug(util.format('[%s]: user [%s](id:%d) connected!',
-                  this._namespace, socket.user.username, socket.user.id));
+    var self = this;
+    logger.debug(util.format('[%s]: user [%s](id:%d) connected! (socketId: %s)',
+                  self._namespace, socket.user.username, socket.user.id, socket.id));
 
     // Default behavior
-    socket.on('disconnect', this._onDisconnect.bind(this, socket));
+    socket.on('disconnect', self._onDisconnect.bind(self, socket));
 
     // Customized behavior
-    if (this._events) {
+    if (self._events) {
       var e;
-      for (e in this._events) {
-        socket.on(e, this[this._events[e]].bind(this, socket));
+      for (e in self._events) {
+        socket.on(e, self[self._events[e]].bind(self, socket));
       }
     }
   },
@@ -49,9 +50,7 @@ module.exports = BaseClass.extend({
       var token = socket.request._query.auth_token;
       var jwtPayload = jwt.decode(token, jwtSecret);
       var UserModel = ModelFactory.create('UserModel');
-      UserModel.findOne({
-        id: jwtPayload.userId
-      }, function(err, user) {
+      UserModel.findOne(jwtPayload.userId, function(err, user) {
         if (err) {
           return next(err, false);
         }
