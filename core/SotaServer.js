@@ -44,6 +44,7 @@ var SotaServer = BaseClass.extend({
     this._loadControllers();
     this._loadModels();
     this._loadServices();
+    this._setupCheckit();
     this._setupPassport();
     this._setupRoutes();
     this._initSocket();
@@ -114,6 +115,11 @@ var SotaServer = BaseClass.extend({
   _loadServices : function() {
     var init = require('./initializer/Service');
     init(this.myApp, ServiceFactory, this._config.serviceDirs);
+  },
+
+  _setupCheckit: function() {
+    var init = require('./initializer/Checkit');
+    init(Checkit, this._config.checkitDirs);
   },
 
   _setupPassport : function() {
