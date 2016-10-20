@@ -15,8 +15,8 @@ passport            = require('passport');
 flash               = require('connect-flash');
 jwt                 = require('jwt-simple');
 log4js              = require('log4js');
-
 logger              = log4js.getLogger();
+Checkit             = require('checkit');
 
 Const               = require('./common/Const');
 BaseClass           = require('./common/BaseClass');
