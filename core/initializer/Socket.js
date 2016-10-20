@@ -1,5 +1,6 @@
 var logger        = require('log4js').getLogger('SocketIO');
 var SocketManager = require('../socket/SocketManager');
+var logger        = log4js.getLogger('Initializer');
 
 module.exports = function(app, server, dirs) {
   logger.info('Start initializing SocketIO...');

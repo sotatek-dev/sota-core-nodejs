@@ -1,5 +1,6 @@
 var BaseClass         = require('../common/BaseClass');
 var BaseEntity        = require('../entity/BaseEntity');
+var logger            = log4js.getLogger('BaseQueryBuilder');
 
 /**
  * Based on MySQL syntax.

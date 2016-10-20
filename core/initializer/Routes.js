@@ -1,4 +1,5 @@
 var Filter = require('../controller/Filter');
+var logger = log4js.getLogger('Initializer');
 
 module.exports = function(app, config) {
   var route,

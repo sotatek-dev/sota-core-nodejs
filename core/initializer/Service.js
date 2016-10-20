@@ -1,3 +1,5 @@
+var logger = log4js.getLogger('Initializer');
+
 module.exports = function(app, factory, serviceDirs) {
   _.each(serviceDirs, function(serviceDir) {
     logger.info('Initializer::Service serviceDir=' + serviceDir);

@@ -1,3 +1,5 @@
+var logger = log4js.getLogger('Initializer');
+
 module.exports = function(app, factory, modelDirs) {
   _.each(modelDirs, function(modelDir) {
     logger.info('Initializer::Model modelDir=' + modelDir);

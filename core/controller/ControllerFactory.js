@@ -1,18 +1,22 @@
 var BaseClass = require('../common/BaseClass');
+var logger    = require('log4js').getLogger('ControllerFactory');
 
 var ControllerFactory = BaseClass.singleton({
   classname : 'ControllerFactory',
   _registers : {},
 
   register : function(c) {
-    logger.info('ControllerFactory::register ' + c.classname);
     if (c.classname) {
+      if (this._registers[c.classname]) {
+        logger.warn('Controller is registered multiple times, will be overried: ' + c.classname);
+      }
       this._registers[c.classname] = c;
     }
+    logger.info('registered: ' + c.classname);
   },
 
   get : function(classname) {
-    logger.info('ControllerFactory::get ' + classname);
+    // logger.info('get: ' + classname);
     var c = new this._registers[classname]();
     return c;
   },

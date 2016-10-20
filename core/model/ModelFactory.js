@@ -1,4 +1,5 @@
 var BaseClass = require('../common/BaseClass');
+var logger = log4js.getLogger('ModelFactory');
 
 var ModelFactory = BaseClass.singleton({
   classname : 'ModelFactory',

@@ -1,6 +1,7 @@
 var BaseClass           = require('../common/BaseClass');
 var BaseEntity          = require('../entity/BaseEntity');
 var AdapterFactory      = require('../data/AdapterFactory');
+var logger              = log4js.getLogger('BaseModel');
 
 var BaseModel = BaseClass.extend({
   classname   : 'BaseModel',

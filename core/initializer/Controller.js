@@ -1,6 +1,8 @@
+var logger = log4js.getLogger('Initializer');
+
 module.exports = function(app, factory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {
-    logger.info('SotaServer::_loadControllers controllerDir=' + controllerDir);
+    logger.info('Load controllers dir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {
       throw new Error('Invalid controller directory: ' + controllerDir);
     }

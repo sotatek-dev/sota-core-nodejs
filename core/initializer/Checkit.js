@@ -1,3 +1,5 @@
+var logger = log4js.getLogger('Initializer');
+
 module.exports = function(Checkit, dirs) {
 
   _.forEach(dirs, function(dir) {
@@ -20,6 +22,8 @@ module.exports = function(Checkit, dirs) {
       var module = require(file);
       name = path.basename(file, '.js');
       Checkit.Validator.prototype[name] = module;
+
+      logger.info('initialized customized validator: ' + name);
     });
 
   });

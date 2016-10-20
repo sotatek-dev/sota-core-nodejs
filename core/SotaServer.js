@@ -15,8 +15,10 @@ passport            = require('passport');
 flash               = require('connect-flash');
 jwt                 = require('jwt-simple');
 log4js              = require('log4js');
-logger              = log4js.getLogger();
 Checkit             = require('checkit');
+
+// TODO: remove global scope of logger
+logger              = log4js.getLogger('SotaServer');
 
 Const               = require('./common/Const');
 BaseClass           = require('./common/BaseClass');
@@ -36,7 +38,7 @@ var SotaServer = BaseClass.extend({
   classname : 'SotaServer',
 
   initialize : function(config) {
-    logger.info('SotaServer::initialize config=' + util.inspect(config));
+    // logger.info('SotaServer::initialize config=' + util.inspect(config));
     this._config = config;
 
     this._initApp();

@@ -1,6 +1,6 @@
 var LocalStrategy   = require('passport-local').Strategy;
 var JwtStrategy     = require('passport-jwt').Strategy;
-// var ExtractJwt      = require('passport-jwt').ExtractJwt;
+var logger          = log4js.getLogger('Initializer');
 
 module.exports = function(app, passport) {
 

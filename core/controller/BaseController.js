@@ -1,6 +1,7 @@
 var BaseClass           = require('../common/BaseClass');
 var Filter              = require('./Filter');
 var ControllerFactory   = require('./ControllerFactory');
+var logger              = require('log4js').getLogger('BaseController');
 
 var BaseController = BaseClass.extend({
   classname : 'BaseController',
