@@ -70,7 +70,7 @@ var SotaServer = BaseClass.extend({
     app.use(cookieParser());
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(session(sessionOpts));
-    app.use(express.static(path.join(__dirname, '../public')));
+    app.use(express.static(this._config.publicDir));
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(flash());
