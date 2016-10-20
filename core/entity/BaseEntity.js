@@ -1,4 +1,5 @@
 var BaseClass = require('../common/BaseClass');
+var logger    = require('log4js').getLogger('BaseEntity');
 
 module.exports = BaseClass.extend({
   classname : 'BaseEntity',
@@ -120,6 +121,29 @@ module.exports = BaseClass.extend({
     });
 
     return this;
+  },
+
+  setExtra: function(data) {
+    var self = this;
+
+    if (_.intersection(this._model.getAttributeNames(), _.keys(data)).length > 0) {
+      logger.error('Cannot set extra data to mapped column. data=' + util.inspect(data));
+      return;
+    }
+
+    _.forEach(_.keys(data), function(property) {
+      self._data[property] = data[property];
+
+      /*jshint loopfunc: true */
+      self.__defineGetter__(property, function(property) {
+        return self._data[property];
+      }.bind(self, property));
+      /*jshint loopfunc: true */
+      self.__defineSetter__(property, function(property, value) {
+        self._data[property] = value;
+      }.bind(self, property));
+
+    });
   },
 
   _save : function(callback) {
