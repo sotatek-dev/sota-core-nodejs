@@ -163,7 +163,18 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::count query=[' + sql + ']');
+    logger.info(this.classname + '::countGroupBy query=[' + sql + ']');
+    return sql;
+  },
+
+  sumGroupBy: function(tableName, column, options) {
+    var self = this;
+
+    var sql =   'SELECT ' + options.groupBy + ', sum(' + column + ') AS `sum` FROM ';
+    sql += tableName;
+    sql += self._buildWhereClause(options);
+
+    logger.info(this.classname + '::sumGroupBy query=[' + sql + ']');
     return sql;
   },
 
@@ -230,6 +241,10 @@ var BaseQueryBuilder = BaseClass.extend({
           return self._escapeColumn(col) + '=?';
         }).join(' AND ');
       }
+    }
+
+    if (options.groupBy && typeof options.groupBy === 'string') {
+      clause += (' GROUP BY ' + options.groupBy);
     }
 
     if (options.orderBy && typeof options.orderBy === 'string') {

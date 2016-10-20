@@ -315,6 +315,12 @@ var BaseModel = BaseClass.extend({
     adapter.countGroupBy(self.tableName, groupCols, options, callback);
   },
 
+  sumGroupBy: function(column, options, callback) {
+    var self = this;
+    var adapter = self._getAdapterForSelect();
+    adapter.sumGroupBy(self.tableName, column, options, callback);
+  },
+
   existed: function(options, callback) {
     var self = this;
     var adapter = self._getAdapterForSelect();

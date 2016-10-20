@@ -227,6 +227,28 @@ module.exports = BaseAdapter.extend({
     });
   },
 
+  sumGroupBy: function(tableName, column, options, callback) {
+    var sqlQuery = QueryBuilder.sumGroupBy(tableName, column, options);
+    if (!sqlQuery) {
+      callback(this.classname + '::sumGroupBy something went wrong. Couldn\'t build query.');
+      return;
+    }
+
+    var params = [];
+    if (options && options.params && _.isArray(options.params)) {
+      params = options.params;
+    }
+
+    this._exec(sqlQuery, params, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      callback(null, ret);
+    });
+  },
+
   existed: function(tableName, options, callback) {
     var sqlQuery = QueryBuilder.existed(tableName, options);
     if (!sqlQuery) {
