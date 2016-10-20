@@ -71,6 +71,16 @@ function extendResponse(res, req) {
       res.status(404).render('404');
     }
   };
+
+  var end = res.end;
+  res.end = function(data, encoding) {
+    res.end = end;
+
+    req.exSession.destroy();
+    delete req.exSession;
+
+    res.end(data, encoding);
+  }
 }
 
 function _purifyEntity(data) {
@@ -236,7 +246,7 @@ function login(req, res, callback) {
       user = user.toJSON();
     }
 
-    var expires = moment().add('days', 7).valueOf(),
+    var expires = moment().add(7, 'days').valueOf(),
         secret = global.sotaServer.app.myApp.get('jwtSecret');
     user.token = jwt.encode({
       userId: user.id,
