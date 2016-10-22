@@ -4,9 +4,6 @@ SotaServer      = require('./core/SotaServer');
 
 (function boot() {
   logger.info('Start booting application...');
-  if (!global.sotaServer) {
-    global.sotaServer = {};
-  }
 
   var rootDir = path.join(path.resolve('.'));
   logger.info('[BOOTING] Root dir: ' + rootDir);
@@ -29,8 +26,6 @@ SotaServer      = require('./core/SotaServer');
     serviceDirs     : serviceDirs,
     routes          : Routes,
   });
-
-  global.sotaServer.app = app;
 
 })();
 

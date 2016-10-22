@@ -3,6 +3,7 @@ var UnauthorizedError = require('./UnauthorizedError');
 var NotFoundError     = require('./NotFoundError');
 var ConflictError     = require('./ConflictError');
 var ForbiddenError    = require('./ForbiddenError');
+var InternalError     = require('./InternalError');
 
 module.exports = BaseClass.singleton({
   classname: 'ErrorFactory',
@@ -25,6 +26,10 @@ module.exports = BaseClass.singleton({
 
   conflict: function(msg, code) {
     return new ConflictError(msg, code);
+  },
+
+  internal: function(msg, code) {
+    return new InternalError(msg, code);
   },
 
 });

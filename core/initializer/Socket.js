@@ -20,7 +20,7 @@ module.exports = function(app, server, dirs) {
 
     _.forEach(files, function(file) {
       if (!FileUtils.isFileSync(file)) {
-        throw new Error('Invalid service file: ' + file);
+        throw new Error('Invalid socket file: ' + file);
       }
 
       var module = require(file);

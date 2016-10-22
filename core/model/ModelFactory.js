@@ -6,6 +6,18 @@ var ModelFactory = BaseClass.singleton({
 
   _registers : {},
 
+  setAdaptersConfig: function(adaptersConfig) {
+    this._adaptersConfig = adaptersConfig;
+  },
+
+  getAdapterConfig: function(key) {
+    var config = this._adaptersConfig[key];
+    if (!config) {
+      throw new Error('Cannot find adapter config for key: ' + key);
+    }
+    return config;
+  },
+
   register : function(m) {
     logger.info(this.classname + '::register ' + m.classname);
 

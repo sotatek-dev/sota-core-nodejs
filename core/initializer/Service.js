@@ -1,6 +1,6 @@
 var logger = log4js.getLogger('Initializer');
 
-module.exports = function(app, factory, serviceDirs) {
+module.exports = function(app, ServiceFactory, serviceDirs) {
   _.each(serviceDirs, function(serviceDir) {
     logger.info('Initializer::Service serviceDir=' + serviceDir);
     if (!FileUtils.isDirectorySync(serviceDir)) {
@@ -25,7 +25,7 @@ module.exports = function(app, factory, serviceDirs) {
       }
 
       var module = require(file);
-      factory.register(module);
+      ServiceFactory.register(module);
     });
   });
 };

@@ -1,6 +1,6 @@
 var logger = log4js.getLogger('Initializer');
 
-module.exports = function(app, factory, controllerDirs) {
+module.exports = function(app, ControllerFactory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {
     logger.info('Load controllers dir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {
@@ -19,7 +19,7 @@ module.exports = function(app, factory, controllerDirs) {
       }
 
       var module = require(file);
-      factory.register(module);
+      ControllerFactory.register(module);
     });
   });
 };

@@ -29,13 +29,12 @@ var BaseModel = BaseClass.extend({
     this._exSession       = exSession;
     this._useMasterSelect = false;
 
-    var app,
-        masterConfig,
+    var masterConfig,
         slaveConfig;
+
     if (!dsConfig) {
-      app           = global.sotaServer.app;
-      masterConfig  = app.getAdapterConfig(this.dsConfig.write);
-      slaveConfig   = app.getAdapterConfig(this.dsConfig.read);
+      masterConfig  = ModelFactory.getAdapterConfig(this.dsConfig.write);
+      slaveConfig   = ModelFactory.getAdapterConfig(this.dsConfig.read);
     } else {
       masterConfig  = dsConfig[this.dsConfig.write];
       slaveConfig   = dsConfig[this.dsConfig.read];
@@ -154,6 +153,15 @@ var BaseModel = BaseClass.extend({
   },
 
   /**
+   * Same specs with find, but will try to get data from cache first instead of db
+   * Currently it's just an alias of find
+   * TODO: implement cache mechanism
+   */
+  findCache: function(options, callback) {
+    this.find(options, callback);
+  },
+
+  /**
    * @param {object} options - The settings for update query.
    *   Options can contains:
    *   - {string} where   : where clause in statment
@@ -163,6 +171,15 @@ var BaseModel = BaseClass.extend({
    */
   find : function(options, callback) {
     this._select(options, callback);
+  },
+
+  /**
+   * Same specs with findOne, but will try to get data from cache first instead of db
+   * Currently it's just an alias of findOne
+   * TODO: implement cache mechanism
+   */
+  findCacheOne: function(id, callback) {
+    this.findOne(id, callback);
   },
 
   /**

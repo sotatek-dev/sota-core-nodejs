@@ -1,16 +1,19 @@
+var util            = require('util');
 var LocalStrategy   = require('passport-local').Strategy;
 var JwtStrategy     = require('passport-jwt').Strategy;
-var logger          = log4js.getLogger('Initializer');
+var logger          = require('log4js').getLogger('Initializer');
 
 module.exports = function(app, passport) {
 
   // Serialize user for the session: from entity to id
   passport.serializeUser(function(user, done) {
+    logger.debug('Passport::serializeUser: ' + util.inspect(user));
     done(null, user.id);
   });
 
   // Deserialize user for the session: id to entity
   passport.deserializeUser(function(id, done) {
+    logger.debug('Passport::deserializeUser: ' + id);
     var UserModel = ModelFactory.create('UserModel');
     UserModel.findById(id, function(err, user) {
       if (err) {

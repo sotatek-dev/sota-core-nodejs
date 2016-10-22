@@ -1,5 +1,5 @@
-var BaseClass = require('../common/BaseClass');
-var logger    = require('log4js').getLogger('ControllerFactory');
+var logger        = require('log4js').getLogger('ControllerFactory');
+var BaseClass     = require('../common/BaseClass');
 
 var ControllerFactory = BaseClass.singleton({
   classname : 'ControllerFactory',
@@ -15,7 +15,11 @@ var ControllerFactory = BaseClass.singleton({
     logger.info('registered: ' + c.classname);
   },
 
-  get : function(classname) {
+  get: function(classname) {
+    return this._registers[classname];
+  },
+
+  create : function(classname) {
     // logger.info('get: ' + classname);
     var c = new this._registers[classname]();
     return c;
@@ -31,7 +35,7 @@ var ControllerFactory = BaseClass.singleton({
     //logger.info('ControllerFactory::getBaseHandler ' + classname + '.' + funcName);
     var self = this;
     return function(req, res, cb) {
-      var o = self.get(classname);
+      var o = self.create(classname);
       o[funcName](req, res, cb);
     };
   },
@@ -68,10 +72,11 @@ var ControllerFactory = BaseClass.singleton({
 
       // The simple case, a route mapped to a single function
       // Just use this function as handler
-      return handlerDef;
+      // return this.wrapHandler(handlerDef, [sotaDefault], [], errorHandler);
+      throw new Error('Invalid handler definition: ' + handlerDef);
     }
 
-    // Case that handler is defined by Filter
+    // Case that handler is defined in an object
     // Firstly the main action must be defined and is a function
     if (typeof handlerDef.action !== 'function') {
       throw new Error('Invalid main handler: ' + handlerDef.action);

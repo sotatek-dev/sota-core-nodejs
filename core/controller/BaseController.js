@@ -1,29 +1,49 @@
 var BaseClass           = require('../common/BaseClass');
-var Filter              = require('./Filter');
 var ControllerFactory   = require('./ControllerFactory');
 var logger              = require('log4js').getLogger('BaseController');
+var errorHandler        = require('../policy/errorHandler');
 
 var BaseController = BaseClass.extend({
   classname : 'BaseController',
 
   initialize: function() {
-    this.logger = require('log4js').getLogger(this.classname);
-    this.logger.debug('BaseController::initialize');
+    logger.debug('BaseController::initialize');
   },
 
-  $createNoCheck: function(funcName) {
-    var base = ControllerFactory.getBaseHandler(this.classname, funcName);
-    return Filter.createNoCheck(base);
-  },
+  $handleBy: function(func, beforePolicies, afterPolicies) {
+    if (!beforePolicies) {
+      beforePolicies = [];
+    }
 
-  $createAuth: function(funcName) {
-    var base = ControllerFactory.getBaseHandler(this.classname, funcName);
-    return Filter.createAuth(base);
-  },
+    if (!afterPolicies) {
+      afterPolicies = [];
+    }
 
-  $createLoginBasic: function(funcName) {
-    var base = ControllerFactory.getBaseHandler(this.classname, funcName);
-    return Filter.createLoginBasic(base);
+    if (!_.includes(beforePolicies, 'sotaDefault')) {
+      beforePolicies = ['sotaDefault'].concat(beforePolicies);
+    };
+
+    var before = _.map(beforePolicies, function(policy) {
+      return PolicyManager.get(policy);
+    });
+
+    var after = _.map(afterPolicies, function(policy) {
+      return PolicyManager.get(policy);
+    });
+
+    var mainHandler;
+    if (typeof func === 'function') {
+      mainHandler = func;
+    } else if (typeof func === 'string') {
+      mainHandler = ControllerFactory.getBaseHandler(this.classname, func);
+    }
+
+    return ControllerFactory.createRequestHandler({
+      action        : mainHandler,
+      before        : before,
+      after         : after,
+      errorHandler  : errorHandler
+    });
   },
 
   /**
@@ -55,7 +75,7 @@ var BaseController = BaseClass.extend({
       });
     };
 
-    return Filter.createNoCheck(baseHandler);
+    return this.handleBy(baseHandler);
 
   },
 
@@ -93,7 +113,7 @@ var BaseController = BaseClass.extend({
       });
     };
 
-    return Filter.createNoCheck(baseHandler);
+    return this.handleBy(baseHandler);
 
   },
 
@@ -121,7 +141,7 @@ var BaseController = BaseClass.extend({
       });
     };
 
-    return Filter.createNoCheck(baseHandler);
+    return this.handleBy(baseHandler);
 
   },
 
@@ -149,7 +169,7 @@ var BaseController = BaseClass.extend({
       });
     };
 
-    return Filter.createNoCheck(baseHandler);
+    return this.handleBy(baseHandler);
 
   },
 
@@ -181,7 +201,7 @@ var BaseController = BaseClass.extend({
       });
     };
 
-    return Filter.createNoCheck(baseHandler);
+    return this.handleBy(baseHandler);
 
   },
 

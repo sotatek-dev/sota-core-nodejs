@@ -31,6 +31,7 @@ BaseModel           = require('./model/BaseModel');
 BaseService         = require('./service/BaseService');
 ErrorFactory        = require('./error/ErrorFactory');
 ControllerFactory   = require('./controller/ControllerFactory');
+PolicyManager       = require('./policy/PolicyManager');
 ModelFactory        = require('./model/ModelFactory');
 ServiceFactory      = require('./service/ServiceFactory');
 
@@ -43,6 +44,8 @@ var SotaServer = BaseClass.extend({
 
     this._initApp();
     this._initServer();
+    this._extendConstants();
+    this._initPolicies();
     this._loadControllers();
     this._loadModels();
     this._loadServices();
@@ -64,6 +67,7 @@ var SotaServer = BaseClass.extend({
 
     app.set('jwtSecret', this._config.secret);
     app.set('jwtBodyField', this._config.jwtBodyField || 'auth_token');
+    app.set('rootDir', this._config.rootDir || path.join(path.resolve('.')));
 
     app.set('port', this._config.port);
     app.set('views', this._config.viewDir);
@@ -86,22 +90,30 @@ var SotaServer = BaseClass.extend({
   },
 
   _initServer : function() {
+    this.myServer = http.createServer(this.myApp);
+  },
+
+  startServer: function() {
     var self = this;
-    var server = http.createServer(this.myApp);
-
-    server.listen(this._config.port, function() {
-      logger.info('SotaServer::_initServer creating http server. Listening on port: '
-                    + self._config.port);
+    this.myServer.listen(this._config.port, function() {
+      logger.info('Creating http server. Listening on port: ' + self._config.port);
     });
-    server.on('error', this.onError.bind(this));
-    server.on('listening', this.onListening.bind(this));
+    this.myServer.on('error', this.onError.bind(this));
+    this.myServer.on('listening', this.onListening.bind(this));
+  },
 
-    this.myServer   = server;
+  _extendConstants: function() {
+    Const = _.merge({}, Const, this._config.const);
   },
 
   _initSocket: function() {
     var init = require('./initializer/Socket');
     init(this.myApp, this.myServer, this._config.socketDirs);
+  },
+
+  _initPolicies: function() {
+    var init = require('./initializer/Policy');
+    init(this.myApp, PolicyManager, this._config.policyDirs);
   },
 
   _loadControllers : function() {
@@ -111,7 +123,7 @@ var SotaServer = BaseClass.extend({
 
   _loadModels : function() {
     var init = require('./initializer/Model');
-    init(this.myApp, ModelFactory, this._config.modelDirs);
+    init(this.myApp, ModelFactory, this._config.adapters, this._config.modelDirs);
   },
 
   _loadServices : function() {
@@ -125,11 +137,13 @@ var SotaServer = BaseClass.extend({
   },
 
   _setupPassport : function() {
-    require('./initializer/Passport')(this.myApp, passport);
+    var init = require('./initializer/Passport');
+    init(this.myApp, passport);
   },
 
   _setupRoutes : function() {
-    require('./initializer/Routes')(this.myApp, this._config);
+    var init = require('./initializer/Routes');
+    init(this.myApp, ControllerFactory, this._config);
   },
 
   getAdapterConfig : function(key) {

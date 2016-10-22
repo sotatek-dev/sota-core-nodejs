@@ -198,9 +198,19 @@ module.exports = BaseAdapter.extend({
         return;
       }
 
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::count TODO implement me.');
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
-      callback(null, 1000); // TODO: remove harded code test
+      if (!ret.length) {
+        logger.error('Something went wrong. Count query doesn\'t return any row: ' + sqlQuery);
+        callback(ErrorFactory.internal());
+        return;
+      }
+
+      if (typeof ret[0].count !== 'number') {
+        logger.error('Something went wrong. Count query doesn\'t return number: ' + sqlQuery);
+        callback(ErrorFactory.internal());
+        return;
+      }
+
+      callback(null, ret[0].count);
     });
   },
 
@@ -222,9 +232,7 @@ module.exports = BaseAdapter.extend({
         return;
       }
 
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>> MySQLAdapter::countGroupBy TODO implement me.');
-      logger.warn('>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ret=' + JSON.stringify(ret));
-      callback(null, []); // TODO: remove harded code test
+      callback(null, ret);
     });
   },
 

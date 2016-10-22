@@ -1,6 +1,11 @@
 var logger = log4js.getLogger('Initializer');
 
-module.exports = function(app, factory, modelDirs) {
+module.exports = function(app, ModelFactory, adaptersConfig, modelDirs) {
+
+  // Store config of provided adapters/connections
+  ModelFactory.setAdaptersConfig(adaptersConfig);
+
+  // Load
   _.each(modelDirs, function(modelDir) {
     logger.info('Initializer::Model modelDir=' + modelDir);
     if (!FileUtils.isDirectorySync(modelDir)) {
@@ -26,7 +31,7 @@ module.exports = function(app, factory, modelDirs) {
       }
 
       var module = require(file);
-      factory.register(module);
+      ModelFactory.register(module);
     });
   });
 };
