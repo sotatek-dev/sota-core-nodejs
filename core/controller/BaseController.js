@@ -111,7 +111,7 @@ var BaseController = BaseClass.extend({
           return;
         }
 
-        res.send(ret.find);
+        res.ok(ret.find);
       });
     };
 
@@ -167,7 +167,7 @@ var BaseController = BaseClass.extend({
           return;
         }
 
-        res.send(ret.update);
+        res.ok(ret.update);
       });
     };
 

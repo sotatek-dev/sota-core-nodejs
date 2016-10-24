@@ -4,6 +4,9 @@ var logger    = require('log4js').getLogger('BaseEntity');
 module.exports = BaseClass.extend({
   classname : 'BaseEntity',
 
+  // These columns defined here will be omitted from result of toJSON() method
+  _excludedCols: [],
+
   initialize : function(model, data) {
     // logger.info(this.classname + '::initialize data=' + util.inspect(data));
     this._model         = model;
@@ -29,13 +32,34 @@ module.exports = BaseClass.extend({
       var prop = Utils.convertToCamelCase(col);
       return self._data[prop] !== self._dataOld[prop];
     }).concat(self._model.predefinedCols);
+    return self;
   },
 
   getColumnValues : function() {
     return _.values(this._data);
   },
 
+  excludeFromResult: function(columnName) {
+    if (!_.includes(this._excludedCols, columnName)) {
+      this._excludedCols.push(columnName);
+    }
+    return this;
+  },
+
+  includeToResult: function(columnName) {
+    if (_.includes(this._excludedCols, columnName)) {
+      _.remove(this._excludedCols, function(e) {
+        return e === columnName;
+      });
+    }
+    return this;
+  },
+
   toJSON: function() {
+    if (this._excludedCols.length > 0) {
+      return _.omit(this._data, this._excludedCols);
+    }
+
     return this._data;
   },
 
@@ -245,7 +269,7 @@ module.exports = BaseClass.extend({
   },
 
   $extractDataFromEntities : function(entities) {
-    return _.pluck(entities, '_data');
+    return _.map(entities, '_data');
   },
 
 });
