@@ -6,6 +6,7 @@ var async       = require('async');
 var Types       = require('../../node_modules/mysql/lib/protocol/constants/types');
 
 var BaseClass   = require('../../common/BaseClass');
+var BaseModel   = require('../../model/BaseModel');
 
 module.exports = BaseClass.extend({
   classname: 'MySQLSchemaGetter',
@@ -53,6 +54,10 @@ module.exports = BaseClass.extend({
 
       var def = {};
       _.forEach(fields, function(field) {
+        if (field.name === 'id' || _.includes(BaseModel.predefinedCols, field.name)) {
+          return;
+        }
+
         def[field.name] = {
           type: self._getType(field.type),
           length: field.length,

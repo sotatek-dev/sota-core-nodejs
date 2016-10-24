@@ -10,6 +10,10 @@ var ModelFactory = BaseClass.singleton({
     this._adaptersConfig = adaptersConfig;
   },
 
+  setModelSchema: function(modelSchema) {
+    this._modelSchema = modelSchema;
+  },
+
   getAdapterConfig: function(key) {
     var config = this._adaptersConfig[key];
     if (!config) {
@@ -30,6 +34,10 @@ var ModelFactory = BaseClass.singleton({
       logger.error('No table name, invalid model: ' + m.classname);
       return;
     }
+
+    // Inject columns property from auto-generated object into model class
+    var columns = this._modelSchema[m.classname];
+    m.prototype.columns = m.columns = columns;
 
     this._registers[m.classname] = m;
   },

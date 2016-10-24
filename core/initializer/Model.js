@@ -1,9 +1,10 @@
 var logger = log4js.getLogger('Initializer');
 
-module.exports = function(app, ModelFactory, adaptersConfig, modelDirs) {
+module.exports = function(app, ModelFactory, adaptersConfig, modelSchema, modelDirs) {
 
   // Store config of provided adapters/connections
   ModelFactory.setAdaptersConfig(adaptersConfig);
+  ModelFactory.setModelSchema(modelSchema);
 
   // Load
   _.each(modelDirs, function(modelDir) {

@@ -123,7 +123,12 @@ var SotaServer = BaseClass.extend({
 
   _loadModels : function() {
     var init = require('./initializer/Model');
-    init(this.myApp, ModelFactory, this._config.adapters, this._config.modelDirs);
+    init(this.myApp,
+      ModelFactory,
+      this._config.adapters,
+      this._config.modelSchema,
+      this._config.modelDirs
+    );
   },
 
   _loadServices : function() {

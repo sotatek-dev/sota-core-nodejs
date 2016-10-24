@@ -6,14 +6,6 @@ module.exports = BaseModel.extend({
 
   $tableName: 'user',
   $Entity: UserEntity,
-  $columns: {
-    'username'   : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
-    'first_name'  : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
-    'last_name'   : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
-    'last_name'   : {type: 'string', size: 128, version: 1, active: true, isNotNull: false},
-    'email'       : {type: 'string', size: 128, version: 1, active: true, isNotNull: false},
-    'password'    : {type: 'number', size: 10 , version: 1, active: true, isNotNull: false},
-  },
 
   $indexes: {
     'username': ['username'],
