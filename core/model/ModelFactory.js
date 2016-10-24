@@ -51,9 +51,12 @@ var ModelFactory = BaseClass.singleton({
     return _.keys(this._registers);
   },
 
-  create: function(classname, exSession, dsConfig) {
+  create: function(classname, exSession) {
     if (this._registers[classname]) {
-      return new this._registers[classname](exSession, dsConfig);
+      var modelClass = this._registers[classname];
+      var masterConfig = this._adaptersConfig[modelClass.dsConfig.write],
+          slaveConfig = this._adaptersConfig[modelClass.dsConfig.read];
+      return new this._registers[classname](exSession, masterConfig, slaveConfig);
     }
   },
 

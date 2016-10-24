@@ -142,8 +142,8 @@ function extendRequest(req, res) {
     return req.exSession.getService(name);
   };
 
-  req.getModel    = function(name, config) {
-    return req.exSession.getModel(name, config);
+  req.getModel    = function(name) {
+    return req.exSession.getModel(name);
   };
 
   req.commit      = function(callback) {

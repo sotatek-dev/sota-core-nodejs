@@ -215,7 +215,7 @@ module.exports = BaseAdapter.extend({
   },
 
   countGroupBy: function(tableName, groupCols, options, callback) {
-    var sqlQuery = QueryBuilder.countGroupBy(tableName, options);
+    var sqlQuery = QueryBuilder.countGroupBy(tableName, groupCols, options);
     if (!sqlQuery) {
       callback(this.classname + '::countGroupBy something went wrong. Couldn\'t build query.');
       return;

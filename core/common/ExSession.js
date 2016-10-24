@@ -21,13 +21,13 @@ module.exports = BaseClass.extend({
     return this._services[classname];
   },
 
-  getModel : function(classname, dsConfig) {
+  getModel : function(classname) {
     if (!this._models) {
       this._models = {};
     }
 
     if (!this._models[classname]) {
-      this._models[classname] = ModelFactory.create(classname, this, dsConfig);
+      this._models[classname] = ModelFactory.create(classname, this);
     }
 
     return this._models[classname];

@@ -23,22 +23,18 @@ var BaseModel = BaseClass.extend({
     return this.tableName + 's';
   },
 
-  initialize : function(exSession, dsConfig) {
-    logger.info('BaseModel<' + this.classname + '>::initialize exSession=' +
-                  exSession + ', dsConfig=' + dsConfig);
+  initialize : function(exSession, masterConfig, slaveConfig) {
+    logger.info('BaseModel<' + this.classname + '>::initialize exSession=' + exSession);
+    if (!masterConfig) {
+      throw new Error('Invalid config for master adapter');
+    }
+
+    if (!slaveConfig) {
+      throw new Error('Invalid config for slave adapter');
+    }
+
     this._exSession       = exSession;
     this._useMasterSelect = false;
-
-    var masterConfig,
-        slaveConfig;
-
-    if (!dsConfig) {
-      masterConfig  = ModelFactory.getAdapterConfig(this.dsConfig.write);
-      slaveConfig   = ModelFactory.getAdapterConfig(this.dsConfig.read);
-    } else {
-      masterConfig  = dsConfig[this.dsConfig.write];
-      slaveConfig   = dsConfig[this.dsConfig.read];
-    }
 
     this._masterAdapter   = AdapterFactory.create(
       this._exSession,
@@ -90,6 +86,35 @@ var BaseModel = BaseClass.extend({
   _constructEntity : function(data) {
     var entity = new this.Entity(this, data);
     return entity;
+  },
+
+  _convertObjectsToCamelCase: function(data) {
+    if (!_.isArray(data)) {
+      logger.error('_convertObjectsToCamelCase: invalid parameters data=' + util.inspect(data));
+      return null;
+    }
+
+    var self = this,
+        result = [];
+    _.forEach(data, function(e) {
+      result.push(self._convertOneObjectToCamelCase(e));
+    })
+
+    return result;
+  },
+
+  _convertOneObjectToCamelCase: function(data) {
+    if (!_.isObject(data)) {
+      logger.error('_convertOneObjectToCamelCase: invalid parameters data=' + util.inspect(data));
+      return null;
+    }
+
+    var result = {};
+    for (var p in data) {
+      result[Utils.convertToCamelCase(p)] = data[p];
+    }
+
+    return result;
   },
 
   _isEntityObject : function(data) {
@@ -330,7 +355,14 @@ var BaseModel = BaseClass.extend({
   countGroupBy: function(groupCols, options, callback) {
     var self = this;
     var adapter = self._getAdapterForSelect();
-    adapter.countGroupBy(self.tableName, groupCols, options, callback);
+    adapter.countGroupBy(self.tableName, groupCols, options, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      callback(null, self._convertObjectsToCamelCase(ret));
+    });
   },
 
   sumGroupBy: function(column, options, callback) {

@@ -158,7 +158,7 @@ var BaseQueryBuilder = BaseClass.extend({
 
   countGroupBy: function(tableName, groupCols, options) {
     var self = this;
-
+    options.groupBy = groupCols;
     var sql =   'SELECT ' + _.map(groupCols, self._escapeColumn).join(',') +
                 ', COUNT(1) AS `count` FROM ';
     sql += tableName;
@@ -244,8 +244,12 @@ var BaseQueryBuilder = BaseClass.extend({
       }
     }
 
-    if (options.groupBy && typeof options.groupBy === 'string') {
-      clause += (' GROUP BY ' + options.groupBy);
+    if (options.groupBy) {
+      if (_.isArray(options.groupBy)) {
+        clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+      } else if (typeof options.groupBy === 'string') {
+        clause += (' GROUP BY ' + options.groupBy);
+      }
     }
 
     if (options.orderBy && typeof options.orderBy === 'string') {
