@@ -71,7 +71,9 @@ var BaseController = BaseClass.extend({
           return;
         }
 
-        res.send(ret.find);
+        var result = {};
+        result[modelClass.getPluralTableName()] = ret.find;
+        res.ok(result);
       });
     };
 
