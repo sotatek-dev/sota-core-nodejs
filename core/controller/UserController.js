@@ -30,19 +30,18 @@ module.exports = BaseController.extend({
         res.sendError(info);
       }
 
-      if (user instanceof BaseEntity) {
-        user = user.toJSON();
-      }
-
       var expires = moment().add(7, 'days').valueOf(),
           secret = process.env.SECRET;
-      user.token = jwt.encode({
+
+      var token = jwt.encode({
         userId: user.id,
         email: user.email,
         exp: expires
       }, secret);
 
-      res.send(user);
+      res.ok(user.setExtra({
+        token: token
+      }));
 
     })(req, res);
   },

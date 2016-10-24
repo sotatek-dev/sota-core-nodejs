@@ -125,8 +125,15 @@ module.exports = BaseClass.extend({
 
   setExtra: function(data) {
     var self = this;
+    var presetKeys = _.map(self._model.primaryKeys.concat(self._model.predefinedCols), function(c) {
+      return Utils.convertToCamelCase(c);
+    });
 
-    if (_.intersection(this._model.getAttributeNames(), _.keys(data)).length > 0) {
+    var dataKeys = _.filter(_.keys(data), function(k) {
+      return !_.includes(presetKeys, k);
+    });
+
+    if (_.intersection(this._model.getAttributeNames(), dataKeys).length > 0) {
       logger.error('Cannot set extra data to mapped column. data=' + util.inspect(data));
       return;
     }
@@ -144,6 +151,8 @@ module.exports = BaseClass.extend({
       }.bind(self, property));
 
     });
+
+    return this;
   },
 
   _save : function(callback) {

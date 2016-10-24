@@ -4,12 +4,19 @@ var BaseError       = require('../error/BaseError');
 
 function _purifyEntity(data) {
 
+  if (data === undefined || data === null) {
+    return data;
+  }
+
   if (typeof data === 'boolean'  ||
       typeof data === 'number'   ||
       typeof data === 'string'   ||
-      typeof data === 'function' ||
       typeof data === 'undefined') {
     return data;
+  }
+
+  if (typeof data === 'function') {
+    return 'function';
   }
 
   if (data instanceof BaseEntity) {
