@@ -7,15 +7,7 @@ module.exports = BaseModel.extend({
   $tableName: 'user',
   $Entity: UserEntity,
 
-  $indexes: {
-    'username': ['username'],
-    'email': ['email'],
-  },
-
-  $uniques: {
-    'username': ['username'],
-    'email': ['email'],
-  },
+  $excludedCols: ['password'],
 
   dsConfig: {
     read   : 'mysql-slave',

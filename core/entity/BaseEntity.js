@@ -4,19 +4,18 @@ var logger    = require('log4js').getLogger('BaseEntity');
 module.exports = BaseClass.extend({
   classname : 'BaseEntity',
 
-  // These columns defined here will be omitted from result of toJSON() method
-  _excludedCols: [],
-
   initialize : function(model, data) {
     // logger.info(this.classname + '::initialize data=' + util.inspect(data));
     this._model         = model;
     this._data          = {};
     this._dataOld       = {};
 
+    this.classname      = model.classname.replace('Model', 'Entity');
     this.tableName      = model.tableName;
     this.primaryKeys    = model.primaryKeys;
     this.columns        = model.columns;
     this.predefinedCols = model.predefinedCols;
+    this.excludedCols   = model.excludedCols || [];
 
     if (!data.id) {
       data.id = 0;
@@ -40,15 +39,24 @@ module.exports = BaseClass.extend({
   },
 
   excludeFromResult: function(columnName) {
-    if (!_.includes(this._excludedCols, columnName)) {
-      this._excludedCols.push(columnName);
+    var self = this;
+    if (_.isArray(columnName)) {
+      _.forEach(columnName, function(col) {
+        self.excludeFromResult(col);
+      });
+      return self;
     }
+
+    if (!_.includes(this.excludedCols, columnName)) {
+      this.excludedCols.push(columnName);
+    }
+
     return this;
   },
 
   includeToResult: function(columnName) {
-    if (_.includes(this._excludedCols, columnName)) {
-      _.remove(this._excludedCols, function(e) {
+    if (_.includes(this.excludedCols, columnName)) {
+      _.remove(this.excludedCols, function(e) {
         return e === columnName;
       });
     }
@@ -56,8 +64,8 @@ module.exports = BaseClass.extend({
   },
 
   toJSON: function() {
-    if (this._excludedCols.length > 0) {
-      return _.omit(this._data, this._excludedCols);
+    if (this.excludedCols.length > 0) {
+      return _.omit(this._data, this.excludedCols);
     }
 
     return this._data;

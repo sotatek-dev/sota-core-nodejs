@@ -98,7 +98,7 @@ var BaseModel = BaseClass.extend({
         result = [];
     _.forEach(data, function(e) {
       result.push(self._convertOneObjectToCamelCase(e));
-    })
+    });
 
     return result;
   },
