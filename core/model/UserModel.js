@@ -7,7 +7,7 @@ module.exports = BaseModel.extend({
   $tableName: 'user',
   $Entity: UserEntity,
 
-  $excludedCols: ['password'],
+  $excludedCols: ['createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'password'],
 
   dsConfig: {
     read   : 'mysql-slave',

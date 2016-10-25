@@ -10,6 +10,7 @@ var BaseModel = BaseClass.extend({
   $primaryKeys      : ['id'],     // Currently it's always `id`
   $pkAutoIncrement  : true,       // Always true
   $predefinedCols   : ['created_at', 'updated_at', 'created_by', 'updated_by'],
+  $excludedCols     : ['createdAt', 'updatedAt', 'createdBy', 'updatedBy'],
 
   /**
    * Customizable properties will be defined in derived model
@@ -354,6 +355,12 @@ var BaseModel = BaseClass.extend({
 
       callback(null, self._convertObjectsToCamelCase(ret));
     });
+  },
+
+  sum: function(column, options, callback) {
+    var self = this;
+    var adapter = self._getAdapterForSelect();
+    adapter.sum(self.tableName, column, options, callback);
   },
 
   sumGroupBy: function(column, options, callback) {

@@ -64,7 +64,7 @@ function _envelopResponse(data) {
         serverTime  : Utils.now(),
       },
       data        : data.data || {},
-      pagination  : data.pagination || {},
+      pagination  : data.pagination,
     };
   } else { // Send error
     return {

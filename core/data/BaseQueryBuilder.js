@@ -168,6 +168,17 @@ var BaseQueryBuilder = BaseClass.extend({
     return sql;
   },
 
+  sum: function(tableName, column, options) {
+    var self = this;
+
+    var sql = 'SELECT SUM(' + self._escapeColumn(column) + ') AS `sum` FROM ';
+    sql += tableName;
+    sql += self._buildWhereClause(options);
+
+    logger.info(this.classname + '::count query=[' + sql + ']');
+    return sql;
+  },
+
   sumGroupBy: function(tableName, column, options) {
     var self = this;
 

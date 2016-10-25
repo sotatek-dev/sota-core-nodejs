@@ -233,6 +233,40 @@ module.exports = BaseAdapter.extend({
     });
   },
 
+  sum: function(tableName, column, options, callback) {
+    var sqlQuery = QueryBuilder.sum(tableName, column, options);
+    if (!sqlQuery) {
+      callback(this.classname + '::sum something went wrong. Couldn\'t build query.');
+      return;
+    }
+
+    var params = [];
+    if (options && options.params && _.isArray(options.params)) {
+      params = options.params;
+    }
+
+    this._exec(sqlQuery, params, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      if (!ret.length) {
+        logger.error('Something went wrong. Sum query doesn\'t return any row: ' + sqlQuery);
+        callback(ErrorFactory.internal());
+        return;
+      }
+
+      if (ret[0].sum && typeof ret[0].sum !== 'number') {
+        logger.error('Something went wrong. Sum query doesn\'t return number: ' + sqlQuery);
+        callback(ErrorFactory.internal());
+        return;
+      }
+
+      callback(null, ret[0].sum || 0);
+    });
+  },
+
   sumGroupBy: function(tableName, column, options, callback) {
     var sqlQuery = QueryBuilder.sumGroupBy(tableName, column, options);
     if (!sqlQuery) {
