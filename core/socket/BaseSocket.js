@@ -51,6 +51,12 @@ module.exports = BaseClass.extend({
       var jwtPayload = jwt.decode(token, jwtSecret);
       var UserModel = ModelFactory.create('UserModel');
       UserModel.findOne(jwtPayload.userId, function(err, user) {
+        // When a model is not got from request, need to destroy manually
+        // to prevent connection leak
+        // TODO: Implement a generic mechanism to handle this
+        UserModel.destroy();
+        delete UserModel;
+
         if (err) {
           return next(err, false);
         }

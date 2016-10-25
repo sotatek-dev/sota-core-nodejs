@@ -8,7 +8,7 @@ module.exports = BaseAdapter.extend({
   initialize : function($super, exSession, pool) {
     $super(exSession);
     this._pool        = pool;
-    this._connection  = null;
+    this._connections = [];
   },
 
   beginTransaction : function(callback) {
@@ -31,15 +31,12 @@ module.exports = BaseAdapter.extend({
     var self = this;
     async.auto({
       connect : function(next) {
-        if (self._connection) {
-          next(null, self._connection);
-        } else {
-          self._pool.getConnection(next);
-        }
+        self._pool.getConnection(next);
       },
       exec : ['connect', function(ret, next) {
-        self._connection = ret.connect;
-        self._connection.query(sqlQuery, params, next);
+        let connection = ret.connect;
+        self._connections.push(connection);
+        connection.query(sqlQuery, params, next);
       }],
     }, function(err, res) {
       if (err) {
@@ -291,9 +288,13 @@ module.exports = BaseAdapter.extend({
   },
 
   destroy : function() {
-    if (this._connection) {
-      this._connection.release();
+    if (this._connections && this._connections.length > 0) {
+      for (let i = 0; i < this._connections.length; i++) {
+        this._connections[i].release();
+        delete this._connections[i];
+      }
     }
+    delete this._connections;
   },
 
 });

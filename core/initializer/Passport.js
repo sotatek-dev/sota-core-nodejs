@@ -16,6 +16,12 @@ module.exports = function(app, passport) {
     logger.debug('Passport::deserializeUser: ' + id);
     var UserModel = ModelFactory.create('UserModel');
     UserModel.findById(id, function(err, user) {
+      // When a model is not got from request, need to destroy manually
+      // to prevent connection leak
+      // TODO: Implement a generic mechanism to handle this
+      UserModel.destroy();
+      delete UserModel;
+
       if (err) {
         return done(err);
       }
@@ -28,6 +34,7 @@ module.exports = function(app, passport) {
   var opts = {
     tokenBodyField: jwtBodyField,
     secretOrKey: app.get('jwtSecret'),
+    passReqToCallback: true
   };
 
   opts.jwtFromRequest = function(req) {
@@ -37,8 +44,8 @@ module.exports = function(app, passport) {
     return null;
   };
 
-  passport.use(new JwtStrategy(opts, function(jwtPayload, done) {
-    var UserModel = ModelFactory.create('UserModel');
+  passport.use(new JwtStrategy(opts, function(req, jwtPayload, done) {
+    var UserModel = req.getModel('UserModel');
     UserModel.findOne({
       id: jwtPayload.sub
     }, function(err, user) {
