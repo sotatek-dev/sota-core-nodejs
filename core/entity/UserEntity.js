@@ -8,4 +8,9 @@ module.exports = BaseEntity.extend({
     return bcrypt.compareSync(password, this.password || '');
   },
 
+  toJSON: function($super) {
+    this._data.fullName = this._data.firstName + ' ' + this._data.lastName;
+    return $super();
+  },
+
 });

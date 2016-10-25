@@ -17,12 +17,15 @@ var XModel = BaseModel.extend({
 
 });
 
+var xMasterConfig = Config.adapters[XModel.dsConfig.write];
+var xSlaveConfig = Config.adapters[XModel.dsConfig.read];
+
 var assert = require('assert');
 describe('BaseModel', function() {
 
   describe('#getAttributeNames', function() {
     it('should return atrributes\' name in model', function() {
-      var x = new XModel(null, Config.adapters);
+      var x = new XModel(null, xMasterConfig, xSlaveConfig);
       var cols = x.getAttributeNames();
       assert.equal(cols.length, 7);
       assert.equal(cols[0], 'id');
@@ -37,7 +40,7 @@ describe('BaseModel', function() {
 
   describe('#getColumnNames', function() {
     it('should return columns\' name in model', function() {
-      var x = new XModel(null, Config.adapters);
+      var x = new XModel(null, xMasterConfig, xSlaveConfig);
       var cols = x.getColumnNames();
       assert.equal(cols.length, 7);
       assert.equal(cols[0], 'id');

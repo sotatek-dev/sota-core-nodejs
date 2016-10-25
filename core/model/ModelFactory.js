@@ -1,29 +1,36 @@
-var BaseClass = require('../common/BaseClass');
-var logger = log4js.getLogger('ModelFactory');
+var BaseClass   = require('../common/BaseClass');
+var logger      = require('log4js').getLogger('ModelFactory');
 
-var ModelFactory = BaseClass.singleton({
+/**
+ * Hide real private objects from rest of the world
+ * No outsider should be able to touch it
+ */
+var _adaptersConfig = {},
+    _registers = {},
+    _modelSchema = {};
+
+module.exports = BaseClass.singleton({
   classname : 'ModelFactory',
 
-  _registers : {},
-
   setAdaptersConfig: function(adaptersConfig) {
-    this._adaptersConfig = adaptersConfig;
+    _adaptersConfig = adaptersConfig;
   },
 
   setModelSchema: function(modelSchema) {
-    this._modelSchema = modelSchema;
+    _modelSchema = modelSchema;
   },
 
   getAdapterConfig: function(key) {
-    var config = this._adaptersConfig[key];
+    var config = _adaptersConfig[key];
     if (!config) {
       throw new Error('Cannot find adapter config for key: ' + key);
     }
+    config['key'] = key;
     return config;
   },
 
   register : function(m) {
-    logger.info(this.classname + '::register ' + m.classname);
+    logger.info('register: ' + m.classname);
 
     if (!m.classname) {
       logger.error('No classname, invalid model: ' + util.inspect(m));
@@ -36,30 +43,28 @@ var ModelFactory = BaseClass.singleton({
     }
 
     // Inject columns property from auto-generated object into model class
-    var columns = this._modelSchema[m.classname];
+    var columns = _modelSchema[m.classname];
     m.prototype.columns = m.columns = columns;
 
-    this._registers[m.classname] = m;
+    _registers[m.classname] = m;
   },
 
   get : function(classname) {
-    logger.info(this.classname + '::get ' + classname);
-    return this._registers[classname];
+    // logger.info(this.classname + '::get ' + classname);
+    return _registers[classname];
   },
 
   getAll: function() {
-    return _.keys(this._registers);
+    return _.keys(_registers);
   },
 
   create: function(classname, exSession) {
-    if (this._registers[classname]) {
-      var modelClass = this._registers[classname];
-      var masterConfig = this._adaptersConfig[modelClass.dsConfig.write],
-          slaveConfig = this._adaptersConfig[modelClass.dsConfig.read];
-      return new this._registers[classname](exSession, masterConfig, slaveConfig);
+    if (_registers[classname]) {
+      var modelClass = _registers[classname];
+      var masterConfig = this.getAdapterConfig(modelClass.dsConfig.write),
+          slaveConfig = this.getAdapterConfig(modelClass.dsConfig.read);
+      return new _registers[classname](exSession, masterConfig, slaveConfig);
     }
   },
 
 });
-
-module.exports = ModelFactory;

@@ -1,27 +1,32 @@
 var logger        = require('log4js').getLogger('ControllerFactory');
 var BaseClass     = require('../common/BaseClass');
 
-var ControllerFactory = BaseClass.singleton({
+/**
+ * Hide real private objects from rest of the world
+ * No outsider should be able to touch it
+ */
+var _registers = {};
+
+module.exports = BaseClass.singleton({
   classname : 'ControllerFactory',
-  _registers : {},
 
   register : function(c) {
     if (c.classname) {
-      if (this._registers[c.classname]) {
+      if (_registers[c.classname]) {
         logger.warn('Controller is registered multiple times, will be overried: ' + c.classname);
       }
-      this._registers[c.classname] = c;
+      _registers[c.classname] = c;
     }
     logger.info('registered: ' + c.classname);
   },
 
   get: function(classname) {
-    return this._registers[classname];
+    return _registers[classname];
   },
 
   create : function(classname) {
     // logger.info('get: ' + classname);
-    var c = new this._registers[classname]();
+    var c = new _registers[classname]();
     return c;
   },
 
@@ -103,5 +108,3 @@ var ControllerFactory = BaseClass.singleton({
   }
 
 });
-
-module.exports = ControllerFactory;

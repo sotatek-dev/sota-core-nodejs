@@ -1,6 +1,5 @@
 var BaseClass           = require('../common/BaseClass');
 var BaseEntity          = require('../entity/BaseEntity');
-var AdapterFactory      = require('../data/AdapterFactory');
 var logger              = log4js.getLogger('BaseModel');
 
 var BaseModel = BaseClass.extend({
@@ -24,7 +23,7 @@ var BaseModel = BaseClass.extend({
   },
 
   initialize : function(exSession, masterConfig, slaveConfig) {
-    logger.info('BaseModel<' + this.classname + '>::initialize exSession=' + exSession);
+    // logger.info(this.classname + '::initialize exSession=' + exSession);
     if (!masterConfig) {
       throw new Error('Invalid config for master adapter');
     }
@@ -35,16 +34,8 @@ var BaseModel = BaseClass.extend({
 
     this._exSession       = exSession;
     this._useMasterSelect = false;
-
-    this._masterAdapter   = AdapterFactory.create(
-      this._exSession,
-      masterConfig
-    );
-
-    this._slaveAdapter    = AdapterFactory.create(
-      this._exSession,
-      slaveConfig
-    );
+    this._masterAdapter   = AdapterFactory.create(exSession, masterConfig);
+    this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig);
   },
 
   getAttributeNames : function() {

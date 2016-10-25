@@ -1,13 +1,14 @@
 var BaseClass           = require('../common/BaseClass');
 var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
+var logger              = require('log4js').getLogger('AdapterFactory');
 
-var AdapterFactory = BaseClass.singleton({
+var _nextId = 0,
+    _registry = {},
+    _pools = {};
+
+module.exports = BaseClass.singleton({
   classname : 'AdapterFactory',
-
-  _nextId     : 0,
-  _registry   : {},
-  _pools      : {},
 
   create : function(exSession, config) {
     if (!config || !config.key) {
@@ -29,10 +30,10 @@ var AdapterFactory = BaseClass.singleton({
   },
 
   _createMySQLAdapter : function(exSession, key) {
-    var adapter = new MySQLAdapter(exSession, this._pools[key].instance);
-    this._nextId++;
-    this._registry[this._nextId] = adapter;
-    adapter.registryId = this._nextId;
+    var adapter = new MySQLAdapter(exSession, _pools[key].instance);
+    _nextId++;
+    _registry[_nextId] = adapter;
+    adapter.registryId = _nextId;
     return adapter;
   },
 
@@ -40,29 +41,31 @@ var AdapterFactory = BaseClass.singleton({
     var type = config.type,
         key  = config.key;
 
-    if (!!this._pools[key]) {
+    if (!!_pools[key]) {
       return;
     }
 
-    var pool;
+    var pool,
+        poolConfig = {
+          host                : config.dbHost,
+          user                : config.dbUser,
+          password            : config.dbPwd,
+          database            : config.dbName,
+          connectionLimit     : config.connectionLimit || 10,
+          waitForConnections  : config.waitForConnections || true,
+          queueLimit          : config.queueLimit || 5,
+        };
 
     if (type === Const.DATA_SOURCE_TYPE.MYSQL) {
-      pool = MySQL.createPool({
-        host      : config.dbHost,
-        user      : config.dbUser,
-        password  : config.dbPwd,
-        database  : config.dbName,
-      });
+      pool = MySQL.createPool(poolConfig);
     } else {
       logger.error('AdapterFactory::_createPool unsupported type config=' + util.inspect(config));
       pool = null;
     }
 
-    this._pools[key] = {};
-    this._pools[key].config = config;
-    this._pools[key].instance = pool;
-  }
+    _pools[key] = {};
+    _pools[key].config = config;
+    _pools[key].instance = pool;
+  },
 
 });
-
-module.exports = AdapterFactory;
