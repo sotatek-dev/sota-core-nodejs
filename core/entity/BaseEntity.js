@@ -120,6 +120,11 @@ module.exports = BaseClass.extend({
         }
       }
 
+      // Always freeze 'id' property if it has value already
+      if (p === 'id' && self._data.id > 0) {
+        return;
+      }
+
       // property = p.toLowerCase();
       // /*jshint loopfunc: true */
       // this.__defineGetter__(property, function(property) {
@@ -196,7 +201,7 @@ module.exports = BaseClass.extend({
       if (self.isChanged()) {
         adapter.updateOne(this, callback);
       } else {
-        logger.warn('Entity has no update: ' + util.inspect(this));
+        logger.info('Entity has no update: ' + util.inspect(this));
         callback(null, this);
       }
     }
@@ -265,13 +270,18 @@ module.exports = BaseClass.extend({
     var self = this;
     return _.some(_.keys(self._model.columns), function(col) {
       var prop = Utils.convertToCamelCase(col);
+      // logger.debug(self.classname + '::isChanged check prop=' + prop +
+      //   ', oldValue=' + self._dataOld[prop] +
+      //   ', newValue=' + self._data[prop] +
+      //   ', result=' + (self._data[prop] !== self._dataOld[prop])
+      // );
       return self._data[prop] !== self._dataOld[prop];
     });
   },
 
   _refreshLocal: function() {
     var self = this;
-    _.each(this._model.getColumnNames(), function(p) {
+    _.each(this._model.getAttributeNames(), function(p) {
       self._dataOld[p] = self._data[p];
     });
   },

@@ -1,6 +1,6 @@
 var BaseClass         = require('../common/BaseClass');
 var BaseEntity        = require('../entity/BaseEntity');
-var logger            = log4js.getLogger('BaseQueryBuilder');
+var logger            = require('log4js').getLogger('BaseQueryBuilder');
 
 /**
  * Based on MySQL syntax.
@@ -80,11 +80,11 @@ var BaseQueryBuilder = BaseClass.extend({
   },
 
   updateOne : function(entity) {
-    var self = this;
-    var tableName = entity.tableName;
-    var changeCols = entity.getChangedColumns();
+    var self = this,
+        tableName = entity.tableName,
+        changeCols = entity.getChangedColumns(),
+        sql = 'UPDATE ';
 
-    var sql = 'UPDATE ';
     sql += tableName;
     sql += ' SET ';
     sql += _.map(changeCols, function(col) {
