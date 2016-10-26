@@ -85,22 +85,25 @@ var BaseQueryBuilder = BaseClass.extend({
     var self = this,
         tableName = entity.tableName,
         changeCols = entity.getChangedColumns(),
+        params = [],
         sql = 'UPDATE ';
 
     sql += tableName;
     sql += ' SET ';
     sql += _.map(changeCols, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      return self._escapeColumn(col) + '=' + self._escapeString(entity[prop]);
+      params.push(self._escapeString(entity[prop]));
+      return self._escapeColumn(col) + '=?';
     }).join(',');
     sql += ' WHERE ';
     sql += _.map(entity.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      return self._escapeColumn(col) + '=' + self._escapeString(entity[prop]);
+      params.push(self._escapeString(entity[prop]));
+      return self._escapeColumn(col) + '=?';
     }).join(' AND ');
 
     logger.info(this.classname + '::updateOne query=[' + sql + ']');
-    return sql;
+    return [sql, params];
   },
 
   /**
@@ -124,16 +127,18 @@ var BaseQueryBuilder = BaseClass.extend({
   },
 
   deleteOne : function(entity) {
-    var self = this;
+    var self = this,
+        params = [];
 
     var sql = 'DELETE FROM ';
     sql += entity.tableName;
     sql += ' WHERE ';
     sql += _.map(entity._model.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      return self._escapeColumn(col) + '=' + self._escapeString(entity[prop]);
+      params.push(self._escapeString(entity[prop]));
+      return self._escapeColumn(col) + '=?';
     }).join(' AND ');
-    return sql;
+    return [sql, params];
   },
 
   deleteBatch : function(tableName, options) {

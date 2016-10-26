@@ -122,13 +122,13 @@ module.exports = BaseAdapter.extend({
   },
 
   updateOne : function(entity, callback) {
-    var sqlQuery = QueryBuilder.updateOne(entity);
+    var [sqlQuery, params] = QueryBuilder.updateOne(entity);
 
     if (!sqlQuery) {
       callback(this.classname + '::updateOne something went wrong. Couldn\'t build query.');
     }
 
-    this._exec(sqlQuery, [], callback);
+    this._exec(sqlQuery, params, callback);
   },
 
   /**
@@ -156,14 +156,14 @@ module.exports = BaseAdapter.extend({
   },
 
   deleteOne : function(entity, callback) {
-    var sqlQuery = QueryBuilder.deleteOne(entity);
+    var [sqlQuery, params] = QueryBuilder.deleteOne(entity);
 
     if (!sqlQuery) {
       callback(this.classname + '::deleteOne something went wrong. Couldn\'t build query.');
       return;
     }
 
-    this._exec(sqlQuery, [], callback);
+    this._exec(sqlQuery, params, callback);
   },
 
   deleteBatch : function(tableName, options, callback) {
