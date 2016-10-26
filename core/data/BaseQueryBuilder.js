@@ -41,7 +41,8 @@ var BaseQueryBuilder = BaseClass.extend({
       return isPK;
     }).concat(entities[0].predefinedCols);
 
-    var valueStrs = [];
+    var valueStrs = [],
+        params = [];
     _.each(entities, function(entity) {
       if (tableName !== entity.tableName) {
         logger.error(self.classname + '::insert mismatch tableName (' +
@@ -53,18 +54,19 @@ var BaseQueryBuilder = BaseClass.extend({
       valueStr += _.map(cols, function(col) {
         var prop = Utils.convertToCamelCase(col);
         if (entity[prop] === null || entity[prop] === undefined) {
-          return 'NULL';
+          params.push(null);
         } else if (typeof entity[prop] === 'string') {
-          return '\'' + entity[prop] + '\'';
+          params.push(entity[prop]);
         } else {
-          return entity[prop];
+          params.push(entity[prop]);
         }
+        return '?';
       }).join(',');
       valueStr += ')';
       valueStrs.push(valueStr);
     });
 
-    return self._buildInsertQuery(tableName, cols, valueStrs);
+    return [self._buildInsertQuery(tableName, cols, valueStrs), params];
   },
 
   _buildInsertQuery : function(tableName, cols, valueStrs) {

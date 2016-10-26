@@ -70,12 +70,12 @@ module.exports = BaseAdapter.extend({
     var self = this;
     async.auto({
       insert: function(next) {
-        var sqlQuery = QueryBuilder.insert(entity);
+        var [sqlQuery, params] = QueryBuilder.insert(entity);
         if (!sqlQuery) {
           callback(self.classname + '::insertOne something went wrong. Couldn\'t build query.');
           return;
         }
-        self._exec(sqlQuery, [], next);
+        self._exec(sqlQuery, params, next);
       }
     }, function(err, ret) {
       if (err) {
@@ -97,13 +97,13 @@ module.exports = BaseAdapter.extend({
         }, next);
       },
       insert : ['beforeSave', function(ret, next) {
-        var sqlQuery = QueryBuilder.insert(entities);
+        var [sqlQuery, params] = QueryBuilder.insert(entities);
 
         if (!sqlQuery) {
           callback(self.classname + '::insertBatch something went wrong. Couldn\'t build query.');
         }
 
-        self._exec(sqlQuery, [], next);
+        self._exec(sqlQuery, params, next);
       }],
       afterSave : ['insert', function(ret, next) {
         async.forEach(entities, function(entity, _next) {
