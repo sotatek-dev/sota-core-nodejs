@@ -147,7 +147,12 @@ module.exports = BaseAdapter.extend({
       return;
     }
 
-    this._exec(sqlQuery, options.params || [], callback);
+    var params = [];
+    if (options && options.params && _.isArray(options.params)) {
+      params = options.params;
+    }
+
+    this._exec(sqlQuery, params, callback);
   },
 
   deleteOne : function(entity, callback) {

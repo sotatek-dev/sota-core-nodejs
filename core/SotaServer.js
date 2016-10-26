@@ -223,6 +223,7 @@ var SotaServer = BaseClass.extend({
     };
     app.use(morgan('dev'));
     app.use(cookieParser());
+    app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(session(sessionOpts));
     app.use(express.static(_realConfig.publicDir));
