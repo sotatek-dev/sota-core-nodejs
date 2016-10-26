@@ -147,7 +147,7 @@ module.exports = BaseAdapter.extend({
       return;
     }
 
-    this._exec(sqlQuery, [], callback);
+    this._exec(sqlQuery, options.params || [], callback);
   },
 
   deleteOne : function(entity, callback) {
