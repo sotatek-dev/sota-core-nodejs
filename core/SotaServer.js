@@ -85,7 +85,7 @@ var SotaServer = BaseClass.extend({
      /**
      * viewDir should be the folder contains view templates
      */
-     _realConfig.publicDir = path.join(rootDir, 'views');
+     _realConfig.viewDir = path.join(rootDir, 'views');
 
     /**
      * Port and secret phrase for encryption
