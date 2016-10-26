@@ -326,7 +326,11 @@ var BaseModel = BaseClass.extend({
 
   delete: function(data, callback) {
     var self = this;
-    if (typeof data === 'number' && data > 0) {
+    if (data && !isNaN(data)) {
+      if (typeof data !== 'number') {
+        data = parseInt(data);
+      }
+
       self.delete({
         where   : 'id=?',
         params  : [data],
