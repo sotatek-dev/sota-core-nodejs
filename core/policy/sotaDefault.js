@@ -60,8 +60,9 @@ function _envelopResponse(data) {
   if (!data.code) { // No error
     return {
       meta        : {
-        code        : 0,
-        serverTime  : Utils.now(),
+        code: 0,
+        serverTime : Utils.now(),
+        masterdataVersion: LocalCache.get('dataVersion') || 1,
       },
       data        : data.data || {},
       pagination  : data.pagination,

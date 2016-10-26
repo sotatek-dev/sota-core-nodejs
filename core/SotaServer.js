@@ -24,6 +24,7 @@ imageminPngquant    = require('imagemin-pngquant');
 // TODO: remove global scope of logger
 logger              = log4js.getLogger('SotaServer');
 
+LocalCache          = require('./common/LocalCache');
 Const               = require('./common/Const');
 BaseClass           = require('./common/BaseClass');
 FileUtils           = require('./util/FileUtils');
