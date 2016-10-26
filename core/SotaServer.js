@@ -16,6 +16,10 @@ flash               = require('connect-flash');
 jwt                 = require('jwt-simple');
 log4js              = require('log4js');
 Checkit             = require('checkit');
+formidable          = require('formidable');
+imagemin            = require('imagemin');
+imageminMozjpeg     = require('imagemin-mozjpeg');
+imageminPngquant    = require('imagemin-pngquant');
 
 // TODO: remove global scope of logger
 logger              = log4js.getLogger('SotaServer');
