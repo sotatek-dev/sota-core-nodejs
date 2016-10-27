@@ -17,6 +17,7 @@ jwt                 = require('jwt-simple');
 log4js              = require('log4js');
 Checkit             = require('checkit');
 formidable          = require('formidable');
+multiparty          = require('multiparty');
 imagemin            = require('imagemin');
 imageminMozjpeg     = require('imagemin-mozjpeg');
 imageminPngquant    = require('imagemin-pngquant');
@@ -46,7 +47,6 @@ AdapterFactory      = require('./data/AdapterFactory');
  * No one should be able to touch it
  */
 var _realConfig = {},
-    myApp = null,
     myServer = null;
 
 var SotaServer = BaseClass.extend({
@@ -57,15 +57,6 @@ var SotaServer = BaseClass.extend({
 
     this._resolveConfig(config);
     this._initExpress();
-    this._initServer();
-    this._initPolicies();
-    this._loadControllers();
-    this._loadModels();
-    this._loadServices();
-    this._setupCheckit();
-    this._setupPassport();
-    this._setupRoutes();
-    this._initSocket();
   },
 
   _resolveConfig: function(config) {
@@ -204,76 +195,55 @@ var SotaServer = BaseClass.extend({
 
   _initExpress: function() {
     logger.info('SotaServer::_initExpress initializing express application...');
-    myApp = express();
+    var myApp = require('./initializer/Express')(_realConfig);
+    var myServer = http.createServer(myApp);
 
-    // Customized config
-    myApp.set('jwtSecret', _realConfig.secret);
-    myApp.set('jwtBodyField', _realConfig.jwtBodyField || 'auth_token');
-    myApp.set('rootDir', _realConfig.rootDir);
+    this._initMiddlewares(myApp);
+    this._initPolicies(myApp);
+    this._loadControllers(myApp);
+    this._loadModels(myApp);
+    this._loadServices(myApp);
+    this._setupCheckit(myApp);
+    this._setupPassport(myApp);
+    this._setupRoutes(myApp);
+    this._initSocket(myApp, myServer);
 
-    // Express config
-    myApp.set('port', _realConfig.port);
-    myApp.set('views', _realConfig.viewDir);
-    myApp.set('view engine', _realConfig.viewExtension || 'hbs');
-    myApp.engine('html', _realConfig.viewEngine || require('hbs').__express);
+    this._setupProcess();
 
-    // Middlewares setup
-    // TODO: make this more configurable
-    let sessionOpts = {
-      secret: _realConfig.secret,
-      resave: true,
-      saveUninitialized: true,
-    };
-    myApp.use(morgan('dev'));
-    myApp.use(cookieParser());
-    myApp.use(bodyParser.json());
-    myApp.use(bodyParser.urlencoded({extended: true}));
-    myApp.use(session(sessionOpts));
-    myApp.use(express.static(_realConfig.publicDir));
-    myApp.use(passport.initialize());
-    myApp.use(passport.session());
-    myApp.use(flash());
-
-    // TODO: Handle process-level events
-    process.on('uncaughtException', function (err) {
-      logger.error('############## process begin uncaught exception info ##############');
-      logger.error(err);
-      logger.error('############## process  end  uncaught exception info ##############');
-    });
+    process.nextTick(function() {
+      myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
+      myServer.on('error', this.onError.bind(this));
+      myServer.on('listening', this.onListening.bind(this));
+    }.bind(this));
   },
 
-  _initServer: function() {
-    myServer = http.createServer(myApp);
+  _initMiddlewares: function(myApp) {
+    var init = require('./initializer/Middleware');
+    init(myApp, _realConfig);
   },
 
-  startServer: function() {
-    myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
-    myServer.on('error', this.onError.bind(this));
-    myServer.on('listening', this.onListening.bind(this));
-  },
-
-  _initSocket: function() {
+  _initSocket: function(myApp, myServer) {
     var init = require('./initializer/Socket'),
         socketDirs = _realConfig.socketDirs;
 
     init(myApp, myServer, socketDirs);
   },
 
-  _initPolicies: function() {
+  _initPolicies: function(myApp) {
     var init = require('./initializer/Policy'),
         policyDirs = _realConfig.policyDirs;
 
     init(myApp, PolicyManager, policyDirs);
   },
 
-  _loadControllers: function() {
+  _loadControllers: function(myApp) {
     var init = require('./initializer/Controller'),
         controllerDirs = _realConfig.controllerDirs;
 
     init(myApp, ControllerFactory, controllerDirs);
   },
 
-  _loadModels: function() {
+  _loadModels: function(myApp) {
     var init = require('./initializer/Model'),
         adapters = _realConfig.adapters,
         schema = _realConfig.modelSchema,
@@ -282,26 +252,35 @@ var SotaServer = BaseClass.extend({
     init(myApp, ModelFactory, adapters, schema, modelDirs);
   },
 
-  _loadServices: function() {
+  _loadServices: function(myApp) {
     var init = require('./initializer/Service'),
         serviceDirs = _realConfig.serviceDirs;
     init(myApp, ServiceFactory, serviceDirs);
   },
 
-  _setupCheckit: function() {
+  _setupCheckit: function(myApp) {
     var init = require('./initializer/Checkit'),
         checkitDirs = _realConfig.checkitDirs;
     init(Checkit, checkitDirs);
   },
 
-  _setupPassport: function() {
+  _setupPassport: function(myApp) {
     var init = require('./initializer/Passport');
     init(myApp, passport);
   },
 
-  _setupRoutes: function() {
+  _setupRoutes: function(myApp) {
     var init = require('./initializer/Routes');
     init(myApp, ControllerFactory, _realConfig);
+  },
+
+  _setupProcess: function() {
+    // TODO: Handle process-level events
+    process.on('uncaughtException', function (err) {
+      logger.error('############## process begin uncaught exception info ##############');
+      logger.error(err);
+      logger.error('############## process  end  uncaught exception info ##############');
+    });
   },
 
   onServerCreated: function() {
