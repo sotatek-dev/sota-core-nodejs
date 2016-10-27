@@ -45,7 +45,9 @@ AdapterFactory      = require('./data/AdapterFactory');
  * Hide real configuration object from rest of the world
  * No one should be able to touch it
  */
-var _realConfig = {};
+var _realConfig = {},
+    myApp = null,
+    myServer = null;
 
 var SotaServer = BaseClass.extend({
   classname : 'SotaServer',
@@ -202,18 +204,18 @@ var SotaServer = BaseClass.extend({
 
   _initExpress: function() {
     logger.info('SotaServer::_initExpress initializing express application...');
-    var app = express();
+    myApp = express();
 
     // Customized config
-    app.set('jwtSecret', _realConfig.secret);
-    app.set('jwtBodyField', _realConfig.jwtBodyField || 'auth_token');
-    app.set('rootDir', _realConfig.rootDir);
+    myApp.set('jwtSecret', _realConfig.secret);
+    myApp.set('jwtBodyField', _realConfig.jwtBodyField || 'auth_token');
+    myApp.set('rootDir', _realConfig.rootDir);
 
     // Express config
-    app.set('port', _realConfig.port);
-    app.set('views', _realConfig.viewDir);
-    app.set('view engine', _realConfig.viewExtension || 'hbs');
-    app.engine('html', _realConfig.viewEngine || require('hbs').__express);
+    myApp.set('port', _realConfig.port);
+    myApp.set('views', _realConfig.viewDir);
+    myApp.set('view engine', _realConfig.viewExtension || 'hbs');
+    myApp.engine('html', _realConfig.viewEngine || require('hbs').__express);
 
     // Middlewares setup
     // TODO: make this more configurable
@@ -222,18 +224,15 @@ var SotaServer = BaseClass.extend({
       resave: true,
       saveUninitialized: true,
     };
-    app.use(morgan('dev'));
-    app.use(cookieParser());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: true}));
-    app.use(session(sessionOpts));
-    app.use(express.static(_realConfig.publicDir));
-    app.use(passport.initialize());
-    app.use(passport.session());
-    app.use(flash());
-
-    // Expose the express app locally
-    this.myApp = app;
+    myApp.use(morgan('dev'));
+    myApp.use(cookieParser());
+    myApp.use(bodyParser.json());
+    myApp.use(bodyParser.urlencoded({extended: true}));
+    myApp.use(session(sessionOpts));
+    myApp.use(express.static(_realConfig.publicDir));
+    myApp.use(passport.initialize());
+    myApp.use(passport.session());
+    myApp.use(flash());
 
     // TODO: Handle process-level events
     process.on('uncaughtException', function (err) {
@@ -244,34 +243,34 @@ var SotaServer = BaseClass.extend({
   },
 
   _initServer: function() {
-    this.myServer = http.createServer(this.myApp);
+    myServer = http.createServer(myApp);
   },
 
   startServer: function() {
-    this.myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
-    this.myServer.on('error', this.onError.bind(this));
-    this.myServer.on('listening', this.onListening.bind(this));
+    myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
+    myServer.on('error', this.onError.bind(this));
+    myServer.on('listening', this.onListening.bind(this));
   },
 
   _initSocket: function() {
     var init = require('./initializer/Socket'),
         socketDirs = _realConfig.socketDirs;
 
-    init(this.myApp, this.myServer, socketDirs);
+    init(myApp, myServer, socketDirs);
   },
 
   _initPolicies: function() {
     var init = require('./initializer/Policy'),
         policyDirs = _realConfig.policyDirs;
 
-    init(this.myApp, PolicyManager, policyDirs);
+    init(myApp, PolicyManager, policyDirs);
   },
 
   _loadControllers: function() {
     var init = require('./initializer/Controller'),
         controllerDirs = _realConfig.controllerDirs;
 
-    init(this.myApp, ControllerFactory, controllerDirs);
+    init(myApp, ControllerFactory, controllerDirs);
   },
 
   _loadModels: function() {
@@ -280,13 +279,13 @@ var SotaServer = BaseClass.extend({
         schema = _realConfig.modelSchema,
         modelDirs = _realConfig.modelDirs;
 
-    init(this.myApp, ModelFactory, adapters, schema, modelDirs);
+    init(myApp, ModelFactory, adapters, schema, modelDirs);
   },
 
   _loadServices: function() {
     var init = require('./initializer/Service'),
         serviceDirs = _realConfig.serviceDirs;
-    init(this.myApp, ServiceFactory, serviceDirs);
+    init(myApp, ServiceFactory, serviceDirs);
   },
 
   _setupCheckit: function() {
@@ -297,12 +296,12 @@ var SotaServer = BaseClass.extend({
 
   _setupPassport: function() {
     var init = require('./initializer/Passport');
-    init(this.myApp, passport);
+    init(myApp, passport);
   },
 
   _setupRoutes: function() {
     var init = require('./initializer/Routes');
-    init(this.myApp, ControllerFactory, _realConfig);
+    init(myApp, ControllerFactory, _realConfig);
   },
 
   onServerCreated: function() {
