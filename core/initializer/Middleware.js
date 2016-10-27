@@ -18,6 +18,7 @@ module.exports = function(app, config) {
 
   // TODO: implement the mechanism for customized middlewares
   app.use(function(req, res, next) {
+    req.files = req.files || {};
     var form = new multiparty.Form();
     form.keepExtensions = true;
     form.uploadDir = path.join(app.get('rootDir'), 'public/uploads');
@@ -25,6 +26,9 @@ module.exports = function(app, config) {
       req.params = req.params || {};
       _.forEach(_.keys(fields), function(key) {
         req.body[key] = fields[key][0];
+      });
+      _.forEach(_.keys(files), function(key) {
+        req.files[key] = files[key][0];
       });
       next();
     });
