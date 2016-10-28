@@ -1,9 +1,10 @@
 var util            = require('util');
+var passport        = require('passport');
 var LocalStrategy   = require('passport-local').Strategy;
 var JwtStrategy     = require('passport-jwt').Strategy;
-var logger          = require('log4js').getLogger('Initializer');
+var logger          = require('log4js').getLogger('Init.Passport');
 
-module.exports = function(app, passport) {
+module.exports = function(app) {
 
   // Serialize user for the session: from entity to id
   passport.serializeUser(function(user, done) {

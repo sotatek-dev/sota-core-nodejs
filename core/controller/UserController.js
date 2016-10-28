@@ -1,4 +1,5 @@
-var BaseController = require('./BaseController');
+var BaseController  = require('./BaseController');
+var jwt             = require('jwt-simple');
 
 module.exports = BaseController.extend({
   classname: 'UserController',

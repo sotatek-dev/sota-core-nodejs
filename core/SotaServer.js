@@ -1,29 +1,13 @@
-http                = require('http');
-express             = require('express');
-morgan              = require('morgan');
-cookieParser        = require('cookie-parser');
-cookieSession       = require('cookie-session');
-session             = require('express-session');
-bodyParser          = require('body-parser');
 fs                  = require('fs');
 path                = require('path');
 util                = require('util');
 _                   = require('lodash');
 async               = require('async');
 moment              = require('moment');
-passport            = require('passport');
-flash               = require('connect-flash');
-jwt                 = require('jwt-simple');
-log4js              = require('log4js');
 Checkit             = require('checkit');
-formidable          = require('formidable');
-multiparty          = require('multiparty');
 imagemin            = require('imagemin');
 imageminMozjpeg     = require('imagemin-mozjpeg');
 imageminPngquant    = require('imagemin-pngquant');
-
-// TODO: remove global scope of logger
-logger              = log4js.getLogger('SotaServer');
 
 LocalCache          = require('./common/LocalCache');
 Const               = require('./common/Const');
@@ -41,6 +25,9 @@ PolicyManager       = require('./policy/PolicyManager');
 ModelFactory        = require('./model/ModelFactory');
 ServiceFactory      = require('./service/ServiceFactory');
 AdapterFactory      = require('./data/AdapterFactory');
+
+// TODO: remove global scope of logger
+logger          = require('log4js').getLogger('SotaServer');
 
 /**
  * Hide real configuration object from rest of the world
@@ -100,6 +87,21 @@ var SotaServer = BaseClass.extend({
       throw new Error('Routes configuration file does not exist: ' + routeConfigFile);
     }
     _realConfig.routes = require(routeConfigFile);
+
+    /**
+     * Middlewares
+     */
+    let middlwareConfigFile = path.resolve(rootDir, 'config', 'Middlewares.js');
+    if (FileUtils.isFileSync(middlwareConfigFile)) {
+      _realConfig.middlewares = require(middlwareConfigFile);
+    } else {
+      _realConfig.middlewares = {};
+    }
+
+     let middlewareDirs = [];
+     middlewareDirs.push(path.resolve(rootDir, 'core', 'middleware'));
+     middlewareDirs.push(path.resolve(rootDir, 'app', 'middlewares'));
+     _realConfig.middlewareDirs = middlewareDirs;
 
     /**
      * Policies are stored in:
@@ -196,7 +198,7 @@ var SotaServer = BaseClass.extend({
   _initExpress: function() {
     logger.info('SotaServer::_initExpress initializing express application...');
     var myApp = require('./initializer/Express')(_realConfig);
-    var myServer = http.createServer(myApp);
+    var myServer = require('http').createServer(myApp);
 
     this._initMiddlewares(myApp);
     this._initPolicies(myApp);
@@ -266,7 +268,7 @@ var SotaServer = BaseClass.extend({
 
   _setupPassport: function(myApp) {
     var init = require('./initializer/Passport');
-    init(myApp, passport);
+    init(myApp);
   },
 
   _setupRoutes: function(myApp) {

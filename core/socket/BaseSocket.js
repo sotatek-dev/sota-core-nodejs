@@ -1,3 +1,4 @@
+var jwt           = require('jwt-simple');
 var socketIO      = require('socket.io');
 var BaseClass     = require('../common/BaseClass');
 var logger        = require('log4js').getLogger('BaseSocket');

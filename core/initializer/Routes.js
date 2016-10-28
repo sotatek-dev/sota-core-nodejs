@@ -1,4 +1,4 @@
-var logger              = require('log4js').getLogger('Initializer');
+var logger              = require('log4js').getLogger('Init.Routes');
 var UserController      = require('../controller/UserController');
 
 module.exports = function(app, ControllerFactory, config) {

@@ -1,4 +1,5 @@
 var BaseClass   = require('../common/BaseClass');
+var logger      = require('log4js').getLogger('BaseService');
 
 module.exports = BaseClass.extend({
   classname : 'BaseService',

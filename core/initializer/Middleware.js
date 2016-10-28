@@ -1,36 +1,55 @@
-module.exports = function(app, config) {
-  // Middlewares setup
-  // TODO: make this more configurable
-  let sessionOpts = {
-    secret: config.secret,
-    resave: true,
-    saveUninitialized: true,
-  };
-  app.use(morgan('dev'));
-  app.use(cookieParser());
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({extended: true}));
-  app.use(session(sessionOpts));
-  app.use(express.static(config.publicDir));
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(flash());
+var logger = require('log4js').getLogger('Init.Middleware');
 
-  // TODO: implement the mechanism for customized middlewares
-  app.use(function(req, res, next) {
-    req.files = req.files || {};
-    var form = new multiparty.Form();
-    form.keepExtensions = true;
-    form.uploadDir = path.join(app.get('rootDir'), 'public/uploads');
-    form.parse(req, function(err, fields, files) {
-      req.params = req.params || {};
-      _.forEach(_.keys(fields), function(key) {
-        req.body[key] = fields[key][0];
-      });
-      _.forEach(_.keys(files), function(key) {
-        req.files[key] = files[key][0];
-      });
-      next();
+var defaultList = [
+  'requestLogger',
+  'cookieParser',
+  'bodyParser',
+  'bodyMultipart',
+  'expressSession',
+  'www',
+  'passportInit',
+  'passportSession',
+];
+
+function getModuleMap(dirs) {
+  var _map = {};
+  _.forEach(dirs, function(dir) {
+    if (!FileUtils.isDirectorySync(dir)) {
+      logger.warn('Invalid middleware directory: ' + dir);
+      return;
+    }
+
+    var files = FileUtils.listFiles(dir, /.js$/i);
+    if (!files.length) {
+      logger.warn('Middleware directory (' + dir + ') is empty');
+      return;
+    }
+
+    _.forEach(files, function(file) {
+      if (!FileUtils.isFileSync(file)) {
+        throw new Error('Invalid middleware file: ' + file);
+      }
+
+      var moduleName = path.basename(file, '.js');
+      _map[moduleName] = file;
     });
   });
+
+  return _map;
+}
+
+module.exports = function(app, config) {
+
+  var moduleMap = getModuleMap(config.middlewareDirs),
+      list = config.middlewares.list || defaultList;
+
+  for (let i = 0; i < list.length; i++) {
+    let moduleName = list[i];
+    if (!moduleMap[moduleName]) {
+      throw new Error('Invalid middleware: ' + moduleName);
+    }
+    let middleware = require(moduleMap[moduleName])(app, config);
+    app.use(middleware);
+  }
+
 };

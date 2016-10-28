@@ -1,5 +1,5 @@
 module.exports = function(config) {
-    var app = express();
+    var app = require('express')();
 
     // Customized config
     app.set('jwtSecret', config.secret);

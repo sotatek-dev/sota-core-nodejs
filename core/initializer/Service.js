@@ -1,4 +1,4 @@
-var logger = log4js.getLogger('Initializer');
+var logger = require('log4js').getLogger('Init.Service');
 
 module.exports = function(app, ServiceFactory, serviceDirs) {
   _.each(serviceDirs, function(serviceDir) {

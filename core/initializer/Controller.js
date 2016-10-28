@@ -1,4 +1,4 @@
-var logger = log4js.getLogger('Initializer');
+var logger = require('log4js').getLogger('Init.Controller');
 
 module.exports = function(app, ControllerFactory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {

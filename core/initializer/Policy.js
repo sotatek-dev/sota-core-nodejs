@@ -1,4 +1,5 @@
-var path = require('path');
+var path    = require('path');
+var logger  = require('log4js').getLogger('Init.Policy');
 
 module.exports = function(app, PolicyManager, dirs) {
   _.each(dirs, function(dir) {

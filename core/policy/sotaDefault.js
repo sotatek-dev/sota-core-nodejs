@@ -118,16 +118,19 @@ function extendParams(req) {
     req.params = {};
   }
 
-  var k;
+  // Retreive auth token from header if cannot find that parameter anywhere else
+  if (req.headers['x-auth-token'] && !req.body.auth_token && !req.query.auth_token) {
+    req.params.auth_token = req.headers['x-auth-token'];
+  }
 
   if (!_.isEmpty(req.query)) {
-    for (k in req.query) {
+    for (let k in req.query) {
       req.params[Utils.convertToSnakeCase(k)] = req.query[k];
     }
   }
 
   if (!_.isEmpty(req.body)) {
-    for (k in req.body) {
+    for (let k in req.body) {
       req.params[Utils.convertToSnakeCase(k)] = req.body[k];
     }
   }
