@@ -2,7 +2,7 @@
 module.exports = function(app, config, options) {
   options = options || {
     keepExtensions: true,
-    uploadDir: path.join(__dirname, '../../public/uploads'),
+    uploadDir: path.join(app.get('rootDir'), 'public/uploads'),
   };
   var multiparty = require('multiparty'),
       typeis = require('type-is'),
@@ -37,6 +37,11 @@ module.exports = function(app, config, options) {
     });
 
     form.parse(req, function(err, fields, files) {
+      if (err) {
+        next(err);
+        return;
+      }
+
       req.params = req.params || {};
       _.forEach(_.keys(fields), function(key) {
         req.body[key] = fields[key][0];
