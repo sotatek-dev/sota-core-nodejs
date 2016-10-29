@@ -65,4 +65,9 @@ Utils.nowInSeconds = function() {
   return Utils.nowInMilis()/1000|0;
 };
 
+Utils.getUploadedLink = function(filename) {
+  return util.format('%s:%d/uploads/%s',
+          process.env.APP_ENDPOINT, process.env.PORT, filename);
+};
+
 module.exports = Utils;
