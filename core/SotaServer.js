@@ -33,8 +33,7 @@ logger          = require('log4js').getLogger('SotaServer');
  * Hide real configuration object from rest of the world
  * No one should be able to touch it
  */
-var _realConfig = {},
-    myServer = null;
+var _realConfig = {};
 
 var SotaServer = BaseClass.extend({
   classname : 'SotaServer',
@@ -260,7 +259,7 @@ var SotaServer = BaseClass.extend({
     init(myApp, ServiceFactory, serviceDirs);
   },
 
-  _setupCheckit: function(myApp) {
+  _setupCheckit: function() {
     var init = require('./initializer/Checkit'),
         checkitDirs = _realConfig.checkitDirs;
     init(Checkit, checkitDirs);

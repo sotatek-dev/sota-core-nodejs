@@ -5,8 +5,7 @@ module.exports = function(app, config, options) {
     uploadDir: path.join(app.get('rootDir'), 'public/uploads'),
   };
   var multiparty = require('multiparty'),
-      typeis = require('type-is'),
-      qs = require('qs');
+      typeis = require('type-is');
 
   return function(req, res, next) {
     // Ignore if the body has been processed
@@ -51,6 +50,6 @@ module.exports = function(app, config, options) {
       });
       next();
     });
-  }
+  };
 
 };
