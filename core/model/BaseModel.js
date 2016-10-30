@@ -80,9 +80,9 @@ var BaseModel = BaseClass.extend({
     return entity;
   },
 
-  _convertObjectsToCamelCase: function(data) {
+  _constructCollection: function(data) {
     if (!_.isArray(data)) {
-      logger.error('_convertObjectsToCamelCase: invalid parameters data=' + util.inspect(data));
+      logger.error('_constructCollection: invalid parameters data=' + util.inspect(data));
       return null;
     }
 
@@ -349,15 +349,19 @@ var BaseModel = BaseClass.extend({
   },
 
   countGroupBy: function(groupCols, options, callback) {
-    var self = this;
-    var adapter = self._getAdapterForSelect();
+    if (typeof groupCols === 'string') {
+      groupCols = [groupCols];
+    }
+
+    var self = this,
+        adapter = self._getAdapterForSelect();
     adapter.countGroupBy(self.tableName, groupCols, options, function(err, ret) {
       if (err) {
         callback(err);
         return;
       }
 
-      callback(null, self._convertObjectsToCamelCase(ret));
+      callback(null, self._constructCollection(ret));
     });
   },
 
@@ -370,7 +374,14 @@ var BaseModel = BaseClass.extend({
   sumGroupBy: function(column, options, callback) {
     var self = this;
     var adapter = self._getAdapterForSelect();
-    adapter.sumGroupBy(self.tableName, column, options, callback);
+    adapter.sumGroupBy(self.tableName, column, options, function(err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      callback(null, self._constructCollection(ret));
+    });
   },
 
   existed: function(options, callback) {
