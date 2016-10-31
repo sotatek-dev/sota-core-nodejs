@@ -67,6 +67,13 @@ BaseClass.extend = (function() {
     var properties = arguments[0];
 
     /*
+     * Second arguments of extend method is an arrays of objects
+     * that also contain properties will be injected in to the derived class
+     * but with a lower priority.
+     */
+    var mixins = arguments[1];
+
+    /*
      * Check whether classname is defined
      * If not the classname will be Anonymous
      */
@@ -82,12 +89,12 @@ BaseClass.extend = (function() {
      * Prepare to traversal through all properties
      * that will be appended to the result class
      */
-    var property;
+    // var property;
 
     /*
      * Copy static properties from superclass
      */
-    for (property in this) {
+    for (let property in this) {
       if (!this.hasOwnProperty(property)) {
         continue;
       }
@@ -108,7 +115,7 @@ BaseClass.extend = (function() {
     /*
      * Here comes derived properties that were passed into extend method
      */
-    for (property in properties) {
+    for (let property in properties) {
       if (!properties.hasOwnProperty(property)) {
         continue;
       }
@@ -116,7 +123,7 @@ BaseClass.extend = (function() {
       // getters / setters behave differently than normal properties.
       var getter = properties.__lookupGetter__(property);
       var setter = properties.__lookupSetter__(property);
-      var value;
+      let value;
 
       if (getter || setter) {
         // And we don't support them for now ;(
@@ -173,6 +180,36 @@ BaseClass.extend = (function() {
 
       // Copy method into new class prototype.
       NewClass.prototype[property] = value;
+    }
+
+    // Mixins
+    if (mixins && mixins.length > 0) {
+      for (let i = 0; i < mixins.length; i++) {
+        let mixin = mixins[i];
+        for (let property in mixin) {
+          if (NewClass.prototype[property]) {
+            continue;
+          }
+
+          if (!mixin.hasOwnProperty(property)) {
+            continue;
+          }
+
+          let value = mixin[property];
+
+          if (typeof value !== 'function' || property[0] === '$') {
+            if (property[0] === '$') {
+              property = property.slice(1);
+            }
+
+            NewClass[property] = value;
+            NewClass.prototype[property] = value;
+            continue;
+          }
+
+          NewClass.prototype[property] = value;
+        }
+      }
     }
 
     // Make sure there is an initialize function.
