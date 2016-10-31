@@ -92,13 +92,13 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += ' SET ';
     sql += _.map(changeCols, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeString(entity[prop]));
+      params.push(self._escapeValue(entity[prop]));
       return self._escapeColumn(col) + '=?';
     }).join(',');
     sql += ' WHERE ';
     sql += _.map(entity.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeString(entity[prop]));
+      params.push(self._escapeValue(entity[prop]));
       return self._escapeColumn(col) + '=?';
     }).join(' AND ');
 
@@ -135,7 +135,7 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += ' WHERE ';
     sql += _.map(entity._model.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeString(entity[prop]));
+      params.push(self._escapeValue(entity[prop]));
       return self._escapeColumn(col) + '=?';
     }).join(' AND ');
     return [sql, params];
@@ -210,10 +210,16 @@ var BaseQueryBuilder = BaseClass.extend({
   },
 
   _escapeColumn : function(columnName) {
-    return '`' + columnName.toLowerCase() + '`';
+    if (columnName.indexOf('.') < 0) {
+      return '`' + columnName.toLowerCase() + '`';
+    }
+
+    return _.map(columnName.split('.'), function(e) {
+      return '`' + e.toLowerCase() + '`';
+    }).join('.');
   },
 
-  _escapeString : function(val) {
+  _escapeValue : function(val) {
     if (val === null || val === undefined) {
       return 'NULL';
     }

@@ -1,5 +1,7 @@
 var BaseClass           = require('../common/BaseClass');
 var BaseEntity          = require('../entity/BaseEntity');
+var BaseCollection      = require('../collection/BaseCollection');
+var IAdaptative         = require('../interface/IAdaptative');
 var logger              = require('log4js').getLogger('BaseModel');
 
 var BaseModel = BaseClass.extend({
@@ -37,6 +39,8 @@ var BaseModel = BaseClass.extend({
     this._useMasterSelect = false;
     this._masterAdapter   = AdapterFactory.create(exSession, masterConfig);
     this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig);
+
+    this._collections     = [];
   },
 
   getAttributeNames : function() {
@@ -68,45 +72,20 @@ var BaseModel = BaseClass.extend({
     return this._exSession;
   },
 
-  _getAdapterForSelect: function() {
+  getAdapterForSelect: function() {
     if (this.isUseMasterSelect()) {
       return this._masterAdapter;
     }
     return this._slaveAdapter;
   },
 
+  getFromClause: function() {
+    return this.tableName;
+  },
+
   _constructEntity : function(data) {
     var entity = new this.Entity(this, data);
     return entity;
-  },
-
-  _constructCollection: function(data) {
-    if (!_.isArray(data)) {
-      logger.error('_constructCollection: invalid parameters data=' + util.inspect(data));
-      return null;
-    }
-
-    var self = this,
-        result = [];
-    _.forEach(data, function(e) {
-      result.push(self._convertOneObjectToCamelCase(e));
-    });
-
-    return result;
-  },
-
-  _convertOneObjectToCamelCase: function(data) {
-    if (!_.isObject(data)) {
-      logger.error('_convertOneObjectToCamelCase: invalid parameters data=' + util.inspect(data));
-      return null;
-    }
-
-    var result = {};
-    for (var p in data) {
-      result[Utils.convertToCamelCase(p)] = data[p];
-    }
-
-    return result;
   },
 
   _isEntityObject : function(data) {
@@ -342,61 +321,11 @@ var BaseModel = BaseClass.extend({
     }
   },
 
-  count: function(options, callback) {
-    var self = this;
-    var adapter = self._getAdapterForSelect();
-    adapter.count(self.tableName, options, callback);
+  as: function(alias) {
+    var collection = new BaseCollection(this, alias);
+    this._collections.push(collection);
+    return collection;
   },
-
-  countGroupBy: function(groupCols, options, callback) {
-    if (typeof groupCols === 'string') {
-      groupCols = [groupCols];
-    }
-
-    var self = this,
-        adapter = self._getAdapterForSelect();
-    adapter.countGroupBy(self.tableName, groupCols, options, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, self._constructCollection(ret));
-    });
-  },
-
-  sum: function(column, options, callback) {
-    var self = this;
-    var adapter = self._getAdapterForSelect();
-    adapter.sum(self.tableName, column, options, callback);
-  },
-
-  sumGroupBy: function(column, options, callback) {
-    var self = this;
-    var adapter = self._getAdapterForSelect();
-    adapter.sumGroupBy(self.tableName, column, options, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, self._constructCollection(ret));
-    });
-  },
-
-  existed: function(options, callback) {
-    var self = this;
-    var adapter = self._getAdapterForSelect();
-    adapter.existed(self.tableName, options, callback);
-  },
-
-  // commit: function(callback) {
-  //   this._exSession.commit(callback);
-  // },
-
-  // rollback: function(callback) {
-  //   this._exSession.rollback(callback);
-  // },
 
   singleCommit: function(callback) {
     this._masterAdapter.commit(callback);
@@ -412,13 +341,11 @@ var BaseModel = BaseClass.extend({
         'Invalid settings for building where clause: column=%s, length=%d',
         column, length
       );
-      // TODO: Just for easier debug in development phase
-      // should log error only instead of throwing error
       throw new Error(msg);
     }
 
     var place = [];
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
         place.push('?');
     }
     return '`' + column + '` in (' + place.join(',') + ')';
@@ -433,11 +360,16 @@ var BaseModel = BaseClass.extend({
       this._slaveAdapter.destroy();
     }
 
+    for (let i = 0; i < this._collections.length; i++) {
+      this._collections[i].destroy();
+    }
+
     delete this._masterAdapter;
     delete this._slaveAdapter;
     delete this._exSession;
+    delete this._collections;
   },
 
-});
+}, [IAdaptative]);
 
 module.exports = BaseModel;
