@@ -135,7 +135,7 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += ' WHERE ';
     sql += _.map(entity._model.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeValue(entity[prop]));
+      params.push(entity[prop]);
       return self._escapeColumn(col) + '=?';
     }).join(' AND ');
     return [sql, params];
@@ -217,18 +217,6 @@ var BaseQueryBuilder = BaseClass.extend({
     return _.map(columnName.split('.'), function(e) {
       return '`' + e.toLowerCase() + '`';
     }).join('.');
-  },
-
-  _escapeValue : function(val) {
-    if (val === null || val === undefined) {
-      return 'NULL';
-    }
-
-    if (typeof val === 'string') {
-      return '\'' + val + '\'';
-    } else {
-      return val;
-    }
   },
 
   _buildColumns : function(options) {
