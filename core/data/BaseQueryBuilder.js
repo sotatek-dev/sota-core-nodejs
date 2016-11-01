@@ -92,13 +92,13 @@ var BaseQueryBuilder = BaseClass.extend({
     sql += ' SET ';
     sql += _.map(changeCols, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeValue(entity[prop]));
+      params.push(entity[prop]);
       return self._escapeColumn(col) + '=?';
     }).join(',');
     sql += ' WHERE ';
     sql += _.map(entity.primaryKeys, function(col) {
       var prop = Utils.convertToCamelCase(col);
-      params.push(self._escapeValue(entity[prop]));
+      params.push(entity[prop]);
       return self._escapeColumn(col) + '=?';
     }).join(' AND ');
 
