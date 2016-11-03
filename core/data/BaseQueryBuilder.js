@@ -37,8 +37,10 @@ var BaseQueryBuilder = BaseClass.extend({
     }
 
     var cols = _.reject(_.keys(entities[0].columns), function(col) {
-      var isPK = _.indexOf(entities[0].primaryKeys, col) > -1;
-      return isPK;
+      let isPK = _.indexOf(entities[0].primaryKeys, col) > -1,
+          prop = Utils.convertToCamelCase(col),
+          isNull = entities[0][prop] === null || entities[0][prop] === undefined;
+      return isPK || isNull;
     }).concat(entities[0].predefinedCols);
 
     var valueStrs = [],
