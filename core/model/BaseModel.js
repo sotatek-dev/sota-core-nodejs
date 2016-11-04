@@ -351,6 +351,22 @@ var BaseModel = BaseClass.extend({
     return '`' + column + '` in (' + place.join(',') + ')';
   },
 
+  $whereNotIn: function(column, length) {
+    if (!length) {
+      var msg = util.format(
+        'Invalid settings for building where clause: column=%s, length=%d',
+        column, length
+      );
+      throw new Error(msg);
+    }
+
+    var place = [];
+    for (let i = 0; i < length; i++) {
+        place.push('?');
+    }
+    return '`' + column + '` not in (' + place.join(',') + ')';
+  },
+
   destroy : function() {
     if (this._masterAdapter) {
       this._masterAdapter.destroy();
