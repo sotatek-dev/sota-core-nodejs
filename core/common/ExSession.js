@@ -5,8 +5,8 @@ module.exports = BaseClass.extend({
 
   _sessionId : '',
 
-  initialize: function(req) {
-    this._req = req;
+  initialize: function(sessionInfo) {
+    this._info = sessionInfo || {};
   },
 
   getService : function(classname) {
@@ -37,11 +37,11 @@ module.exports = BaseClass.extend({
    * Return id of current current session's user
    */
   getUserId: function() {
-    if (!this._req || !this._req.user) {
+    if (!this._info.user) {
       return 0;
     }
 
-    return this._req.user.id;
+    return this._info.user.id;
   },
 
   commit: function(callback) {

@@ -27,6 +27,10 @@ var BaseModel = BaseClass.extend({
 
   initialize : function(exSession, masterConfig, slaveConfig) {
     // logger.info(this.classname + '::initialize exSession=' + exSession);
+    if (!exSession) {
+      throw new Error('Invalid exSession: ' + exSession);
+    }
+
     if (!masterConfig) {
       throw new Error('Invalid config for master adapter');
     }
@@ -223,6 +227,18 @@ var BaseModel = BaseClass.extend({
    */
   findById: function(id, callback) {
     this.findOne(id, callback);
+  },
+
+  findByIds: function(ids, callback) {
+    if (!_.isArray(ids) || ids.length === 0) {
+      callback(ErrorFactory.internal(this.classname + '::findByIds invalid ids=' + ids));
+      return;
+    }
+
+    this.find({
+      where: this.whereIn('id', ids.length),
+      params: ids
+    }, callback);
   },
 
   /**

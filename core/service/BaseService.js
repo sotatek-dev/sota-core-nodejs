@@ -5,7 +5,10 @@ module.exports = BaseClass.extend({
   classname : 'BaseService',
 
   initialize : function(exSession) {
-    logger.info('BaseService<' + this.classname + '>::initialize');
+    // logger.info('BaseService<' + this.classname + '>::initialize');
+    if (!exSession) {
+      throw new Error('Invalid exSession: ' + exSession);
+    }
     this._exSession = exSession;
   },
 

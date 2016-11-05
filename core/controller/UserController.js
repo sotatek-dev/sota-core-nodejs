@@ -1,4 +1,5 @@
 var BaseController  = require('./BaseController');
+var passport        = require('passport');
 var jwt             = require('jwt-simple');
 
 module.exports = BaseController.extend({
