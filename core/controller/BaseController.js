@@ -139,7 +139,7 @@ var BaseController = BaseClass.extend({
           return;
         }
 
-        res.contentCreated(ret.add);
+        res.created(ret.add);
       });
     };
 
