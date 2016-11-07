@@ -1,6 +1,7 @@
 var jwt           = require('jwt-simple');
 var socketIO      = require('socket.io');
 var BaseClass     = require('../common/BaseClass');
+var ExSession     = require('../common/ExSession');
 var logger        = require('log4js').getLogger('BaseSocket');
 
 module.exports = BaseClass.extend({
@@ -50,7 +51,7 @@ module.exports = BaseClass.extend({
     try {
       var token = socket.request._query.auth_token;
       var jwtPayload = jwt.decode(token, jwtSecret);
-      var UserModel = ModelFactory.create('UserModel');
+      var UserModel = ModelFactory.create('UserModel', new ExSession());
       UserModel.findOne(jwtPayload.userId, function(err, user) {
         // When a model is not got from request, need to destroy manually
         // to prevent connection leak
