@@ -1,4 +1,4 @@
-var BaseClass   = require('../common/BaseClass');
+var Class       = require('../common/Class');
 var logger      = require('log4js').getLogger('ModelFactory');
 
 /**
@@ -9,7 +9,7 @@ var _adaptersConfig = {},
     _registers = {},
     _modelSchema = {};
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname : 'ModelFactory',
 
   setAdaptersConfig: function(adaptersConfig) {

@@ -1,6 +1,6 @@
 var BaseController = require('../../core/controller/BaseController');
 
-module.exports = BaseController.extend({
+module.exports = BaseController.extends({
   classname : 'TestUserController',
 
   initialize : function() {

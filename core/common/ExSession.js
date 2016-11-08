@@ -1,6 +1,6 @@
-var BaseClass = require('./BaseClass');
+var Class = require('./Class');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname : 'ExSession',
 
   _sessionId : '',

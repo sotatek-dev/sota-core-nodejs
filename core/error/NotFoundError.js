@@ -1,6 +1,6 @@
 var BaseError = require('./BaseError');
 
-module.exports = BaseError.extend({
+module.exports = BaseError.extends({
   classname: 'NotFoundError',
 
   initialize: function($super, msg, code) {

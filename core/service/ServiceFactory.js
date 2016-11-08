@@ -1,4 +1,4 @@
-var BaseClass = require('../common/BaseClass');
+var Class     = require('../common/Class');
 var logger    = require('log4js').getLogger('ServiceFactory');
 
 /**
@@ -7,7 +7,7 @@ var logger    = require('log4js').getLogger('ServiceFactory');
  */
 var _registers = {};
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname : 'ServiceFactory',
 
   register : function(s) {
@@ -27,6 +27,10 @@ module.exports = BaseClass.singleton({
     }
 
     return _registers[classname];
+  },
+
+  create: function(classname, exSession) {
+    return (new this.get(classname))(exSession);
   },
 
 });

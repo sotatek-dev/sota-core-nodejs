@@ -46,32 +46,29 @@ function emptyFunction() {
   // Nothing
 }
 
-var BaseClass = function() {};
+var Class = function() {};
 /*
  * Create a subclass
  * @param {object} properties: the extended properties of derived class
  *                             property begins with '$' is static one
  * @param {array} mixins: the interfaces that dervied class implemented
  */
-BaseClass.extend = (function() {
+Class.extends = (function() {
 
   /*
    * Of course javascript class is a function
    */
   return function() {
 
+    if (arguments.length !== 1) {
+      throw new Error('Invalid class arguments');
+    }
+
     /*
-     * First arguments of extend method is an object contains properties
+     * First arguments of extends method is an object contains properties
      * that will be injected in to the derived class
      */
     var properties = arguments[0];
-
-    /*
-     * Second arguments of extend method is an arrays of objects
-     * that also contain properties will be injected in to the derived class
-     * but with a lower priority.
-     */
-    var mixins = arguments[1];
 
     /*
      * Check whether classname is defined
@@ -113,7 +110,7 @@ BaseClass.extend = (function() {
     NewClass.prototype.constructor = NewClass;
 
     /*
-     * Here comes derived properties that were passed into extend method
+     * Here comes derived properties that were passed into extends method
      */
     for (let property in properties) {
       if (!properties.hasOwnProperty(property)) {
@@ -127,7 +124,7 @@ BaseClass.extend = (function() {
 
       if (getter || setter) {
         // And we don't support them for now ;(
-        throw new Error('BaseClass::extend still does not support setter and getter yet...');
+        throw new Error('Class::extends still does not support setter and getter yet...');
       }
 
       value = properties[property];
@@ -182,36 +179,6 @@ BaseClass.extend = (function() {
       NewClass.prototype[property] = value;
     }
 
-    // Mixins
-    if (mixins && mixins.length > 0) {
-      for (let i = 0; i < mixins.length; i++) {
-        let mixin = mixins[i];
-        for (let property in mixin) {
-          if (NewClass.prototype[property]) {
-            continue;
-          }
-
-          if (!mixin.hasOwnProperty(property)) {
-            continue;
-          }
-
-          let value = mixin[property];
-
-          if (typeof value !== 'function' || property[0] === '$') {
-            if (property[0] === '$') {
-              property = property.slice(1);
-            }
-
-            NewClass[property] = value;
-            NewClass.prototype[property] = value;
-            continue;
-          }
-
-          NewClass.prototype[property] = value;
-        }
-      }
-    }
-
     // Make sure there is an initialize function.
     if (!NewClass.prototype.initialize) {
       NewClass.prototype.initialize = emptyFunction;
@@ -227,9 +194,9 @@ BaseClass.extend = (function() {
 
 })();
 
-BaseClass.singleton = function(){
+Class.singleton = function(){
   // Create sublcass as normal.
-  var TempClass = this.extend.apply(this, arguments);
+  var TempClass = this.extends.apply(this, arguments);
 
   // Hide the initialize.
   var initialize = TempClass.prototype.initialize;
@@ -290,4 +257,39 @@ BaseClass.singleton = function(){
   return instance;
 };
 
-module.exports = BaseClass;
+Class.implements = function(interfaces) {
+  if (!interfaces || !interfaces.length) {
+    throw new Error('Invalid interfaces to implement');
+  }
+
+  for (let i = 0; i < interfaces.length; i++) {
+    var interface = interfaces[i];
+    for (let property in interface) {
+      if (this.prototype[property]) {
+        continue;
+      }
+
+      if (!interface.hasOwnProperty(property)) {
+        continue;
+      }
+
+      let value = interface[property];
+
+      if (typeof value !== 'function' || property[0] === '$') {
+        if (property[0] === '$') {
+          property = property.slice(1);
+        }
+
+        this[property] = value;
+        this.prototype[property] = value;
+        continue;
+      }
+
+      this.prototype[property] = value;
+    }
+  }
+
+  return this;
+};
+
+module.exports = Class;

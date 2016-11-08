@@ -11,7 +11,7 @@ imageminPngquant    = require('imagemin-pngquant');
 
 LocalCache          = require('./common/LocalCache');
 Const               = require('./common/Const');
-BaseClass           = require('./common/BaseClass');
+Class               = require('./common/Class');
 FileUtils           = require('./util/FileUtils');
 Utils               = require('./util/Utils');
 
@@ -35,7 +35,7 @@ logger          = require('log4js').getLogger('SotaServer');
  */
 var _realConfig = {};
 
-var SotaServer = BaseClass.extend({
+var SotaServer = Class.extends({
   classname : 'SotaServer',
 
   initialize: function(config) {

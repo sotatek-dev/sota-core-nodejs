@@ -1,7 +1,7 @@
-var BaseClass = require('../common/BaseClass');
+var Class     = require('../common/Class');
 var logger    = require('log4js').getLogger('BaseEntity');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname : 'BaseEntity',
 
   initialize : function(model, data) {
@@ -88,13 +88,13 @@ module.exports = BaseClass.extend({
     var self    = this,
         result  = true;
 
-    _.each(self._model.getColumnNames(), function(p) {
-      if (_.indexOf(self._model.predefinedCols, p) > -1 || p === 'id') {
+    _.each(self._model.getColumnNames(), function(columnName) {
+      if (_.indexOf(self._model.predefinedCols, columnName) > -1 || columnName === 'id') {
         return;
       }
 
-      var property = Utils.convertToCamelCase(p.toLowerCase());
-      if (!!self._model.columns[p].isNotNull && _.isEmpty(self._data[property])) {
+      var property = Utils.convertToCamelCase(columnName.toLowerCase());
+      if (!!self._model.columns[columnName].isNotNull && _.isEmpty(self._data[property])) {
         result = false;
       }
 
@@ -108,24 +108,29 @@ module.exports = BaseClass.extend({
         now = Utils.now(),
         exSession = this._model.getExSession();
     var userId = exSession ? exSession.getUserId() : 0;
-    _.each(this._model.getColumnNames(), function(p) {
+    _.each(this._model.getColumnNames(), function(columnName) {
+      let property = Utils.convertToCamelCase(columnName.toLowerCase());
 
-      if (data[p] === undefined) {
-        if (p === 'created_at' || p === 'updated_at') {
-          data[p] = now;
-        } else if (p === 'created_by' || p === 'updated_by') {
-          data[p] = userId;
+      if (data[columnName] === undefined) {
+        if (data[property] === undefined) {
+          if (columnName === 'created_at' || columnName === 'updated_at') {
+            data[columnName] = now;
+          } else if (columnName === 'created_by' || columnName === 'updated_by') {
+            data[columnName] = userId;
+          } else {
+            return;
+          }
         } else {
-          return;
+          data[columnName] = data[property];
         }
       }
 
       // Always freeze 'id' property if it has value already
-      if (p === 'id' && self._data.id > 0) {
+      if (columnName === 'id' && self._data.id > 0) {
         return;
       }
 
-      // property = p.toLowerCase();
+      // property = columnName.toLowerCase();
       // /*jshint loopfunc: true */
       // this.__defineGetter__(property, function(property) {
       //   return self._data[property];
@@ -140,11 +145,10 @@ module.exports = BaseClass.extend({
        * into camel-case here? Is it too magical?
        */
 
-      property = Utils.convertToCamelCase(p.toLowerCase());
-      if (typeof data[p] === 'string' && data[p] === '_NULL') {
+      if (typeof data[columnName] === 'string' && data[columnName] === '_NULL') {
         self._data[property] = null;
       } else {
-        self._data[property] = data[p];
+        self._data[property] = data[columnName];
       }
 
       /*jshint loopfunc: true */
@@ -281,8 +285,8 @@ module.exports = BaseClass.extend({
 
   _refreshLocal: function() {
     var self = this;
-    _.each(this._model.getAttributeNames(), function(p) {
-      self._dataOld[p] = self._data[p];
+    _.each(this._model.getAttributeNames(), function(property) {
+      self._dataOld[property] = self._data[property];
     });
   },
 

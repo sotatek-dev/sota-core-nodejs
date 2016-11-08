@@ -1,6 +1,6 @@
 
 
-module.exports = BaseService.extend({
+module.exports = BaseService.extends({
   classname : 'TestUserService',
 
 });

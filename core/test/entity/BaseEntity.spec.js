@@ -1,6 +1,6 @@
 var SotaServer  = require('../../SotaServer');
 
-var XEntity = BaseEntity.extend({
+var XEntity = BaseEntity.extends({
   classname : 'XEntity',
 
 

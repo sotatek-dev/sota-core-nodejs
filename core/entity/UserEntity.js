@@ -1,7 +1,7 @@
 var BaseEntity  = require('./BaseEntity');
 var bcrypt      = require('bcryptjs');
 
-module.exports = BaseEntity.extend({
+module.exports = BaseEntity.extends({
   classname: 'UserEntity',
 
   isValidPassword: function(password) {

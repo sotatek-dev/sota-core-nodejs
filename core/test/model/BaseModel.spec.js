@@ -1,8 +1,9 @@
 var SotaServer  = require('../../SotaServer');
 var BaseModel   = require('../../model/BaseModel');
 var Config      = require('../../../config/Config');
+var ExSession   = require('../../common/ExSession');
 
-var XModel = BaseModel.extend({
+var XModel = BaseModel.extends({
   classname : 'XModel',
 
   $columns : {
@@ -25,7 +26,7 @@ describe('BaseModel', function() {
 
   describe('#getAttributeNames', function() {
     it('should return atrributes\' name in model', function() {
-      var x = new XModel(null, xMasterConfig, xSlaveConfig);
+      var x = new XModel(new ExSession(), xMasterConfig, xSlaveConfig);
       var cols = x.getAttributeNames();
       assert.equal(cols.length, 7);
       assert.equal(cols[0], 'id');
@@ -40,7 +41,7 @@ describe('BaseModel', function() {
 
   describe('#getColumnNames', function() {
     it('should return columns\' name in model', function() {
-      var x = new XModel(null, xMasterConfig, xSlaveConfig);
+      var x = new XModel(new ExSession(), xMasterConfig, xSlaveConfig);
       var cols = x.getColumnNames();
       assert.equal(cols.length, 7);
       assert.equal(cols[0], 'id');

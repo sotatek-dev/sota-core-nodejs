@@ -1,4 +1,4 @@
-var UserService = BaseService.extend({
+var UserService = BaseService.extends({
   classname : 'UserService',
 
   register : function(userInfo, callback) {

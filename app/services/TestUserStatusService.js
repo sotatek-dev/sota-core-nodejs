@@ -1,6 +1,6 @@
 var BaseService = require('../../core/service/BaseService');
 
-module.exports = BaseService.extend({
+module.exports = BaseService.extends({
   classname : 'TestUserStatusService',
 
   insert : function(callback) {

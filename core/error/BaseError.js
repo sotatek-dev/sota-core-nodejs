@@ -1,6 +1,6 @@
-var BaseClass = require('../common/BaseClass');
+var Class = require('../common/Class');
 
-var BaseError = BaseClass.extend({
+var BaseError = Class.extends({
   classname : 'BaseError',
 
   $_TYPE : 'UNKOWN',

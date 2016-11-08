@@ -1,7 +1,7 @@
 var SotaServer      = require('../../SotaServer');
 var assert          = require('assert');
 
-var SuperClassTest = BaseClass.extend({
+var SuperClassTest = Class.extends({
   classname: 'SuperClassTest',
 
   initialize: function(prop) {
@@ -13,7 +13,7 @@ var SuperClassTest = BaseClass.extend({
 
 });
 
-var DerivedClassTest1 = SuperClassTest.extend({
+var DerivedClassTest1 = SuperClassTest.extends({
   classname: 'DerivedClassTest',
 
   initialize: function() {
@@ -22,7 +22,7 @@ var DerivedClassTest1 = SuperClassTest.extend({
 
 });
 
-var DerivedClassTest2 = SuperClassTest.extend({
+var DerivedClassTest2 = SuperClassTest.extends({
   classname: 'DerivedClassTest',
 
   initialize: function($super, prop) {
@@ -32,7 +32,7 @@ var DerivedClassTest2 = SuperClassTest.extend({
 
 });
 
-var DerivedClassTest3 = SuperClassTest.extend({
+var DerivedClassTest3 = SuperClassTest.extends({
   classname: 'DerivedClassTest',
 
   initialize: function($super, prop) {
@@ -42,7 +42,7 @@ var DerivedClassTest3 = SuperClassTest.extend({
 
 });
 
-describe('BaseClass', function() {
+describe('Class', function() {
 
   describe('#initialize', function() {
     it('Classname', function() {

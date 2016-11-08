@@ -5,7 +5,7 @@ var ConflictError     = require('./ConflictError');
 var ForbiddenError    = require('./ForbiddenError');
 var InternalError     = require('./InternalError');
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname: 'ErrorFactory',
 
   badRequest: function(msg, code) {

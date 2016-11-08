@@ -1,7 +1,7 @@
 var bcrypt        = require('bcryptjs');
 var UserEntity    = require('../entity/UserEntity');
 
-module.exports = BaseModel.extend({
+module.exports = BaseModel.extends({
   classname : 'UserModel',
 
   $tableName: 'user',

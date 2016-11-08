@@ -42,6 +42,10 @@ function _purifyEntity(data) {
 function _envelopData(data) {
   data = data || {};
 
+  if (data.hasOwnProperty('data')) {
+    return data;
+  }
+
   // Wrap data to envelop if it wasn't done yet
   if (data instanceof BaseEntity) {
     data = {
@@ -64,8 +68,9 @@ function _envelopResponse(data) {
         serverTime : Utils.now(),
         masterdataVersion: LocalCache.get('dataVersion') || 1,
       },
-      data        : data.data || {},
+      data        : data.data || null,
       pagination  : data.pagination,
+      global      : data.global,
     };
   } else { // Send error
     return {
@@ -125,13 +130,15 @@ function extendParams(req) {
 
   if (!_.isEmpty(req.query)) {
     for (let k in req.query) {
-      req.params[Utils.convertToSnakeCase(k)] = req.query[k];
+      // req.params[Utils.convertToCamelCase(k)] = req.query[k];
+      req.params[k] = req.query[k];
     }
   }
 
   if (!_.isEmpty(req.body)) {
     for (let k in req.body) {
-      req.params[Utils.convertToSnakeCase(k)] = req.body[k];
+      // req.params[Utils.convertToCamelCase(k)] = req.body[k];
+      req.params[k] = req.body[k];
     }
   }
 }

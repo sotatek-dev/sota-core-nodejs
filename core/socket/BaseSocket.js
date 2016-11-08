@@ -1,10 +1,10 @@
 var jwt           = require('jwt-simple');
 var socketIO      = require('socket.io');
-var BaseClass     = require('../common/BaseClass');
+var Class         = require('../common/Class');
 var ExSession     = require('../common/ExSession');
 var logger        = require('log4js').getLogger('BaseSocket');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname: 'BaseSocket',
   _namespace: '/',
 
@@ -33,8 +33,7 @@ module.exports = BaseClass.extend({
 
     // Customized behavior
     if (self._events) {
-      var e;
-      for (e in self._events) {
+      for (let e in self._events) {
         socket.on(e, self[self._events[e]].bind(self, socket));
       }
     }
@@ -64,7 +63,7 @@ module.exports = BaseClass.extend({
         }
 
         if (!user) {
-          next(null, false);
+          return next(null, false);
         }
 
         socket.user = user;

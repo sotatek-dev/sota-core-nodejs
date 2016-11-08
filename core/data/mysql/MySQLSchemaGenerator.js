@@ -5,10 +5,10 @@ var _           = require('lodash');
 var async       = require('async');
 var Types       = require('../../node_modules/mysql/lib/protocol/constants/types');
 
-var BaseClass   = require('../../common/BaseClass');
+var Class       = require('../../common/Class');
 var BaseModel   = require('../../model/BaseModel');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname: 'MySQLSchemaGetter',
 
   /**

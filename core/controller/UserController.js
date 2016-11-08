@@ -2,7 +2,7 @@ var BaseController  = require('./BaseController');
 var passport        = require('passport');
 var jwt             = require('jwt-simple');
 
-module.exports = BaseController.extend({
+module.exports = BaseController.extends({
   classname: 'UserController',
 
   login: function(req, res) {

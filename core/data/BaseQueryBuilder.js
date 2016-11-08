@@ -1,4 +1,4 @@
-var BaseClass         = require('../common/BaseClass');
+var Class             = require('../common/Class');
 var BaseEntity        = require('../entity/BaseEntity');
 var logger            = require('log4js').getLogger('BaseQueryBuilder');
 
@@ -6,7 +6,7 @@ var logger            = require('log4js').getLogger('BaseQueryBuilder');
  * Based on MySQL syntax.
  * Other db types should be customized with own query builder classes
  */
-var BaseQueryBuilder = BaseClass.extend({
+var BaseQueryBuilder = Class.extends({
   classname : 'QueryBuilder',
 
   select : function(tableName, options) {

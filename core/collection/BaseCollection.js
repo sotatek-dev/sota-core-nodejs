@@ -1,8 +1,8 @@
-var BaseClass     = require('../common/BaseClass');
+var Class         = require('../common/Class');
 var IAdaptative   = require('../interface/IAdaptative');
 var logger        = require('log4js').getLogger('BaseCollection');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname: 'BaseCollection',
 
   initialize: function(model, alias) {
@@ -75,4 +75,4 @@ module.exports = BaseClass.extend({
     throw new Error('Invalid conditions format.');
   },
 
-}, [IAdaptative]);
+}).implements([IAdaptative]);

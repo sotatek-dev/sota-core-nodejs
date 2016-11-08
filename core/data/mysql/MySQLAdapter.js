@@ -2,7 +2,7 @@ var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
 var logger              = require('log4js').getLogger('MySQLAdapter');
 
-module.exports = BaseAdapter.extend({
+module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
 
   initialize : function($super, exSession, pool) {

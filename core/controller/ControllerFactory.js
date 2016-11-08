@@ -1,5 +1,5 @@
 var logger        = require('log4js').getLogger('ControllerFactory');
-var BaseClass     = require('../common/BaseClass');
+var Class         = require('../common/Class');
 
 /**
  * Hide real private objects from rest of the world
@@ -7,7 +7,7 @@ var BaseClass     = require('../common/BaseClass');
  */
 var _registers = {};
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname : 'ControllerFactory',
 
   register : function(c) {

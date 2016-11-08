@@ -1,10 +1,10 @@
-var BaseClass = require('../common/BaseClass');
+var Class     = require('../common/Class');
 var logger    = require('log4js').getLogger('SocketManager');
 
-module.exports = BaseClass.singleton({
-  classname: 'SocketManager',
+var _registers = {};
 
-  _registers: {},
+module.exports = Class.singleton({
+  classname: 'SocketManager',
 
   create: function(SocketClass, server, jwtSecret) {
     var classname = SocketClass.classname;
@@ -12,13 +12,13 @@ module.exports = BaseClass.singleton({
       throw new Error('Invalid socket classname: ' + classname);
     }
 
-    if (this._registers[classname]) {
-      logger.warn(util.format('%s was already class before', classname));
+    if (_registers[classname]) {
+      logger.warn(util.format('%s was already created before', classname));
       return;
     }
 
     var socket = new SocketClass(server, jwtSecret);
-    this._registers[classname] = socket;
+    _registers[classname] = socket;
   }
 
 });

@@ -1,6 +1,6 @@
-var BaseClass = require('../../common/BaseClass');
+var Class = require('../../common/Class');
 
-var MockFactory = BaseClass.singleton({
+var MockFactory = Class.singleton({
   classname : 'MockFactory',
 
   _registers : {},

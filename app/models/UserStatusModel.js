@@ -1,6 +1,6 @@
 var BaseModel       = require('../../core/model/BaseModel');
 
-module.exports = BaseModel.extend({
+module.exports = BaseModel.extends({
   classname : 'UserStatusModel',
 
   $tableName : 'user_status',

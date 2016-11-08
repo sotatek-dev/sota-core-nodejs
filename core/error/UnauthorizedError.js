@@ -1,6 +1,6 @@
 var BaseError = require('./BaseError');
 
-module.exports = BaseError.extend({
+module.exports = BaseError.extends({
   classname: 'UnauthorizedError',
 
   initialize: function($super, msg, code) {

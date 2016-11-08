@@ -1,10 +1,10 @@
-var BaseClass           = require('../common/BaseClass');
+var Class               = require('../common/Class');
 var BaseEntity          = require('../entity/BaseEntity');
 var BaseCollection      = require('../collection/BaseCollection');
 var IAdaptative         = require('../interface/IAdaptative');
 var logger              = require('log4js').getLogger('BaseModel');
 
-var BaseModel = BaseClass.extend({
+var BaseModel = Class.extends({
   classname   : 'BaseModel',
 
   // Fixed properties for all models
@@ -402,6 +402,6 @@ var BaseModel = BaseClass.extend({
     delete this._collections;
   },
 
-}, [IAdaptative]);
+}).implements([IAdaptative]);
 
 module.exports = BaseModel;

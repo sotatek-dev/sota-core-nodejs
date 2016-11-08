@@ -1,4 +1,4 @@
-var BaseClass           = require('../common/BaseClass');
+var Class               = require('../common/Class');
 var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
 var logger              = require('log4js').getLogger('AdapterFactory');
@@ -7,7 +7,7 @@ var _nextId = 0,
     _registry = {},
     _pools = {};
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname : 'AdapterFactory',
 
   create : function(exSession, config) {

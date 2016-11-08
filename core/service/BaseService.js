@@ -1,7 +1,7 @@
-var BaseClass   = require('../common/BaseClass');
+var Class       = require('../common/Class');
 var logger      = require('log4js').getLogger('BaseService');
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname : 'BaseService',
 
   initialize : function(exSession) {

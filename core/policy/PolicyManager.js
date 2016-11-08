@@ -1,7 +1,7 @@
 var logger    = require('log4js').getLogger('PolicyManager');
-var BaseClass = require('../common/BaseClass');
+var Class     = require('../common/Class');
 
-module.exports = BaseClass.singleton({
+module.exports = Class.singleton({
   classname: 'PolicyManager',
 
   _registers: {},

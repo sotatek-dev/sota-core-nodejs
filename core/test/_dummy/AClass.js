@@ -1,8 +1,8 @@
-var BaseClass = require('../../common/BaseClass');
+var Class = require('../../common/Class');
 
 var _secret = 'A-secret';
 
-module.exports = BaseClass.extend({
+module.exports = Class.extends({
   classname: 'AClass',
 
   getSecret: function() {

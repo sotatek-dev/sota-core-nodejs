@@ -4,7 +4,7 @@ var BaseModel = require('./BaseModel');
  * The masterdata's tables
  * TODO: implement this
  */
-module.exports = BaseModel.extend({
+module.exports = BaseModel.extends({
   classname: 'VersionedModel',
 
   getCurrent: function(callback) {
