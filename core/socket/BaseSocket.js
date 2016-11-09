@@ -37,9 +37,20 @@ module.exports = Class.extends({
     }
   },
 
+  onDisconnect: function(socket) {
+    throw new Error('Must be implemented in derived class.');
+  },
+
   _onDisconnect: function(socket) {
     logger.debug(util.format('[%s]: user [%s](id:%d) disconnected!',
                   this._namespace, socket.user.username, socket.user.id));
+
+    this.onDisconnect(socket);
+
+    if (socket.exSession) {
+      socket.exSession.destroy();
+      delete socket.exSession;
+    }
   },
 
   _authenticate: function(socket, next) {
@@ -61,16 +72,25 @@ module.exports = Class.extends({
         }
 
         if (!user) {
-          return next(ErrorFactory.notFound());
+          return next(ErrorFactory.notFound('User not found: ' + jwtPayload.userId));
         }
 
         socket.user = user;
+        socket.exSession = new ExSession({user: user});
+        socket.getModel = function getModel(classname) {
+          return exSession.getModel(classname);
+        };
+
+        socket.getService = function getService(classname) {
+          return exSession.getService(classname);
+        };
+
         next(null, true);
 
       });
     } catch (e) {
       logger.error(e);
-      next(e, false);
+      return next(e, false);
     }
   },
 
