@@ -38,7 +38,8 @@ module.exports = Class.extends({
   },
 
   onDisconnect: function(socket, callback) {
-    throw new Error('Must be implemented in derived class.');
+    // throw new Error('Must be implemented in derived class.');
+    callback();
   },
 
   _onDisconnect: function(socket) {
