@@ -1,5 +1,4 @@
 var jwt           = require('jwt-simple');
-var socketIO      = require('socket.io');
 var Class         = require('../common/Class');
 var ExSession     = require('../common/ExSession');
 var logger        = require('log4js').getLogger('BaseSocket');
@@ -10,10 +9,9 @@ module.exports = Class.extends({
 
   _events: {},
 
-  initialize: function(server, jwtSecret) {
+  initialize: function(io, jwtSecret) {
     // logger.debug(this.classname + '::initialize jwtSecret=' + jwtSecret);
-    var self = this,
-        io = socketIO(server);
+    var self = this;
 
     io.of(self._namespace)
       .use(self._authenticate.bind(self))
@@ -63,7 +61,7 @@ module.exports = Class.extends({
         }
 
         if (!user) {
-          return next(null, false);
+          return next(ErrorFactory.notFound());
         }
 
         socket.user = user;

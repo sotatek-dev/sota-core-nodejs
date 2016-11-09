@@ -1,8 +1,10 @@
 var SocketManager = require('../socket/SocketManager');
 var logger        = require('log4js').getLogger('Init.Socket');
+var socketIO      = require('socket.io');
 
 module.exports = function(app, server, dirs) {
   logger.info('Start initializing SocketIO...');
+  var io = socketIO(server);
 
   var jwtSecret = app.get('jwtSecret');
   _.each(dirs, function(dir) {
@@ -23,7 +25,7 @@ module.exports = function(app, server, dirs) {
       }
 
       var module = require(file);
-      SocketManager.create(module, server, jwtSecret);
+      SocketManager.create(module, io, jwtSecret);
     });
 
   });
