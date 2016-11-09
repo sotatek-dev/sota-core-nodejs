@@ -59,7 +59,8 @@ module.exports = Class.extends({
   },
 
   _authenticate: function(socket, next) {
-    var jwtSecret = this._jwtSecret;
+    var self = this,
+        jwtSecret = this._jwtSecret;
 
     try {
       var token = socket.request._query.auth_token;
@@ -81,10 +82,17 @@ module.exports = Class.extends({
         }
 
         var exSession = new ExSession({user: user}),
-            bindMethods = ['getModel', 'getService', 'commit', 'rollback'];
+            bindMethods = ['getModel', 'getService', 'commit'];
         _.forEach(bindMethods, function(method) {
           socket[method] = exSession[method].bind(exSession);
         });
+
+        socket.rollback = function(err) {
+          exSession.rollback();
+          self._io
+              .of(self._namespace)
+              .to(socket.id).emit('error', err);
+        };
 
         socket.user = user;
         socket.exSession = exSession;

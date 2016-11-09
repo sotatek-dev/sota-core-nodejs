@@ -32,6 +32,14 @@ var BaseError = Class.extends({
     return this._msg;
   },
 
+  toJSON: function() {
+    return {
+      httpStatus: this._httpStatus,
+      code: this._code,
+      msg: this._msg,
+    };
+  },
+
 });
 
 module.exports = BaseError;
