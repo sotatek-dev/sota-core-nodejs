@@ -27,25 +27,42 @@ module.exports = BaseAdapter.extends({
   },
 
   _exec : function(sqlQuery, params, callback) {
-    logger.info('MySQLConnection::exec sqlQuery=['+sqlQuery+'], params=' + util.inspect(params));
-    var self = this;
-    async.auto({
-      connect : function(next) {
+    logger.info('_exec sqlQuery=[' + sqlQuery + '], params=' + util.inspect(params));
+    var self = this,
+        connection = null,
+        isSelecting = sqlQuery.toUpperCase().indexOf('SELECT') === 0;
+
+    async.waterfall([
+      function(next) {
         self._pool.getConnection(next);
       },
-      exec : ['connect', function(ret, next) {
-        let connection = ret.connect;
-        self._connections.push(connection);
+      function(conn, next) {
+        connection = conn;
+        connection.beginTransaction(function(err) {
+          next(err, null);
+        });
+      },
+      function(ret, next) {
+        if (!isSelecting) {
+          self._connections.push(connection);
+        }
         connection.query(sqlQuery, params, next);
-      }],
-    }, function(err, res) {
+      },
+      function(rows, fields, next) {
+        if (isSelecting) {
+          connection.release();
+        }
+
+        next(null, rows);
+      },
+    ], function(err, rows) {
       if (err) {
         logger.error(self.classname + '::exec err=' + err);
         callback(err);
         return;
       }
 
-      callback(err, res.exec[0]);
+      callback(err, rows);
     });
   },
 
@@ -317,13 +334,38 @@ module.exports = BaseAdapter.extends({
   },
 
   commit: function(callback) {
-    // TODO
-    callback();
+    this._finishConnections('commit', callback);
   },
 
   rollback: function(callback) {
-    // TODO
-    callback();
+    this._finishConnections('rollback', callback);
+  },
+
+  _finishConnections: function(method, callback) {
+    var self = this,
+        tasks = [];
+
+    for (let i = 0; i < this._connections.length; i++) {
+      let connection = this._connections[i];
+      tasks.push(function(next) {
+        async.waterfall([
+          function finish(_next) {
+            connection[method](_next);
+          },
+          function release(rows, fields, _next) {
+            connection.release();
+            _next();
+          }
+        ], next);
+      });
+    }
+
+    var _callback = function() {
+      self._connections = [];
+      callback(null, null);
+    }
+
+    async.parallel(tasks, _callback);
   },
 
   destroy : function() {

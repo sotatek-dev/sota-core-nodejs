@@ -80,15 +80,14 @@ module.exports = Class.extends({
           return next(ErrorFactory.notFound('User not found: ' + jwtPayload.userId));
         }
 
-        socket.user = user;
-        socket.exSession = new ExSession({user: user});
-        socket.getModel = function getModel(classname) {
-          return exSession.getModel(classname);
-        };
+        var exSession = new ExSession({user: user}),
+            bindMethods = ['getModel', 'getService', 'commit', 'rollback'];
+        _.forEach(bindMethods, function(method) {
+          socket[method] = exSession[method].bind(exSession);
+        });
 
-        socket.getService = function getService(classname) {
-          return exSession.getService(classname);
-        };
+        socket.user = user;
+        socket.exSession = exSession;
 
         next(null, true);
 

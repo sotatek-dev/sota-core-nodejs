@@ -161,7 +161,17 @@ function extendRequest(req, res) {
     return req.exSession.commit(callback);
   };
 
-  req.rollback    = function(callback) {
+  req.rollback    = function(err, callback) {
+    if (typeof err === 'function') {
+      callback = err;
+    }
+
+    if (!callback) {
+      callback = function() {
+        res.sendError(err);
+      }
+    }
+
     return req.exSession.rollback(callback);
   };
 }
