@@ -37,7 +37,7 @@ module.exports = Class.extends({
     }
   },
 
-  onDisconnect: function(socket) {
+  onDisconnect: function(socket, callback) {
     throw new Error('Must be implemented in derived class.');
   },
 
@@ -45,12 +45,16 @@ module.exports = Class.extends({
     logger.debug(util.format('[%s]: user [%s](id:%d) disconnected!',
                   this._namespace, socket.user.username, socket.user.id));
 
-    this.onDisconnect(socket);
+    this.onDisconnect(socket, function(err) {
+      if (err) {
+        logger.error(err);
+      }
 
-    if (socket.exSession) {
-      socket.exSession.destroy();
-      delete socket.exSession;
-    }
+      if (socket.exSession) {
+        socket.exSession.destroy();
+        delete socket.exSession;
+      }
+    });
   },
 
   _authenticate: function(socket, next) {
