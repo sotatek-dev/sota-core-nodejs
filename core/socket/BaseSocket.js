@@ -74,11 +74,17 @@ module.exports = Class.extends({
         delete UserModel;
 
         if (err) {
+          logger.error(err);
           return next(err, false);
         }
 
+        logger.debug(util.format('BaseSocket::_authenticate token: %s', token));
+        logger.debug(util.format('BaseSocket::_authenticate jwtPayload: %s', util.inspect(jwtPayload)));
+
         if (!user) {
-          return next(ErrorFactory.notFound('User not found: ' + jwtPayload.userId));
+          var err = ErrorFactory.notFound('User not found: ' + jwtPayload.userId);
+          logger.error(err);
+          return next(err);
         }
 
         var exSession = new ExSession({user: user}),
