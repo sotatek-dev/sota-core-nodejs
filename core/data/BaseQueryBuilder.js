@@ -178,9 +178,12 @@ var BaseQueryBuilder = Class.extends({
   },
 
   sum: function(tableName, column, options) {
-    var self = this;
+    var self = this,
+        // If the query is aggregation of an expression,
+        // column names should be escaped from outside
+        ignoreEscape = options.isExAggregation;
 
-    var sql = 'SELECT SUM(' + self._escapeColumn(column) + ') AS `sum` FROM ';
+    var sql = 'SELECT SUM(' + self._escapeColumn(column, ignoreEscape) + ') AS `sum` FROM ';
     sql += tableName;
     sql += self._buildWhereClause(options);
 
@@ -211,10 +214,9 @@ var BaseQueryBuilder = Class.extends({
     return sql;
   },
 
-  _escapeColumn : function(columnName) {
-    // TODO: detect the expression here.
-    if (columnName.indexOf(' ') > -1) {
-      return columnName.toLowerCase();
+  _escapeColumn : function(columnName, ignoreEscape) {
+    if (ignoreEscape) {
+      return columnName;
     }
 
     if (columnName.indexOf('.') < 0) {

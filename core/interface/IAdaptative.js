@@ -31,6 +31,7 @@ module.exports = {
   sumEx: function(column, options, callback) {
     var self = this;
     var adapter = self.getAdapterForSelect();
+    options.isExAggregation = true;
     adapter.sum(self.getFromClause(), column, options, callback);
   },
 
