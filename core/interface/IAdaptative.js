@@ -16,7 +16,19 @@ module.exports = {
     adapter.count(self.getFromClause(), options, callback);
   },
 
+  countEx: function(options, callback) {
+    var self = this;
+    var adapter = self.getAdapterForSelect();
+    adapter.count(self.getFromClause(), options, callback);
+  },
+
   sum: function(column, options, callback) {
+    var self = this;
+    var adapter = self.getAdapterForSelect();
+    adapter.sum(self.getFromClause(), column, options, callback);
+  },
+
+  sumEx: function(column, options, callback) {
     var self = this;
     var adapter = self.getAdapterForSelect();
     adapter.sum(self.getFromClause(), column, options, callback);
