@@ -215,7 +215,7 @@ var BaseQueryBuilder = Class.extends({
   },
 
   _escapeColumn : function(columnName, ignoreEscape) {
-    if (ignoreEscape) {
+    if (ignoreEscape || columnName.indexOf('`') > -1) {
       return columnName;
     }
 
