@@ -212,6 +212,11 @@ var BaseQueryBuilder = Class.extends({
   },
 
   _escapeColumn : function(columnName) {
+    // TODO: detect the expression here.
+    if (columnName.indexOf(' ') > -1) {
+      return columnName.toLowerCase();
+    }
+
     if (columnName.indexOf('.') < 0) {
       return '`' + columnName.toLowerCase() + '`';
     }
