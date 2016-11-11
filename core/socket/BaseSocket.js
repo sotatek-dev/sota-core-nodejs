@@ -32,7 +32,11 @@ module.exports = Class.extends({
     // Customized behavior
     if (self._events) {
       for (let e in self._events) {
-        socket.on(e, function(socket, data) {
+        socket.on(e, function(data) {
+          if (!data) {
+            logger.error('Invalid data for event: ' + e);
+            return;
+          }
           data = JSON.parse(data);
           self[self._events[e]](socket, data);
         });
