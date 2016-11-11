@@ -32,7 +32,10 @@ module.exports = Class.extends({
     // Customized behavior
     if (self._events) {
       for (let e in self._events) {
-        socket.on(e, self[self._events[e]].bind(self, socket));
+        socket.on(e, function(socket, data) {
+          data = JSON.parse(data);
+          self[self._events[e]](socket, data);
+        });
       }
     }
   },
