@@ -27,6 +27,7 @@ module.exports = Class.extends({
                   self._namespace, socket.user.username, socket.user.id, socket.id));
 
     // Default behavior
+    socket.on('join-room', self._onRoomChanged.bind(self, socket));
     socket.on('disconnect', self._onDisconnect.bind(self, socket));
 
     // Customized behavior
@@ -47,6 +48,24 @@ module.exports = Class.extends({
   onDisconnect: function(socket, callback) {
     // throw new Error('Must be implemented in derived class.');
     callback();
+  },
+
+  _onRoomChanged: function(socket, data) {
+    if (isNaN(data)) {
+      try {
+        data = JSON.parse(data).roomId;
+      } catch (e) {
+        this._io
+            .of(this._namespace)
+            .to(socket.id).emit('error', e.toString());
+        return;
+      }
+    }
+
+    this.onRoomChanged(socket, data);
+    this._io
+        .of(this._namespace)
+        .to(socket.id).emit('room-changed', data);
   },
 
   _onDisconnect: function(socket) {
