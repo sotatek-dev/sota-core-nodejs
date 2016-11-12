@@ -71,7 +71,7 @@ module.exports = function(app, ControllerFactory, config) {
     app.post('/logout', UserController.handleBy('logout'));
   }
 
-  logger.info('Routes: finished initializing.');
+  logger.trace('Routes: finished initializing.');
 
 };
 

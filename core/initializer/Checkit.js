@@ -6,7 +6,7 @@ module.exports = function(Checkit, dirs) {
     _.forEach(subs, function(sub) {
       let dir = path.join(d, sub);
 
-      logger.info('Initializer::Checkit dir=' + dir);
+      logger.trace('Initializer::Checkit dir=' + dir);
       if (!FileUtils.isDirectorySync(dir)) {
         throw new Error('Invalid checkit directory: ' + dir);
       }
@@ -30,7 +30,7 @@ module.exports = function(Checkit, dirs) {
           Checkit.Transformer.prototype[name] = module;
         }
 
-        logger.info('initialized customized validator: ' + name);
+        logger.trace('initialized customized validator: ' + name);
       });
     });
 

@@ -5,7 +5,7 @@ var _           = require('lodash');
 var async       = require('async');
 var Types       = require('../../node_modules/mysql/lib/protocol/constants/types');
 
-var Class       = require('../../common/Class');
+var Class       = require('sota-class').Class;
 var BaseModel   = require('../../model/BaseModel');
 
 module.exports = Class.extends({
@@ -41,7 +41,7 @@ module.exports = Class.extends({
   _getOneTableSchema: function(def, callback) {
     var tableName = def.tableName,
         classname = def.classname;
-    logger.info('Processing table: ' + tableName);
+    logger.trace('Processing table: ' + tableName);
     var self = this,
         sqlQuery = util.format('SELECT * FROM %s LIMIT 1', tableName),
         connection = mysql.createConnection(this._config);
@@ -76,7 +76,7 @@ module.exports = Class.extends({
       return;
     }
 
-    logger.info('Retrieved schema successfully. ' + ret);
+    logger.trace('Retrieved schema successfully. ' + ret);
 
     var self = this;
     // const content = 'module.exports = ' + JSON.stringify(this._schemaDef, null, 2);
@@ -92,7 +92,7 @@ module.exports = Class.extends({
         logger.error('Failed to write schema file : ${err.message}');
         return;
       }
-      logger.info('Schema file was saved: ' + self._targetFile);
+      logger.trace('Schema file was saved: ' + self._targetFile);
     });
   },
 

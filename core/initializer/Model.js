@@ -8,7 +8,7 @@ module.exports = function(app, ModelFactory, adaptersConfig, modelSchema, modelD
 
   // Load
   _.each(modelDirs, function(modelDir) {
-    logger.info('Initializer::Model modelDir=' + modelDir);
+    logger.trace('Initializer::Model modelDir=' + modelDir);
     if (!FileUtils.isDirectorySync(modelDir)) {
       throw new Error('Invalid model directory: ' + util.inspect(modelDir));
     }

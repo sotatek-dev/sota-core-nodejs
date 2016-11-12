@@ -2,7 +2,7 @@ var logger = require('log4js').getLogger('Init.Service');
 
 module.exports = function(app, ServiceFactory, serviceDirs) {
   _.each(serviceDirs, function(serviceDir) {
-    logger.info('Initializer::Service serviceDir=' + serviceDir);
+    logger.trace('Initializer::Service serviceDir=' + serviceDir);
     if (!FileUtils.isDirectorySync(serviceDir)) {
       throw new Error('Invalid service directory: ' + serviceDir);
     }

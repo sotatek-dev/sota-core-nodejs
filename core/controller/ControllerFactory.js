@@ -1,5 +1,5 @@
+var Class         = require('sota-class').Class;
 var logger        = require('log4js').getLogger('ControllerFactory');
-var Class         = require('../common/Class');
 
 /**
  * Hide real private objects from rest of the world
@@ -17,7 +17,7 @@ module.exports = Class.singleton({
       }
       _registers[c.classname] = c;
     }
-    logger.info('registered: ' + c.classname);
+    logger.trace('registered: ' + c.classname);
   },
 
   get: function(classname) {
@@ -25,7 +25,7 @@ module.exports = Class.singleton({
   },
 
   create : function(classname) {
-    // logger.info('get: ' + classname);
+    // logger.trace('get: ' + classname);
     var c = new _registers[classname]();
     return c;
   },
@@ -37,7 +37,7 @@ module.exports = Class.singleton({
    * @returns {Function} A function(req, res, cb)
    */
   getBaseHandler : function(classname, funcName) {
-    //logger.info('ControllerFactory::getBaseHandler ' + classname + '.' + funcName);
+    //logger.trace('ControllerFactory::getBaseHandler ' + classname + '.' + funcName);
     var self = this;
     return function(req, res, cb) {
       var o = self.create(classname);

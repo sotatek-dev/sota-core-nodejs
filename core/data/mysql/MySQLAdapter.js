@@ -12,17 +12,17 @@ module.exports = BaseAdapter.extends({
   },
 
   beginTransaction : function(callback) {
-    logger.info('MySQLAdapter::beginTransaction TODO');
+    logger.trace('MySQLAdapter::beginTransaction TODO');
     callback();
   },
 
   commit : function(callback) {
-    logger.info('MySQLAdapter::commit TODO');
+    logger.trace('MySQLAdapter::commit TODO');
     callback();
   },
 
   rollback : function(callback) {
-    logger.info('MySQLAdapter::rollback TODO');
+    logger.trace('MySQLAdapter::rollback TODO');
     callback();
   },
 

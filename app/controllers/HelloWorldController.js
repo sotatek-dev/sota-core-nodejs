@@ -4,7 +4,7 @@ module.exports = BaseController.extends({
   classname : 'HelloWorldController',
 
   initialize : function() {
-    logger.info('HelloWorldController::initialize');
+    logger.trace('HelloWorldController::initialize');
   },
 
   helloWorldNoAuth : function(req, res) {

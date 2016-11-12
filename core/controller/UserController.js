@@ -16,9 +16,9 @@ module.exports = BaseController.extends({
       failureRedirect   : '/login',
       failureFlash      : true,
     }, function(err, user, info) {
-      logger.info('login err=' + util.inspect(err));
-      logger.info('login user=' + util.inspect(user));
-      logger.info('login info=' + util.inspect(info));
+      logger.trace('login err=' + util.inspect(err));
+      logger.trace('login user=' + util.inspect(user));
+      logger.trace('login info=' + util.inspect(info));
 
       if (err) {
         return res.sendError(err);

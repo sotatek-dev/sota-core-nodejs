@@ -4,7 +4,7 @@ module.exports = BaseController.extends({
   classname : 'RegisterController',
 
   initialize : function() {
-    logger.info('RegisterController::initialize');
+    logger.trace('RegisterController::initialize');
   },
 
   mainPage: function(req, res) {

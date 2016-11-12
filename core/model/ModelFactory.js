@@ -1,4 +1,4 @@
-var Class       = require('../common/Class');
+var Class       = require('sota-class').Class;
 var logger      = require('log4js').getLogger('ModelFactory');
 
 /**
@@ -30,7 +30,7 @@ module.exports = Class.singleton({
   },
 
   register : function(m) {
-    logger.info('register: ' + m.classname);
+    logger.trace('register: ' + m.classname);
 
     if (!m.classname) {
       logger.error('No classname, invalid model: ' + util.inspect(m));
@@ -50,7 +50,7 @@ module.exports = Class.singleton({
   },
 
   get : function(classname) {
-    // logger.info(this.classname + '::get ' + classname);
+    // logger.trace(this.classname + '::get ' + classname);
     return _registers[classname];
   },
 

@@ -1,4 +1,4 @@
-var Class = require('./Class');
+var Class       = require('sota-class').Class;
 
 module.exports = Class.extends({
   classname : 'ExSession',

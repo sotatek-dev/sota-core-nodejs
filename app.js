@@ -3,10 +3,10 @@ Routes          = require('./config/Routes');
 SotaServer      = require('./core/SotaServer');
 
 (function boot() {
-  logger.info('Start booting application...');
+  logger.trace('Start booting application...');
 
   var rootDir = path.join(path.resolve('.'));
-  logger.info('[BOOTING] Root dir: ' + rootDir);
+  logger.trace('[BOOTING] Root dir: ' + rootDir);
 
   var controllerDirs  = [],
       modelDirs       = [],

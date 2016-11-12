@@ -1,11 +1,11 @@
-var Class       = require('../common/Class');
+var Class       = require('sota-class').Class;
 var logger      = require('log4js').getLogger('BaseService');
 
 module.exports = Class.extends({
   classname : 'BaseService',
 
   initialize : function(exSession) {
-    // logger.info('BaseService<' + this.classname + '>::initialize');
+    // logger.trace('BaseService<' + this.classname + '>::initialize');
     if (!exSession) {
       throw new Error('Invalid exSession: ' + exSession);
     }

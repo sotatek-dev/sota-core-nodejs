@@ -2,7 +2,7 @@ var logger = require('log4js').getLogger('Init.Controller');
 
 module.exports = function(app, ControllerFactory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {
-    logger.info('Load controllers dir=' + controllerDir);
+    logger.trace('Load controllers dir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {
       throw new Error('Invalid controller directory: ' + controllerDir);
     }

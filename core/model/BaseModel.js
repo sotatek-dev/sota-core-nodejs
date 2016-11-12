@@ -1,4 +1,4 @@
-var Class               = require('../common/Class');
+var Class               = require('sota-class').Class;
 var BaseEntity          = require('../entity/BaseEntity');
 var BaseCollection      = require('../collection/BaseCollection');
 var IAdaptative         = require('../interface/IAdaptative');
@@ -26,7 +26,7 @@ var BaseModel = Class.extends({
   },
 
   initialize : function(exSession, masterConfig, slaveConfig) {
-    // logger.info(this.classname + '::initialize exSession=' + exSession);
+    // logger.trace(this.classname + '::initialize exSession=' + exSession);
     if (!exSession) {
       throw new Error('Invalid exSession: ' + exSession);
     }

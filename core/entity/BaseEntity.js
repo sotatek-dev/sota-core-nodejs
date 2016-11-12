@@ -1,11 +1,11 @@
-var Class     = require('../common/Class');
+var Class     = require('sota-class').Class;
 var logger    = require('log4js').getLogger('BaseEntity');
 
 module.exports = Class.extends({
   classname : 'BaseEntity',
 
   initialize : function(model, data) {
-    // logger.info(this.classname + '::initialize data=' + util.inspect(data));
+    // logger.trace(this.classname + '::initialize data=' + util.inspect(data));
     this._model         = model;
     this._data          = {};
     this._dataOld       = {};
@@ -205,7 +205,7 @@ module.exports = Class.extends({
       if (self.isChanged()) {
         adapter.updateOne(this, callback);
       } else {
-        logger.info('Entity has no update: ' + util.inspect(this));
+        logger.trace('Entity has no update: ' + util.inspect(this));
         callback(null, this);
       }
     }

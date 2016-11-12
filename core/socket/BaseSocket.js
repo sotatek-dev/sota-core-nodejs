@@ -1,7 +1,8 @@
-var jwt           = require('jwt-simple');
-var Class         = require('../common/Class');
-var ExSession     = require('../common/ExSession');
-var logger        = require('log4js').getLogger('BaseSocket');
+var jwt               = require('jwt-simple');
+var Class             = require('sota-class').Class;
+var ExSession         = require('../common/ExSession');
+var SocketIOWrapper   = require('./SocketIOWrapper');
+var logger            = require('log4js').getLogger('BaseSocket');
 
 module.exports = Class.extends({
   classname: 'BaseSocket',
@@ -21,6 +22,12 @@ module.exports = Class.extends({
     self._jwtSecret = jwtSecret;
   },
 
+  onDisconnect: function(socket, callback) {
+    // Should be overrided in subclass
+    // throw new Error('Must be implemented in derived class.');
+    callback();
+  },
+
   _onConnection: function(socket) {
     var self = this;
     logger.debug(util.format('[%s]: user [%s](id:%d) connected! (socketId: %s)',
@@ -35,37 +42,45 @@ module.exports = Class.extends({
       for (let e in self._events) {
         socket.on(e, function(data) {
           if (!data) {
-            logger.error('Invalid data for event: ' + e);
+            socket.emit('error', ErrorFactory.badRequest('Invalid data for event: ' + e));
             return;
           }
-          data = JSON.parse(data);
+
+          // TODO: Is client able to send object to server?
+          if (typeof data === 'string') {
+            data = JSON.parse(data);
+          }
+
           self[self._events[e]](socket, data);
         });
       }
     }
   },
 
-  onDisconnect: function(socket, callback) {
-    // throw new Error('Must be implemented in derived class.');
-    callback();
-  },
-
-  _onRoomChanged: function(socket, data) {
-    if (isNaN(data)) {
+  _onRoomChanged: function(socket, roomId) {
+    var self = this;
+    if (isNaN(roomId)) {
       try {
-        data = JSON.parse(data).roomId;
+        // TODO: Is client able to send object to server?
+        roomId = JSON.parse(roomId).roomId;
       } catch (e) {
-        this._io
-            .of(this._namespace)
-            .to(socket.id).emit('error', e.toString());
+        socket.emit('error', e.toString());
         return;
       }
     }
 
-    this.onRoomChanged(socket, data);
-    this._io
-        .of(this._namespace)
-        .to(socket.id).emit('room-changed', data);
+    var user = socket.user;
+    socket.previousRoomId = socket.currentRoomId;
+    socket.currentRoomId = roomId;
+
+    logger.debug(util.format('[%s]: user [%s](id:%d) changed room from [%s] to [%s]',
+      self._namespace, user.username, user.id, socket.previousRoomId, socket.currentRoomId));
+
+    socket.leave(socket.previousRoomId);
+    socket.join(socket.currentRoomId);
+
+    socket.emit('room-changed', socket.currentRoomId);
+    self.onRoomChanged(socket);
   },
 
   _onDisconnect: function(socket) {
@@ -138,4 +153,4 @@ module.exports = Class.extends({
     }
   },
 
-});
+}).implements([SocketIOWrapper]);

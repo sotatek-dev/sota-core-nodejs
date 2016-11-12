@@ -1,4 +1,4 @@
-var Class = require('../../common/Class');
+var Class       = require('sota-class').Class;
 
 var _secret = 'A-secret';
 

@@ -1,4 +1,4 @@
-var Class               = require('../common/Class');
+var Class               = require('sota-class').Class;
 var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
 var logger              = require('log4js').getLogger('AdapterFactory');

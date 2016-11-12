@@ -3,12 +3,12 @@ var logger        = require('log4js').getLogger('Init.Socket');
 var socketIO      = require('socket.io');
 
 module.exports = function(app, server, dirs) {
-  logger.info('Start initializing SocketIO...');
+  logger.trace('Start initializing SocketIO...');
   var io = socketIO(server);
 
   var jwtSecret = app.get('jwtSecret');
   _.each(dirs, function(dir) {
-    logger.info('Initializer::Soket dir=' + dir);
+    logger.trace('Initializer::Soket dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {
       throw new Error('Invalid service directory: ' + dir);
     }
@@ -30,5 +30,5 @@ module.exports = function(app, server, dirs) {
 
   });
 
-  logger.info('Finish initializing SocketIO...');
+  logger.trace('Finish initializing SocketIO...');
 };

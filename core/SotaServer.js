@@ -40,7 +40,7 @@ var SotaServer = Class.extends({
   classname : 'SotaServer',
 
   initialize: function(config) {
-    // logger.info('SotaServer::initialize config=' + util.inspect(config));
+    // logger.trace('SotaServer::initialize config=' + util.inspect(config));
 
     this._resolveConfig(config);
     this._initExpress();
@@ -196,7 +196,7 @@ var SotaServer = Class.extends({
   },
 
   _initExpress: function() {
-    logger.info('SotaServer::_initExpress initializing express application...');
+    logger.trace('SotaServer::_initExpress initializing express application...');
     var myApp = require('./initializer/Express')(_realConfig);
     var myServer = require('http').createServer(myApp);
 
@@ -286,11 +286,11 @@ var SotaServer = Class.extends({
   },
 
   onServerCreated: function() {
-    logger.info('Creating http server. Listening on port: ' + _realConfig.port);
+    logger.trace('Creating http server. Listening on port: ' + _realConfig.port);
   },
 
   onListening: function() {
-    logger.info('SotaServer is on listening');
+    logger.trace('SotaServer is on listening');
   },
 
   onError: function(e) {

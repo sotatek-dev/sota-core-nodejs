@@ -3,7 +3,7 @@ var logger  = require('log4js').getLogger('Init.Policy');
 
 module.exports = function(app, PolicyManager, dirs) {
   _.each(dirs, function(dir) {
-    logger.info('Initializer::Policy dir=' + dir);
+    logger.trace('Initializer::Policy dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {
       throw new Error('Invalid policy directory: ' + dir);
     }

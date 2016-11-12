@@ -1,4 +1,4 @@
-var Class     = require('../common/Class');
+var Class     = require('sota-class').Class;
 var logger    = require('log4js').getLogger('ServiceFactory');
 
 /**
@@ -17,11 +17,11 @@ module.exports = Class.singleton({
       }
       _registers[s.classname] = s;
     }
-    logger.info('registered: ' + s.classname);
+    logger.trace('registered: ' + s.classname);
   },
 
   get : function(classname) {
-    // logger.info('get: ' + classname);
+    // logger.trace('get: ' + classname);
     if (!_registers[classname]) {
       throw new Error('Cannot get unregistered service: ' + classname);
     }

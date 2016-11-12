@@ -1,4 +1,4 @@
-var Class             = require('../common/Class');
+var Class             = require('sota-class').Class;
 var BaseEntity        = require('../entity/BaseEntity');
 var logger            = require('log4js').getLogger('BaseQueryBuilder');
 
@@ -16,12 +16,12 @@ var BaseQueryBuilder = Class.extends({
     sql += ' FROM ' + tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::select query=[' + sql + ']');
+    // logger.trace(this.classname + '::select query=[' + sql + ']');
     return sql;
   },
 
   insert : function(data) {
-    logger.info(this.classname + '::insert data=' + util.inspect(data));
+    // logger.trace(this.classname + '::insert data=' + util.inspect(data));
     var self = this,
         tableName, entities;
     if (data instanceof BaseEntity) {
@@ -79,7 +79,7 @@ var BaseQueryBuilder = Class.extends({
     sql += _.map(cols, self._escapeColumn).join(',');
     sql += ') VALUES ';
     sql += valueStrs.join(',');
-    logger.info(self.classname + '::_buildInsertQuery query=[' + sql + ']');
+    // logger.trace(self.classname + '::_buildInsertQuery query=[' + sql + ']');
     return sql;
   },
 
@@ -104,7 +104,7 @@ var BaseQueryBuilder = Class.extends({
       return self._escapeColumn(col) + '=?';
     }).join(' AND ');
 
-    logger.info(this.classname + '::updateOne query=[' + sql + ']');
+    // logger.trace(this.classname + '::updateOne query=[' + sql + ']');
     return [sql, params];
   },
 
@@ -124,7 +124,7 @@ var BaseQueryBuilder = Class.extends({
     sql += options.set;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::updateBatch query=[' + sql + ']');
+    // logger.trace(this.classname + '::updateBatch query=[' + sql + ']');
     return sql;
   },
 
@@ -150,7 +150,7 @@ var BaseQueryBuilder = Class.extends({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::deleteBatch query=[' + sql + ']');
+    // logger.trace(this.classname + '::deleteBatch query=[' + sql + ']');
     return sql;
   },
 
@@ -161,7 +161,7 @@ var BaseQueryBuilder = Class.extends({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::count query=[' + sql + ']');
+    // logger.trace(this.classname + '::count query=[' + sql + ']');
     return sql;
   },
 
@@ -173,7 +173,7 @@ var BaseQueryBuilder = Class.extends({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::countGroupBy query=[' + sql + ']');
+    // logger.trace(this.classname + '::countGroupBy query=[' + sql + ']');
     return sql;
   },
 
@@ -187,7 +187,7 @@ var BaseQueryBuilder = Class.extends({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::count query=[' + sql + ']');
+    // logger.trace(this.classname + '::count query=[' + sql + ']');
     return sql;
   },
 
@@ -198,7 +198,7 @@ var BaseQueryBuilder = Class.extends({
     sql += tableName;
     sql += self._buildWhereClause(options);
 
-    logger.info(this.classname + '::sumGroupBy query=[' + sql + ']');
+    // logger.trace(this.classname + '::sumGroupBy query=[' + sql + ']');
     return sql;
   },
 
@@ -210,7 +210,7 @@ var BaseQueryBuilder = Class.extends({
                 tableName,
                 self._buildWhereClause(options));
 
-    logger.info(this.classname + '::existed query=[' + sql + ']');
+    // logger.trace(this.classname + '::existed query=[' + sql + ']');
     return sql;
   },
 

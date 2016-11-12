@@ -1,10 +1,10 @@
-var Class = require('../common/Class');
+var Class       = require('sota-class').Class;
 
 var BaseAdapter = Class.extends({
   classname : 'BaseAdapter',
 
   initialize: function(exSession) {
-    // logger.info('BaseAdapter<' + this.classname + '>::initialize config=' + util.inspect(config));
+    // logger.trace('BaseAdapter<' + this.classname + '>::initialize config=' + util.inspect(config));
     this._exSession = exSession;
   },
 

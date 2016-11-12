@@ -4,7 +4,7 @@ module.exports = BaseController.extends({
   classname : 'LoginController',
 
   initialize : function() {
-    logger.info('LoginController::initialize');
+    logger.trace('LoginController::initialize');
   },
 
   mainPage : function(req, res) {

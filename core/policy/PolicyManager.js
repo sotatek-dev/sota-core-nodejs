@@ -1,5 +1,5 @@
 var logger    = require('log4js').getLogger('PolicyManager');
-var Class     = require('../common/Class');
+var Class     = require('sota-class').Class;
 
 module.exports = Class.singleton({
   classname: 'PolicyManager',
@@ -21,7 +21,7 @@ module.exports = Class.singleton({
       }
       this._registers[name] = handler;
     }
-    logger.info('Registered policy: ' + name);
+    logger.trace('Registered policy: ' + name);
   },
 
   get : function(name) {
