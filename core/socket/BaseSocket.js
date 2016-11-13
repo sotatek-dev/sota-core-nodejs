@@ -46,11 +46,6 @@ module.exports = Class.extends({
             return;
           }
 
-          // TODO: Is client able to send object to server?
-          if (typeof data === 'string') {
-            data = JSON.parse(data);
-          }
-
           self[self._events[e]](socket, data);
         });
       }
