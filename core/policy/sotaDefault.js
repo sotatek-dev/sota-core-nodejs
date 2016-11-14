@@ -213,6 +213,8 @@ function extendResponse(req, res) {
 
     req.exSession.destroy();
     delete req.exSession;
+    delete req.params;
+    delete req.pagination;
 
     res.end(data, encoding);
   };

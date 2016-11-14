@@ -281,6 +281,10 @@ var BaseQueryBuilder = Class.extends({
       clause += (' LIMIT ' + options.limit);
     }
 
+    if (options.offset) {
+      clause += (' OFFSET ' + options.offset);
+    }
+
     return clause;
   },
 
