@@ -19,6 +19,10 @@ module.exports = Class.singleton({
 
     var socket = new SocketClass(server, jwtSecret);
     _registers[classname] = socket;
+  },
+
+  getInstance: function(classname) {
+    return _registers[classname];
   }
 
 });

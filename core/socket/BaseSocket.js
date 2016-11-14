@@ -63,6 +63,9 @@ module.exports = Class.extends({
         return;
       }
     }
+    if(roomId == socket.currentRoomId) {
+      return;
+    }
 
     var user = socket.user;
     socket.previousRoomId = socket.currentRoomId;
