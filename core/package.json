@@ -63,7 +63,8 @@
     "socketio-jwt": "^4.5.0",
     "sota-class": "^1.0.2",
     "sqlite3": "^3.1.8",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "ws": "^1.1.1"
   },
   "devDependencies": {
     "eslint": "^3.9.1",

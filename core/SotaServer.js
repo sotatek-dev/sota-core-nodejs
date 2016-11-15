@@ -280,6 +280,12 @@ var SotaServer = Class.extends({
 
   _setupProcess: function() {
     // TODO: Handle process-level events
+    if (_realConfig.errorHandler) {
+      process.on('uncaughtException', _realConfig.errorHandler);
+      return;
+    }
+
+    // Default error handler
     process.on('uncaughtException', function (err) {
       logger.error('############## process begin uncaught exception info ##############');
       logger.error(err);
