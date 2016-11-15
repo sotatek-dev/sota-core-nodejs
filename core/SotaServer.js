@@ -304,3 +304,7 @@ var SotaServer = Class.extends({
 });
 
 module.exports = SotaServer;
+
+module.exports.createServer = function(config) {
+  return new SotaServer(config);
+};
