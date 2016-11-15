@@ -28,7 +28,7 @@ ServiceFactory      = require('./service/ServiceFactory');
 AdapterFactory      = require('./data/AdapterFactory');
 
 // TODO: remove global scope of logger
-logger          = require('log4js').getLogger('SotaServer');
+logger              = require('log4js').getLogger('SotaServer');
 
 /**
  * Hide real configuration object from rest of the world
@@ -185,7 +185,9 @@ var SotaServer = Class.extends({
      * All settings can be overrided via the passed argument here
      */
     if (config) {
-      _realConfig = _.merge(_realConfig, config);
+      _.each(_.keys(config), function(p) {
+        _realConfig[p] = config[p];
+      });
     }
 
     /**
