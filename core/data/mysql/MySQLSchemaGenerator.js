@@ -14,7 +14,7 @@ module.exports = Class.extends({
   /**
    * @param
    */
-  initialize: function(config, tables, targetFile) {
+  initialize: function(config, models, targetFile) {
     // Convert from project style to mysql style
     this._config = {
       host     : config.dbHost,
@@ -23,7 +23,7 @@ module.exports = Class.extends({
       database : config.dbName,
     };
 
-    this._tables = tables;
+    this._models = models;
     this._targetFile = targetFile;
   },
 
@@ -32,15 +32,15 @@ module.exports = Class.extends({
     self._schemaDef = {};
 
     async.forEach(
-      self._tables,
+      self._models,
       self._getOneTableSchema.bind(self),
       self._buildSchemaFile.bind(self)
     );
   },
 
-  _getOneTableSchema: function(def, callback) {
-    var tableName = def.tableName,
-        classname = def.classname;
+  _getOneTableSchema: function(model, callback) {
+    var tableName = model.tableName,
+        classname = model.classname;
     logger.trace('Processing table: ' + tableName);
     var self = this,
         sqlQuery = util.format('SELECT * FROM %s LIMIT 1', tableName),
@@ -54,8 +54,7 @@ module.exports = Class.extends({
 
       var def = {};
       _.forEach(fields, function(field) {
-        var ModelClass = require('../../model/' + classname);
-        if (field.name === 'id' || _.includes(ModelClass.predefinedCols, field.name)) {
+        if (field.name === 'id' || _.includes(model.predefinedCols, field.name)) {
           return;
         }
 

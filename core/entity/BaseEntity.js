@@ -111,17 +111,19 @@ module.exports = Class.extends({
     _.each(this._model.getColumnNames(), function(columnName) {
       let property = Utils.convertToCamelCase(columnName.toLowerCase());
 
-      if (data[columnName] === undefined) {
-        if (data[property] === undefined) {
-          if (columnName === 'created_at' || columnName === 'updated_at') {
-            data[columnName] = now;
-          } else if (columnName === 'created_by' || columnName === 'updated_by') {
-            data[columnName] = userId;
+      if (_.includes(self._model.predefinedCols, columnName)) {
+        if (data[columnName] === undefined) {
+          if (data[property] === undefined) {
+            if (columnName === 'created_at' || columnName === 'updated_at') {
+              data[columnName] = now;
+            } else if (columnName === 'created_by' || columnName === 'updated_by') {
+              data[columnName] = userId;
+            } else {
+              return;
+            }
           } else {
-            return;
+            data[columnName] = data[property];
           }
-        } else {
-          data[columnName] = data[property];
         }
       }
 
@@ -244,12 +246,17 @@ module.exports = Class.extends({
     var now = Utils.now();
 
     if (self.isNew()) {
-      self.createdAt = now;
+      if (_.includes(self._model.predefinedCols, 'created_at')) {
+        self.createdAt = now;
+      }
       self.createdBy = 0;
       self.createdBy = self._model.getExSession().getUserId();
     }
 
-    self.updatedAt = now;
+    if (_.includes(self._model.predefinedCols, 'updated_at')) {
+      self.updatedAt = now;
+    }
+
     self.updatedBy = 0;
     self.updatedBy = self._model.getExSession().getUserId();
 
