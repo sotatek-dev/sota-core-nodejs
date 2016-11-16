@@ -21,8 +21,12 @@ module.exports = Class.singleton({
     _registers[classname] = socket;
   },
 
+  register: function(instace) {
+    _registers[instace.classname] = instace;
+  },
+
   getInstance: function(classname) {
     return _registers[classname];
-  }
+  },
 
 });
