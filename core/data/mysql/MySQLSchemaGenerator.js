@@ -54,7 +54,8 @@ module.exports = Class.extends({
 
       var def = {};
       _.forEach(fields, function(field) {
-        if (field.name === 'id' || _.includes(BaseModel.predefinedCols, field.name)) {
+        var ModelClass = require('../../model/' + classname);
+        if (field.name === 'id' || _.includes(ModelClass.predefinedCols, field.name)) {
           return;
         }
 
