@@ -121,6 +121,8 @@ module.exports = Class.extends({
             } else {
               return;
             }
+          } else {
+            return;
           }
         } else {
           data[columnName] = data[property];
