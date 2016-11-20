@@ -84,9 +84,6 @@ utils/ 				# For common, static handlers (just deal with primitive data)
 - `afterDelete($super, callback)`
 - `reload(callback)`
 
-#### BaseDataSource
-- `initialize($super, options)`
-
 ```
 TODO: Determine whether we need this class...
 ```
