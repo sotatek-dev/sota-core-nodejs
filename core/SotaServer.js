@@ -207,6 +207,7 @@ var SotaServer = Class.extends({
     this._loadControllers(myApp);
     this._loadModels(myApp);
     this._loadServices(myApp);
+    this._setupLodash(myApp);
     this._setupCheckit(myApp);
     this._setupPassport(myApp);
     this._setupRoutes(myApp);
@@ -260,6 +261,11 @@ var SotaServer = Class.extends({
     var init = require('./initializer/Service'),
         serviceDirs = _realConfig.serviceDirs;
     init(myApp, ServiceFactory, serviceDirs);
+  },
+
+  _setupLodash: function() {
+    var init = require('./initializer/Lodash');
+    init(_);
   },
 
   _setupCheckit: function() {

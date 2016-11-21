@@ -25,6 +25,9 @@ module.exports = Class.extends({
 
     this._models = models;
     this._targetFile = targetFile;
+
+    var lodashInitializer = require('../../initializer/Lodash');
+    lodashInitializer(_);
   },
 
   run: function() {
@@ -76,7 +79,8 @@ module.exports = Class.extends({
       return;
     }
 
-    logger.trace('Retrieved schema successfully. ' + ret);
+    logger.trace('Retrieved schema successfully. ');
+    this._schemaDef = _.sortKeysBy(this._schemaDef);
 
     var self = this;
     // const content = 'module.exports = ' + JSON.stringify(this._schemaDef, null, 2);
