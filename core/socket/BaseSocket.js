@@ -63,7 +63,8 @@ module.exports = Class.extends({
         return;
       }
     }
-    if(roomId == socket.currentRoomId) {
+
+    if (roomId === socket.currentRoomId) {
       return;
     }
 
@@ -118,12 +119,13 @@ module.exports = Class.extends({
         }
 
         logger.debug(util.format('BaseSocket::_authenticate token: %s', token));
-        logger.debug(util.format('BaseSocket::_authenticate jwtPayload: %s', util.inspect(jwtPayload)));
+        logger.debug(util.format('BaseSocket::_authenticate jwtPayload: %s',
+          util.inspect(jwtPayload)));
 
         if (!user) {
-          var err = ErrorFactory.notFound('User not found: ' + jwtPayload.userId);
-          logger.error(err);
-          return next(err);
+          let e = ErrorFactory.notFound('User not found: ' + jwtPayload.userId);
+          logger.error(e);
+          return next(e);
         }
 
         var exSession = new ExSession({user: user}),
@@ -132,11 +134,11 @@ module.exports = Class.extends({
           socket[method] = exSession[method].bind(exSession);
         });
 
-        socket.rollback = function(err) {
+        socket.rollback = function(e) {
           exSession.rollback();
           self._io
               .of(self._namespace)
-              .to(socket.id).emit('error', err);
+              .to(socket.id).emit('error', e);
         };
 
         socket.user = user;
