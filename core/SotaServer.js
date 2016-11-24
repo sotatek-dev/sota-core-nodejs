@@ -44,6 +44,15 @@ var SotaServer = Class.extends({
 
     this._resolveConfig(config);
     this._initExpress();
+
+    var testParams = {
+      x : 1,
+      y : 2,
+    };
+
+    var [err, params] = new Checkit({
+      x: 'integer'
+    }).validateSync(testParams);
   },
 
   _resolveConfig: function(config) {

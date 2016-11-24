@@ -257,7 +257,7 @@ var BaseQueryBuilder = Class.extends({
     if (options.where) {
       if (typeof options.where === 'string') {
         clause += (' WHERE ' + options.where);
-      } else if (typeof options.where === 'object') {
+      } else if (_.isPlainObject(options.where)) {
         clause += ' WHERE ';
         clause += _.map(_.keys(options.where), function(col) {
           return self._escapeColumn(col) + '=?';
@@ -266,19 +266,27 @@ var BaseQueryBuilder = Class.extends({
     }
 
     if (options.groupBy) {
-      if (_.isArray(options.groupBy)) {
-        clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
-      } else if (typeof options.groupBy === 'string') {
+      if (typeof options.groupBy === 'string') {
         clause += (' GROUP BY ' + options.groupBy);
+      } else if (_.isArray(options.groupBy)) {
+        clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+      } else {
+        throw new Error('Invalid groupBy options: ' + options.groupBy);
       }
     }
 
-    if (options.orderBy && typeof options.orderBy === 'string') {
-      clause += (' ORDER BY ' + options.orderBy);
+    if (options.orderBy) {
+      if (typeof options.orderBy === 'string') {
+        clause += (' ORDER BY ' + options.orderBy);
+      } else if (_.isArray(options.orderBy)) {
+        clause += (' ORDER BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+      } else {
+        throw new Error('Invalid orderBy options: ' + options.orderBy);
+      }
     }
 
     if (options.limit) {
-      clause += (' LIMIT ' + options.limit);
+      clause += (' LIMIT ' + ((options.limit < 0) ? Const.MAX_QUERY_RECORDS : options.limit));
     }
 
     if (options.offset) {

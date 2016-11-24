@@ -39,9 +39,14 @@ module.exports = function(app) {
   };
 
   opts.jwtFromRequest = function(req) {
-    if (req.params && req.params[jwtBodyField]) {
-      return req.params[jwtBodyField];
+    if (req.headers['x-auth-token']) {
+      return req.headers['x-auth-token'];
     }
+
+    if (req.allParams && req.allParams[jwtBodyField]) {
+      return req.allParams[jwtBodyField];
+    }
+
     return null;
   };
 

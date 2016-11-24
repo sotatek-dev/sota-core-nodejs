@@ -77,7 +77,7 @@ module.exports = Class.singleton({
 
       // The simple case, a route mapped to a single function
       // Just use this function as handler
-      // return this.wrapHandler(handlerDef, [sotaDefault], [], errorHandler);
+      // return this.wrapHandler(handlerDef, [], [], errorHandler);
       throw new Error('Invalid handler definition: ' + handlerDef);
     }
 

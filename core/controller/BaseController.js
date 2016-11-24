@@ -22,6 +22,7 @@ var BaseController = Class.extends({
       beforePolicies = ['sotaDefault'].concat(beforePolicies);
     };
 
+
     var before = _.map(beforePolicies, function(policy) {
       return PolicyManager.get(policy);
     });
@@ -52,8 +53,8 @@ var BaseController = Class.extends({
   $createDefaultFind: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var page      = req.params['page'] || 0,
-          pageSize  = req.params['page_size'] || 10, // TODO: add pageSize to config
+      var page      = req.allParams['page'] || 0,
+          pageSize  = req.allParams['page_size'] || 10, // TODO: add pageSize to config
           model     = req.getModel(modelClass.classname);
 
       async.auto({
@@ -85,7 +86,7 @@ var BaseController = Class.extends({
   $createDefaultFindOne: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var id = req.params['id'],
+      var id = req.allParams['id'],
           model = req.getModel(modelClass.classname);
 
       async.auto({
@@ -123,7 +124,7 @@ var BaseController = Class.extends({
   $createDefaultAdd: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var def = req.params,
+      var def = req.allParams,
           model = req.getModel(modelClass.classname);
 
       async.auto({
@@ -151,7 +152,7 @@ var BaseController = Class.extends({
   $createDefaultUpdate: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var def   = req.params,
+      var def   = req.allParams,
           model = req.getModel(modelClass.classname);
 
       async.auto({
@@ -179,7 +180,7 @@ var BaseController = Class.extends({
   $createDefaultDelete: function(modelClass) {
 
     var baseHandler = function(req, res) {
-      var id = parseInt(req.params['id']),
+      var id = parseInt(req.allParams['id']),
           model = req.getModel(modelClass.classname);
 
       async.auto({

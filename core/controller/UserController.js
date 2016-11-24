@@ -7,8 +7,8 @@ module.exports = BaseController.extends({
 
   login: function(req, res) {
     var redirectUrl = '/';
-    if (req.params && req.params['redirect_url']) {
-      redirectUrl = req.params['redirect_url'];
+    if (req.allParams && req.allParams['redirect_url']) {
+      redirectUrl = req.allParams['redirect_url'];
     }
 
     passport.authenticate('local', {

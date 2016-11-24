@@ -41,7 +41,7 @@ module.exports = function(app, config, options) {
         return;
       }
 
-      req.params = req.params || {};
+      req.allParams = req.allParams || {};
       _.forEach(_.keys(fields), function(key) {
         req.body[key] = fields[key][0];
       });

@@ -43,6 +43,9 @@ module.exports = function(app, config) {
   var moduleMap = getModuleMap(config.middlewareDirs),
       list = config.middlewares.list || defaultList;
 
+  // The required middleware
+  list.push('sotaDefault');
+
   for (let i = 0; i < list.length; i++) {
     let moduleName = list[i];
     if (!moduleMap[moduleName]) {

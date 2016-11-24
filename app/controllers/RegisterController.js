@@ -16,9 +16,9 @@ module.exports = BaseController.extends({
 
   register: function(req, res) {
     var userInfo = {
-      username  : req.params['email'],
-      email     : req.params['email'],
-      password  : req.params['password']
+      username  : req.allParams['email'],
+      email     : req.allParams['email'],
+      password  : req.allParams['password']
     };
 
     var UserService = req.getService('UserService');

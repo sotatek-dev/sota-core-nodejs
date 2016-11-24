@@ -73,7 +73,7 @@ module.exports = BaseController.extends({
   },
 
   delete : function(req, res) {
-    var userId = req.params['user_id'];
+    var userId = req.allParams['user_id'];
     var self = this;
     var UserService = req.getService('UserService');
     async.auto({
@@ -93,8 +93,8 @@ module.exports = BaseController.extends({
   },
 
   updateOne : function(req, res) {
-    var userId = req.params['user_id'];
-    var firstName = req.params['first_name'];
+    var userId = req.allParams['user_id'];
+    var firstName = req.allParams['first_name'];
     var self = this;
     var UserService = req.getService('UserService');
 
