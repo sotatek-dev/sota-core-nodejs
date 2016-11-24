@@ -4,6 +4,7 @@ var NotFoundError     = require('./NotFoundError');
 var ConflictError     = require('./ConflictError');
 var ForbiddenError    = require('./ForbiddenError');
 var InternalError     = require('./InternalError');
+var TooLargeError     = require('./PayloadTooLargeError');
 
 module.exports = Class.singleton({
   classname: 'ErrorFactory',
@@ -26,6 +27,10 @@ module.exports = Class.singleton({
 
   conflict: function(msg, code) {
     return new ConflictError(msg, code);
+  },
+
+  payloadTooLarge: function(msg, code) {
+    return new TooLargeError(msg, code);
   },
 
   internal: function(msg, code) {
