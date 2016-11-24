@@ -13,7 +13,7 @@ module.exports = {
         field = pagination.field,
         before = pagination.before,
         after = pagination.after,
-        orderBy = pagination.field;
+        orderBy = (options.orderBy ? (options.orderBy + ', ') : '' ) + pagination.field;
 
     if (pagination.type === 'cursor' || pagination.type === 'brute') {
 

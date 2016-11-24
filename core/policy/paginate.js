@@ -36,7 +36,7 @@ module.exports = function(req, res, next) {
   };
 
   if (p_type === 'cursor') {
-    if (req.pagination.p_before && req.pagination.p_after) {
+    if (req.pagination.before && req.pagination.after) {
       var msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
     }
