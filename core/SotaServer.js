@@ -107,19 +107,25 @@ var SotaServer = Class.extends({
       _realConfig.middlewares = {};
     }
 
-     let middlewareDirs = [];
-     middlewareDirs.push(path.resolve(rootDir, 'core', 'middleware'));
-     middlewareDirs.push(path.resolve(rootDir, 'app', 'middlewares'));
-     _realConfig.middlewareDirs = middlewareDirs;
+    let middlewareDirs = [],
+       appMiddlewareDir = path.resolve(rootDir, 'app', 'middlewares');
+    middlewareDirs.push(path.resolve(rootDir, 'core', 'middleware'));
+    if (FileUtils.isDirectorySync(appMiddlewareDir)) {
+      middlewareDirs.push(appMiddlewareDir);
+    }
+    _realConfig.middlewareDirs = middlewareDirs;
 
     /**
      * Policies are stored in:
      * - core/policy/     (core-level)
      * - app/policies/    (app-level)
      */
-    let policyDirs = [];
+    let policyDirs = [],
+        appPolicyDir = path.resolve(rootDir, 'app', 'policies');
     policyDirs.push(path.resolve(rootDir, 'core', 'policy'));
-    policyDirs.push(path.resolve(rootDir, 'app', 'policies'));
+    if (FileUtils.isDirectorySync(appPolicyDir)) {
+      policyDirs.push(appPolicyDir);
+    }
     _realConfig.policyDirs = policyDirs;
 
     /**
@@ -127,8 +133,11 @@ var SotaServer = Class.extends({
      * The folder normally contains controllers is
      * - app/controllers/
      */
-    let controllerDirs = [];
-    controllerDirs.push(path.resolve(rootDir, 'app', 'controllers'));
+    let controllerDirs = [],
+        appControllerDir = path.resolve(rootDir, 'app', 'controllers');
+    if (FileUtils.isDirectorySync(appControllerDir)) {
+      controllerDirs.push(appControllerDir);
+    }
     _realConfig.controllerDirs = controllerDirs;
 
     /**
@@ -138,9 +147,12 @@ var SotaServer = Class.extends({
      * - core/model/
      * - app/models/
      */
-    let modelDirs = [];
+    let modelDirs = [],
+        appModelDir = path.resolve(rootDir, 'app', 'models');
     modelDirs.push(path.resolve(rootDir, 'core', 'model'));
-    modelDirs.push(path.resolve(rootDir, 'app', 'models'));
+    if (FileUtils.isDirectorySync(appModelDir)) {
+      modelDirs.push(appModelDir);
+    }
     _realConfig.modelDirs = modelDirs;
 
     /**
@@ -154,24 +166,44 @@ var SotaServer = Class.extends({
      * - core/service/
      * - app/services/
      */
-    let serviceDirs = [];
+    let serviceDirs = [],
+        appServiceDir = path.resolve(rootDir, 'app', 'services');
     serviceDirs.push(path.resolve(rootDir, 'core', 'service'));
-    serviceDirs.push(path.resolve(rootDir, 'app', 'services'));
+    if (FileUtils.isDirectorySync(appServiceDir)) {
+      serviceDirs.push(appServiceDir);
+    }
     _realConfig.serviceDirs = serviceDirs;
 
     /**
      * Rules to check and get parameters
      */
-    let checkitDirs = [];
-    checkitDirs.push(path.resolve(rootDir, 'app', 'checkits'));
+    let checkitDirs = [],
+        appCheckitDir = path.resolve(rootDir, 'app', 'checkits');
+    if (FileUtils.isDirectorySync(appCheckitDir)) {
+      checkitDirs.push(appCheckitDir);
+    }
     _realConfig.checkitDirs = checkitDirs;
+
+    /**
+     * Cache functions
+     */
+    let cacheDirs = [],
+        appCacheDir = path.resolve(rootDir, 'app', 'cache');
+    cacheDirs.push(path.resolve(rootDir, 'core', 'cache'));
+    if (FileUtils.isDirectorySync(appCacheDir)) {
+      cacheDirs.push(appCacheDir);
+    }
+    _realConfig.cacheDirs = cacheDirs;
 
     /**
      * Sockets:
      * - app/sockets/
      */
-    let socketDirs = [];
-    socketDirs.push(path.resolve(rootDir, 'app', 'sockets'));
+    let socketDirs = [],
+        appSocketDir = path.resolve(rootDir, 'app', 'sockets');
+    if (FileUtils.isDirectorySync(appSocketDir)) {
+      socketDirs.push(appSocketDir);
+    }
     _realConfig.socketDirs = socketDirs;
 
     /**
@@ -219,6 +251,7 @@ var SotaServer = Class.extends({
     this._setupLodash(myApp);
     this._setupCheckit(myApp);
     this._setupPassport(myApp);
+    this._setupCache(myApp);
     this._setupRoutes(myApp);
     this._initSocket(myApp, myServer);
 
@@ -286,6 +319,12 @@ var SotaServer = Class.extends({
   _setupPassport: function(myApp) {
     var init = require('./initializer/Passport');
     init(myApp);
+  },
+
+  _setupCache: function(myApp) {
+    var init = require('./initializer/Cache'),
+        cacheDirs = _realConfig.cacheDirs;
+    init(myApp, LocalCache, cacheDirs);
   },
 
   _setupRoutes: function(myApp) {

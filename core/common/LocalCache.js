@@ -1,13 +1,27 @@
-/**
- * Very simple though.
- * TODO: improve this
- */
-var _cache = {};
+'use strict'
 
-module.exports.set = function(key, value) {
-  _cache[key] = value;
+var LocalCache = {},
+    logger = require('log4js').getLogger('LocalCache'),
+    redis = require('redis'),
+    client = redis.createClient({
+      host: process.env.REDIS_SERVER_ADDRESS,
+      port: process.env.REDIS_SERVER_PORT,
+    });
+
+client.on('error', function(err) {
+  logger.error('On redis error: ' + err);
+});
+
+LocalCache.register = function(key, func) {
+  if (!key) {
+    key = func.name;
+  }
+
+  if (LocalCache[key]) {
+    logger.warn('Duplicate cache key will be overwritten: ' + key);
+  }
+
+  LocalCache[key] = func;
 };
 
-module.exports.get = function(key) {
-  return _cache[key];
-};
+module.exports = LocalCache;
