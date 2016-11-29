@@ -28,37 +28,8 @@ module.exports = function(app, CacheFactory, dirs) {
 
   // TODO: find a better way to cache and refresh masterdata version
   function refreshSettings() {
-    var exSession = new ExSession(),
-        key = 'dataVersion',
-        MasterModel = exSession.getModel('MasterModel');
-
-    async.auto({
-      cached: function(next) {
-        RedisCache.get(key, next);
-      },
-      version: ['cached', function(ret, next) {
-        if (ret.cached && !isNaN(ret.cached)) {
-          var version = parseInt(ret.cached);
-          next(null, version);
-          return;
-        }
-
-        MasterModel.getDataVersion(next);
-      }],
-      recached: ['version', function(ret, next) {
-        if (ret.cached && !isNaN(ret.cached)) {
-          return next(null, true);
-        }
-
-        RedisCache.set(key, ret.version, next);
-      }],
-    }, function(err, ret) {
-      if (err) {
-        throw new Error(err.toString());
-      }
-
-      LocalCache.setSync(key, ret.version, {ttl: Const.DAY_IN_MILLISECONDS});
-      setTimeout(refreshSettings, 1000);
+    CacheFactory.getDataVersion(function() {
+      setTimeout(refreshSettings, 10000);
     });
   }
 
