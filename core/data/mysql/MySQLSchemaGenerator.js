@@ -6,7 +6,6 @@ var async       = require('async');
 var Types       = require('../../node_modules/mysql/lib/protocol/constants/types');
 
 var Class       = require('sota-class').Class;
-var BaseModel   = require('../../model/BaseModel');
 
 module.exports = Class.extends({
   classname: 'MySQLSchemaGetter',

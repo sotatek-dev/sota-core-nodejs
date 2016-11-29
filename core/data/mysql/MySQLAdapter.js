@@ -363,7 +363,7 @@ module.exports = BaseAdapter.extends({
     var _callback = function() {
       self._connections = [];
       callback(null, null);
-    }
+    };
 
     async.parallel(tasks, _callback);
   },

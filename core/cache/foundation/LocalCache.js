@@ -1,7 +1,6 @@
 var BaseCache = require('./BaseCache');
-var logger    = require('log4js').getLogger('LocalCache');
 
-'use strict'
+'use strict';
 
 var _localData = {},
     _localMeta = {};
@@ -30,7 +29,7 @@ class LocalCache extends BaseCache {
     if (typeof meta === 'object') {
       _localMeta[key] = {
         expiredAt: Utils.now() + (meta.ttl || Const.DEFAULT_CACHE_TTL),
-      }
+      };
     }
 
     _localData[key] = value;

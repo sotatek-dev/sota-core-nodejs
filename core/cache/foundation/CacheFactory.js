@@ -1,7 +1,7 @@
 var Class   = require('sota-class').Class;
 var logger  = require('log4js').getLogger('CacheFactory');
 
-'use strict'
+'use strict';
 
 var CacheFactory = Class.singleton({
   classname: 'CacheFactory',

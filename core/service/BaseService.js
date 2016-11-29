@@ -1,5 +1,5 @@
 var Class       = require('sota-class').Class;
-var logger      = require('log4js').getLogger('BaseService');
+// var logger      = require('log4js').getLogger('BaseService');
 
 module.exports = Class.extends({
   classname : 'BaseService',

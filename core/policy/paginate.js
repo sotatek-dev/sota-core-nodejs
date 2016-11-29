@@ -1,4 +1,4 @@
-var logger = require('log4js').getLogger('PolicyPaginate');
+// var logger = require('log4js').getLogger('PolicyPaginate');
 
 module.exports = function(req, res, next) {
   var [err, params] = new Checkit({
@@ -17,8 +17,8 @@ module.exports = function(req, res, next) {
 
   // If there's no particular paging
   // just use default values and keep living on
-  var p_type = params.p_type;
-  if (!p_type) {
+  var type = params.p_type;
+  if (!type) {
     return next();
   }
 
@@ -35,23 +35,19 @@ module.exports = function(req, res, next) {
     after   : params.p_after,
   };
 
-  if (p_type === 'cursor') {
+  if (type === 'cursor') {
     if (req.pagination.before && req.pagination.after) {
       var msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
     }
-  }
-  else if (p_type === 'brute') {
+  } else if (type === 'brute') {
     // No limit in brute-mode
     req.pagination.limit = -1;
-  }
-  // Mix between multi and complex conditions
-  else if (p_type === 'complex') {
+  } else if (type === 'complex') { // Mix between multi and complex conditions
     // TODO: implement me
-    return next(ErrorFactory.badRequest('Unsupported pagination type: ' + p_type));
-  }
-  else {
-    return next(ErrorFactory.badRequest('Unsupported pagination type: ' + p_type));
+    return next(ErrorFactory.badRequest('Unsupported pagination type: ' + type));
+  } else {
+    return next(ErrorFactory.badRequest('Unsupported pagination type: ' + type));
   }
 
   next();

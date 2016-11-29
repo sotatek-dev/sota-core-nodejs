@@ -143,7 +143,7 @@ function extendRequest(req, res) {
     if (!callback) {
       callback = function() {
         res.sendError(err);
-      }
+      };
     }
 
     return req.exSession.rollback(callback);

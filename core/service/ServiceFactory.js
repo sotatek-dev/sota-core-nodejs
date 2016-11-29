@@ -30,7 +30,8 @@ module.exports = Class.singleton({
   },
 
   create: function(classname, exSession) {
-    return (new this.get(classname))(exSession);
+    ServiceClass = this.get(classname);
+    return (new ServiceClass)(exSession);
   },
 
 });

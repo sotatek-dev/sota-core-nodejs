@@ -5,7 +5,8 @@ check-syntax:
 	--rule="{ \
 						'max-len':[1, 100, {'ignoreComments':true}],\
 						'max-depth': [1, 4], \
-						'max-statements': [1, 50], \
+						'max-statements': [1, 100], \
+						'no-unused-vars': [1, { 'vars': 'all', 'args': 'none' }], \
 						'camelcase':[1,{'properties': 'never'}] \
 					}" \
 	./

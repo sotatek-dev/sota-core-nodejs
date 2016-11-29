@@ -1,5 +1,4 @@
 var ExSession = require('../../core/common/ExSession');
-var logger    = require('log4js').getLogger('Cache.getMasterdata');
 
 function requery(version, callback) {
   if (typeof version !== 'number') {
