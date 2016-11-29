@@ -13,6 +13,7 @@ Interface           = require('sota-class').Interface;
 
 CacheFactory        = require('./cache/foundation/CacheFactory');
 LocalCache          = require('./cache/foundation/LocalCache');
+RedisCache          = require('./cache/foundation/RedisCache');
 Const               = require('./common/Const');
 FileUtils           = require('./util/FileUtils');
 Utils               = require('./util/Utils');

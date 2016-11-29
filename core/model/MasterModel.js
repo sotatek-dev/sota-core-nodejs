@@ -9,4 +9,19 @@ module.exports = BaseModel.extends({
     write  : 'mysql-master',
   },
 
+  getDataVersion: function(callback) {
+    var key = 'dataVersion';
+
+    this.findOne({
+      where: '`key`=?',
+      params: [key],
+    }, function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+
+      callback(null, parseInt(ret.value));
+    });
+  },
+
 });

@@ -66,23 +66,14 @@ function getVersion(cache, callback) {
         return next(null, parseInt(ret.cached));
       }
 
-      MasterModel.findOne({
-        where: '`key`=?',
-        params: [key],
-      }, function(_err, _ret) {
-        if (_err) {
-          return next(_err);
-        }
-
-        next(null, parseInt(_ret.value));
-      });
+      MasterModel.getDataVersion(next);
     }],
     recache: ['version', function(ret, next) {
       if (ret.cached) {
         return next(null, null);
       }
 
-      cache.set(key, ret.version, {ttl: Const.MINUTE_IN_MILLISECONDS}, next);
+      cache.set(key, ret.version, {ttl: Const.DAY_IN_MILLISECONDS}, next);
     }],
   }, function(err, ret) {
     if (err) {

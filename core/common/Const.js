@@ -37,5 +37,6 @@ module.exports = {
   HOUR_IN_MILLISECONDS    : 1000 * 60 * 60,
   DAY_IN_MILLISECONDS     : 1000 * 60 * 60 * 24,
   MONTH_IN_MILLISECONDS   : 1000 * 60 * 60 * 24 * 30,
+  YEAR_IN_MILLISECONDS    : 1000 * 60 * 60 * 24 * 365,
 
 };
