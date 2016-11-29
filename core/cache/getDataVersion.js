@@ -27,6 +27,9 @@ module.exports = function(callback) {
       RedisCache.set(key, ret.version, next);
     }],
   }, function(err, ret) {
+    exSession.destroy();
+    delete exSession;
+
     if (err) {
       callback(err);
       return;
