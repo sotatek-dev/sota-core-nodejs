@@ -36,7 +36,8 @@ function requery(version, callback) {
         streamingServerUrl: process.env.STREAMING_SERVER_ADDRESS,
         streamingServerUsername: process.env.STREAMING_SERVER_USERNAME,
         streamingServerPassword: process.env.STREAMING_SERVER_PASSWORD,
-        streamingAppName: process.env.STREAMING_APP_NAME
+        streamingAppName: process.env.STREAMING_APP_NAME,
+        itemImageEndpoint: process.env.ITEM_IMAGE_ENDPOINT,
       };
       next(null, result);
     }
@@ -69,7 +70,7 @@ function getVersion(cache, callback) {
       MasterModel.getDataVersion(next);
     }],
     recache: ['version', function(ret, next) {
-      if (ret.cached) {
+      if (ret.cached && !isNaN(ret.cached)) {
         return next(null, null);
       }
 

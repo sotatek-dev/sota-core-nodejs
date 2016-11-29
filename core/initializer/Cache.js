@@ -60,8 +60,6 @@ module.exports = function(app, CacheFactory, dirs) {
       LocalCache.setSync(key, ret.version, {ttl: Const.DAY_IN_MILLISECONDS});
       setTimeout(refreshSettings, 1000);
     });
-
-
   }
 
   setTimeout(refreshSettings, 1);
