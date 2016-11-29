@@ -16,7 +16,7 @@ module.exports = BaseModel.extends({
 
   getByVersion: function(version, callback) {
     // TODO: implement this
-    getCurrent(callback);
+    this.getCurrent(callback);
   }
 
 });

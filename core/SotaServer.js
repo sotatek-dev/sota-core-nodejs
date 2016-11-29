@@ -11,7 +11,8 @@ imageminPngquant    = require('imagemin-pngquant');
 Class               = require('sota-class').Class;
 Interface           = require('sota-class').Interface;
 
-LocalCache          = require('./common/LocalCache');
+CacheFactory        = require('./cache/foundation/CacheFactory');
+LocalCache          = require('./cache/foundation/LocalCache');
 Const               = require('./common/Const');
 FileUtils           = require('./util/FileUtils');
 Utils               = require('./util/Utils');
@@ -324,7 +325,7 @@ var SotaServer = Class.extends({
   _setupCache: function(myApp) {
     var init = require('./initializer/Cache'),
         cacheDirs = _realConfig.cacheDirs;
-    init(myApp, LocalCache, cacheDirs);
+    init(myApp, CacheFactory, cacheDirs);
   },
 
   _setupRoutes: function(myApp) {

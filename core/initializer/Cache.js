@@ -1,7 +1,7 @@
 var path    = require('path');
 var logger  = require('log4js').getLogger('Init.Cache');
 
-module.exports = function(app, LocalCache, dirs) {
+module.exports = function(app, CacheFactory, dirs) {
   _.each(dirs, function(dir) {
     logger.trace('Initializer::Cache dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {
@@ -20,7 +20,7 @@ module.exports = function(app, LocalCache, dirs) {
       }
 
       var module = require(file);
-      LocalCache.register(path.basename(file, '.js'), module);
+      CacheFactory.register(path.basename(file, '.js'), module);
     });
 
   });

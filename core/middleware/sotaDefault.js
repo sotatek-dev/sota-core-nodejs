@@ -65,7 +65,7 @@ function _envelopResponse(data) {
       meta        : {
         code: 0,
         serverTime : Utils.now(),
-        masterdataVersion: LocalCache.get('dataVersion') || 1,
+        masterdataVersion: LocalCache.getSync('dataVersion') || 1,
       },
       data        : data.data || null,
       pagination  : data.pagination,
