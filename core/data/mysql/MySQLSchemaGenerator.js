@@ -96,6 +96,7 @@ module.exports = Class.extends({
         return;
       }
       logger.trace('Schema file was saved: ' + self._targetFile);
+      process.exit(0);
     });
   },
 
