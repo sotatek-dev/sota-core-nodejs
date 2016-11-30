@@ -15,6 +15,8 @@ module.exports = function(req, res, next) {
     return next(err.toString());
   }
 
+  req.pagination = {};
+
   // If there's no particular paging
   // just use default values and keep living on
   var type = params.p_type;
