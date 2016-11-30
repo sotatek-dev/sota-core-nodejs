@@ -1,5 +1,5 @@
 var logger              = require('log4js').getLogger('Init.Routes');
-var UserController      = require('../controller/UserController');
+var AuthController      = require('../controller/AuthController');
 
 module.exports = function(app, ControllerFactory, config) {
 
@@ -63,12 +63,12 @@ module.exports = function(app, ControllerFactory, config) {
 
   // If there's no user-defined login function, use built-int default login
   if (!hasCustomizedLogin) {
-    app.post('/login', UserController.handleBy('login'));
+    app.post('/login', AuthController.handleBy('login'));
   }
 
   // If there's no user-defined logout function, use built-int default login
   if (!hasCustomizedLogout) {
-    app.post('/logout', UserController.handleBy('logout'));
+    app.post('/logout', AuthController.handleBy('logout'));
   }
 
   logger.trace('Routes: finished initializing.');

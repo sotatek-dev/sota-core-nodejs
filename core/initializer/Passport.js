@@ -59,6 +59,7 @@ module.exports = function(app) {
       if (user) {
         done(null, user);
       } else {
+        logger.error('User not found jwtPayload=' + util.inspect(jwtPayload));
         done(ErrorFactory.unauthorized('User not found.'));
       }
     });
@@ -81,10 +82,12 @@ module.exports = function(app) {
         }
 
         if (!user) {
+          logger.error('User not found email=' + email);
           return done(ErrorFactory.notFound('User not found.'));
         }
 
         if (!user.isValidPassword(password)) {
+          logger.error('Invalid password for email=' + email + ', password=' + password);
           return done(ErrorFactory.badRequest('Wrong password.'));
         }
 

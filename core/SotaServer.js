@@ -128,6 +128,7 @@ var SotaServer = Class.extends({
      */
     let controllerDirs = [],
         appControllerDir = path.resolve(rootDir, 'app', 'controllers');
+    controllerDirs.push(path.resolve(rootDir, 'core', 'controller'));
     if (FileUtils.isDirectorySync(appControllerDir)) {
       controllerDirs.push(appControllerDir);
     }
