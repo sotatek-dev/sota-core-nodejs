@@ -75,6 +75,12 @@ module.exports = BaseController.extends({
 
       }],
       userProfile: ['user', function(ret, next) {
+        // If user that associated with fb account is existed, just continue
+        if (ret.existedUser) {
+          next(null, null);
+          return;
+        }
+
         UserProfileModel.add({
           user_id: ret.user.id,
         }, next);
