@@ -26,6 +26,7 @@ module.exports = BaseController.extends({
     }
 
     var UserModel = req.getModel('UserModel'),
+        UserProfileModel = req.getModel('UserProfileModel'),
         secret = process.env.FACEBOOK_APP_SECRET,
         fb_access_token = params.fb_access_token,
         hash = crypto.createHmac('sha256', secret).update(fb_access_token),
@@ -73,7 +74,12 @@ module.exports = BaseController.extends({
         UserModel.add(data, next);
 
       }],
-      commit: ['user', function(ret, next) {
+      userProfile: ['user', function(ret, next) {
+        UserProfileModel.add({
+          user_id: ret.user.id,
+        }, next);
+      }],
+      commit: ['userProfile', function(ret, next) {
         req.commit(next);
       }],
     }, function(err, ret) {
