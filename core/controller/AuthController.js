@@ -78,8 +78,9 @@ module.exports = BaseController.extends({
       }],
     }, function(err, ret) {
       if (err) {
-        req.rollback();
-        res.sendError(err);
+        req.rollback(function() {
+          res.sendError(err);
+        });
         return;
       }
 
@@ -91,7 +92,7 @@ module.exports = BaseController.extends({
       var user = ret.user,
           token = self.generateAccessToken(user);
 
-      res.send({
+      res.ok({
         user: user,
         token: token
       });
