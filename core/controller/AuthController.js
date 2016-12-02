@@ -12,7 +12,9 @@ module.exports = BaseController.extends({
 
     return jwt.sign({
       userId: user.id
-    }, process.env.SECRET, { expiresIn: expiredTime });
+    }, process.env.SECRET, {
+      expiresIn: expiredTime
+    });
   },
 
   facebook: function(req, res) {
@@ -28,11 +30,14 @@ module.exports = BaseController.extends({
     var UserModel = req.getModel('UserModel'),
         UserProfileModel = req.getModel('UserProfileModel'),
         secret = process.env.FACEBOOK_APP_SECRET,
-        fb_access_token = params.fb_access_token,
-        hash = crypto.createHmac('sha256', secret).update(fb_access_token),
-        appsecret_proof = hash.digest('hex'),
+        fbAcessToken = params.fb_access_token,
+        hash = crypto.createHmac('sha256', secret).update(fbAcessToken),
+        appsecretProof = hash.digest('hex'),
         fields = 'id,name,email,first_name,last_name,gender,link,picture.type(large)';
-        url = util.format('https://graph.facebook.com/v2.8/me?fields=%s&access_token=%s&appsecret_proof=%s', fields, fb_access_token, appsecret_proof),
+        url = util.format(
+          'https://graph.facebook.com/v2.8/me?fields=%s&access_token=%s&appsecret_proof=%s',
+          fields, fbAcessToken, appsecretProof
+        ),
         fbid = '';
 
     async.auto({
@@ -44,8 +49,8 @@ module.exports = BaseController.extends({
       },
       existedUser: ['fbInfo', function(ret, next) {
         var result = ret.fbInfo;
-        if (ret.fbInfo && ret.fbInfo.length && ret.fbInfo[0].statusCode === 200) {
-          fbid = ret.fbInfo[1].id;
+        if (result && result.length && result[0].statusCode === 200) {
+          fbid = result[1].id;
           UserModel.findOne({
             where: 'facebook_id=?',
             params: [fbid],

@@ -1,6 +1,5 @@
 var path        = require('path');
 var logger      = require('log4js').getLogger('Init.Cache');
-var ExSession   = require('../../core/common/ExSession');
 
 module.exports = function(app, CacheFactory, dirs) {
   _.each(dirs, function(dir) {
