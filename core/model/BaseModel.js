@@ -211,6 +211,65 @@ var BaseModel = Class.extends({
     });
   },
 
+  /**
+   * @param {Object} def - plain object that describes the expected result
+   *  The criteria should be all in equal comparator
+   * @param {Function} callback - typical callback
+   */
+  findOrInsertOne: function(def, defaultValues, callback) {
+    if (!def || def.id) {
+      return callback('Invalid getOrInsertOne params: ' + util.inspect(def));
+    }
+
+    if (typeof defaultValues === 'function') {
+      callback = defaultValues;
+    }
+
+    var self = this;
+    var conditions = [];
+    var params = [];
+
+    for (let p in def) {
+      if (def[p] === null) {
+        conditions.push(Utils.escapeSqlColumn(p) + ' IS NULL');
+        continue;
+      }
+      conditions.push(Utils.escapeSqlColumn(p) + '=?');
+      params.push(def[p]);
+    }
+
+    async.auto({
+      existed: function(next) {
+        self.findOne({
+          where: conditions.join(' AND '),
+          params: params,
+        }, next);
+      },
+      insert: ['existed', function(ret, next) {
+        if (ret.existed) {
+          return next(null, ret.existed);
+        }
+
+        if (_.isPlainObject(defaultValues)) {
+          for (let p in defaultValues) {
+            if (!_.isNil(def[p])) {
+              continue;
+            }
+            def[p] = defaultValues[p];
+          }
+        }
+
+        self.add(def, next);
+      }],
+    }, function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+
+      callback(null, ret.insert);
+    });
+  },
+
   // Find alias
   select : function(options, callback) {
     this.find(options, callback);

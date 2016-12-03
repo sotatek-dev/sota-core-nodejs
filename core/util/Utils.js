@@ -70,4 +70,8 @@ Utils.getUploadedLink = function(filename) {
           process.env.APP_ENDPOINT, process.env.PORT, filename);
 };
 
+Utils.escapeSqlColumn = function(column) {
+  return '`' + column + '`';
+};
+
 module.exports = Utils;
