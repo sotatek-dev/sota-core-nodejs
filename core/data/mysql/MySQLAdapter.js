@@ -5,10 +5,11 @@ var logger              = require('log4js').getLogger('MySQLAdapter');
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
 
-  initialize : function($super, exSession, pool) {
+  initialize : function($super, exSession, pool, mode) {
     $super(exSession);
+    this._mode        = mode;
     this._pool        = pool;
-    this._connections = [];
+    this._connection  = null;
   },
 
   beginTransaction : function(callback) {
@@ -16,43 +17,32 @@ module.exports = BaseAdapter.extends({
     callback();
   },
 
-  commit : function(callback) {
-    logger.trace('MySQLAdapter::commit TODO');
-    callback();
-  },
-
-  rollback : function(callback) {
-    logger.trace('MySQLAdapter::rollback TODO');
-    callback();
-  },
-
   _exec : function(sqlQuery, params, callback) {
     logger.info('_exec sqlQuery=[' + sqlQuery + '], params=' + util.inspect(params));
-    var self = this,
-        connection = null,
-        isSelecting = sqlQuery.toUpperCase().indexOf('SELECT') === 0;
+    var self = this;
 
     async.waterfall([
-      function(next) {
-        self._pool.getConnection(next);
+      function getConnection(next) {
+        if (self._connection) {
+          next(null, self._connection);
+        } else {
+          self._pool.getConnection(next);
+        }
       },
-      function(conn, next) {
-        connection = conn;
-        connection.beginTransaction(function(err) {
-          next(err, null);
-        });
+      function beginTransaction(connection, next) {
+        self._connection = connection;
+        if (self._mode == 'master') {
+          self._connection.beginTransaction(function(err) {
+            next(err, null);
+          });
+        } else {
+          next(null, null);
+        }
       },
       function(ret, next) {
-        if (!isSelecting) {
-          self._connections.push(connection);
-        }
-        connection.query(sqlQuery, params, next);
+        self._connection.query(sqlQuery, params, next);
       },
       function(rows, fields, next) {
-        if (isSelecting) {
-          connection.release();
-        }
-
         next(null, rows);
       },
     ], function(err, rows) {
@@ -334,10 +324,18 @@ module.exports = BaseAdapter.extends({
   },
 
   commit: function(callback) {
+    if (this._isFinished) {
+      return callback();
+    }
+    this._isFinished = true;
     this._finishConnections('commit', callback);
   },
 
   rollback: function(callback) {
+    if (this._isFinished) {
+      return callback();
+    }
+    this._isFinished = true;
     this._finishConnections('rollback', callback);
   },
 
@@ -345,15 +343,14 @@ module.exports = BaseAdapter.extends({
     var self = this,
         tasks = [];
 
-    for (let i = 0; i < this._connections.length; i++) {
-      let connection = this._connections[i];
+    if (this._connection) {
       tasks.push(function(next) {
         async.waterfall([
           function finish(_next) {
-            connection[method](_next);
+            self._connection[method](_next);
           },
           function release(rows, fields, _next) {
-            connection.release();
+            self._connection.release();
             _next();
           }
         ], next);
@@ -361,7 +358,7 @@ module.exports = BaseAdapter.extends({
     }
 
     var _callback = function() {
-      self._connections = [];
+      delete self._connection;
       callback(null, null);
     };
 
@@ -369,13 +366,10 @@ module.exports = BaseAdapter.extends({
   },
 
   destroy : function() {
-    if (this._connections && this._connections.length > 0) {
-      for (let i = 0; i < this._connections.length; i++) {
-        this._connections[i].release();
-        delete this._connections[i];
-      }
+    if (this._connection) {
+      this._connection.release();
+      delete this._connection;
     }
-    delete this._connections;
   },
 
 });

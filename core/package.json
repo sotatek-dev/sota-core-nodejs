@@ -61,6 +61,7 @@
     "redis": "2.6.3",
     "request": "2.79.0",
     "serve-favicon": "^2.3.0",
+    "shortid": "2.2.6",
     "sinon": "^1.17.6",
     "socket.io": "^1.5.1",
     "socket.io-client": "^1.5.1",

@@ -1,12 +1,17 @@
-var Class       = require('sota-class').Class;
+var Class           = require('sota-class').Class;
+var shortid         = require('shortid');
+var AdapterFactory  = require('../data/AdapterFactory');
 
 module.exports = Class.extends({
   classname : 'ExSession',
 
-  _sessionId : '',
-
   initialize: function(sessionInfo) {
     this._info = sessionInfo || {};
+    this._sessionId = shortid.generate();
+  },
+
+  getSessionId: function() {
+    return this._sessionId;
   },
 
   getService : function(classname) {
@@ -59,12 +64,27 @@ module.exports = Class.extends({
   },
 
   destroy : function() {
-    var i;
-    for (i in this._services) {
+    var self = this;
+
+    var masterAdapterKeys = _.map(this._models, function(model) {
+      return model.getMasterConfig().key;
+    });
+
+    var slaveAdapterKeys = _.map(this._models, function(model) {
+      return model.getSlaveConfig().key;
+    });
+
+    var adapterKeys = _.uniq(_.concat(masterAdapterKeys, slaveAdapterKeys));
+
+    _.each(adapterKeys, function(key) {
+      AdapterFactory.unregister(self, key);
+    });
+
+    for (let i in this._services) {
       this._services[i].destroy();
     }
 
-    for (i in this._models) {
+    for (let i in this._models) {
       this._models[i].destroy();
     }
 

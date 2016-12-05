@@ -10,10 +10,13 @@ var _nextId = 0,
 module.exports = Class.singleton({
   classname : 'AdapterFactory',
 
-  create : function(exSession, config) {
+  create : function(exSession, config, mode) {
+    if (!exSession || !exSession.getSessionId()) {
+      throw new Error('AdapterFactory::create invalid config: config=' + util.inspect(config));
+    }
+
     if (!config || !config.key) {
-      logger.error('AdapterFactory::create invalid config: config=' + util.inspect(config));
-      return null;
+      throw new Error('AdapterFactory::create invalid config: config=' + util.inspect(config));
     }
 
     var type = config.type,
@@ -22,19 +25,26 @@ module.exports = Class.singleton({
     this._createPool(config);
 
     if (type === Const.DATA_SOURCE_TYPE.MYSQL) {
-      return this._createMySQLAdapter(exSession, key);
+      return this._createMySQLAdapter(exSession, key, mode);
     } else {
       logger.error('AdapterFactory::create unsupported type config=' + util.inspect(config));
       return null;
     }
   },
 
-  _createMySQLAdapter : function(exSession, key) {
-    var adapter = new MySQLAdapter(exSession, _pools[key].instance);
-    _nextId++;
-    _registry[_nextId] = adapter;
-    adapter.registryId = _nextId;
-    return adapter;
+  _createMySQLAdapter : function(exSession, key, mode) {
+    if (!_registry[key]) {
+      _registry[key] = {};
+    }
+
+    var sessionId = exSession.getSessionId();
+    if (!_registry[key][sessionId]) {
+      var adapter = new MySQLAdapter(exSession, _pools[key].instance, mode);
+      adapter.registryId = ++_nextId;
+      _registry[key][sessionId] = adapter;
+    }
+
+    return _registry[key][sessionId];
   },
 
   _createPool : function(config) {
@@ -66,6 +76,12 @@ module.exports = Class.singleton({
     _pools[key] = {};
     _pools[key].config = config;
     _pools[key].instance = pool;
+  },
+
+  unregister: function(exSession, key) {
+    if (_registry[key]) {
+      delete _registry[key][exSession.getSessionId()];
+    }
   },
 
 });

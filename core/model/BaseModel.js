@@ -41,8 +41,10 @@ var BaseModel = Class.extends({
 
     this._exSession       = exSession;
     this._useMasterSelect = false;
-    this._masterAdapter   = AdapterFactory.create(exSession, masterConfig);
-    this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig);
+    this._masterConfig    = masterConfig;
+    this._slaveConfig     = slaveConfig;
+    this._masterAdapter   = AdapterFactory.create(exSession, masterConfig, 'master');
+    this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig, 'slave');
 
     this._collections     = [];
   },
@@ -70,6 +72,14 @@ var BaseModel = Class.extends({
 
   setUseMasterSelect : function(flag) {
     this._useMasterSelect = !!flag;
+  },
+
+  getMasterConfig: function() {
+    return this._masterConfig;
+  },
+
+  getSlaveConfig: function() {
+    return this._slaveConfig;
   },
 
   getExSession: function() {
@@ -403,11 +413,17 @@ var BaseModel = Class.extends({
   },
 
   singleCommit: function(callback) {
-    this._masterAdapter.commit(callback);
+    async.parallel([
+      this._masterAdapter.commit.bind(this._masterAdapter),
+      this._slaveAdapter.commit.bind(this._slaveAdapter)
+    ], callback);
   },
 
   singleRollback: function(callback) {
-    this._masterAdapter.rollback(callback);
+    async.parallel([
+      this._masterAdapter.rollback.bind(this._masterAdapter),
+      this._slaveAdapter.rollback.bind(this._slaveAdapter)
+    ], callback);
   },
 
   $whereIn: function(column, length) {
