@@ -72,6 +72,7 @@ var BaseModel = Class.extends({
 
   setUseMasterSelect : function(flag) {
     this._useMasterSelect = !!flag;
+    return this;
   },
 
   getMasterConfig: function() {
@@ -353,7 +354,7 @@ var BaseModel = Class.extends({
     var insertId = ret.insertId,
         count = ret.affectedRows;
 
-    this.select({
+    this.setUseMasterSelect(true).select({
       where: 'id >= ? and id <= ?',
       params: [insertId, insertId + count - 1],
     }, callback);

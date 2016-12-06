@@ -11,7 +11,7 @@ var XModel = BaseModel.extends({
     'last_login'  : {type: 'number', size: 10, version: 1, active: true, isNotNull: true},
   },
 
-  dsConfig     : {
+  $dsConfig     : {
     read  : 'mysql-master',
     write : 'mysql-slave',
   },
