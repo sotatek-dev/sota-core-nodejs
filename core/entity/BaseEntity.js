@@ -183,7 +183,7 @@ module.exports = Class.extends({
       return;
     }
 
-    _.forEach(_.keys(data), function(property) {
+    _.forEach(dataKeys, function(property) {
       self._data[property] = data[property];
 
       /*jshint loopfunc: true */
