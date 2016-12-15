@@ -141,7 +141,7 @@ module.exports = Class.extends({
               .to(socket.id).emit('error', e);
         };
 
-        socket.user = user;
+        socket.user = user.toJSON();
         socket.exSession = exSession;
 
         next(null, true);
