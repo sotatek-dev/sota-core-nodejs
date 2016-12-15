@@ -2,23 +2,22 @@ var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
 var logger              = require('log4js').getLogger('MySQLAdapter');
 
+var __id = 0;
+
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
 
   initialize : function($super, exSession, pool, mode) {
     $super(exSession);
+    // For bug tracing only
+    this.__id         = ++__id;
     this._mode        = mode;
     this._pool        = pool;
     this._connection  = null;
   },
 
-  beginTransaction : function(callback) {
-    logger.trace('MySQLAdapter::beginTransaction TODO');
-    callback();
-  },
-
   _exec : function(sqlQuery, params, callback) {
-    logger.info('_exec sqlQuery=[' + sqlQuery + '], params=' + util.inspect(params));
+    logger.info(util.format('<%s> __exec sqlQuery=[%s], params=[%s]', this.__id, sqlQuery, params));
     var self = this;
 
     async.waterfall([
@@ -340,6 +339,7 @@ module.exports = BaseAdapter.extends({
   },
 
   _finishConnections: function(method, callback) {
+    logger.trace(util.format('<%s> _finishConnections method=%s', this.__id, method));
     var self = this,
         tasks = [];
 
@@ -366,6 +366,7 @@ module.exports = BaseAdapter.extends({
   },
 
   destroy : function() {
+    logger.trace(util.format('<%s> _destroy', this.__id));
     if (this._connection) {
       this._connection.release();
       delete this._connection;
