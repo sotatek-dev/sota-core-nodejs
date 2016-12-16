@@ -2,35 +2,44 @@ var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
 var logger              = require('log4js').getLogger('MySQLAdapter');
 
-var __id = 0;
-
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
 
   initialize : function($super, exSession, pool, mode) {
     $super(exSession);
     // For bug tracing only
-    this.__id         = ++__id;
-    this._mode        = mode;
-    this._pool        = pool;
-    this._connection  = null;
+    this._mode          = mode;
+    this._pool          = pool;
+    this._connection    = null;
+    this._gotConnection = false;
   },
 
   _exec : function(sqlQuery, params, callback) {
-    logger.info(util.format('<%s> __exec sqlQuery=[%s], params=[%s]', this.__id, sqlQuery, params));
     var self = this;
+
+    // If the adapter is trying to get connection, but it's not finished
+    // Just retry execution in the next tick, when the connection is ready
+    if (self._gotConnection && !self._connection) {
+      logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection');
+      return setTimeout(function() {
+        self._exec(sqlQuery, params, callback);
+      }, 20);
+    }
+
+    logger.info(util.format('<%s> _exec sqlQuery=[%s], params=[%s]', this.registryId, sqlQuery, params));
 
     async.waterfall([
       function getConnection(next) {
         if (self._connection) {
-          next(null, self._connection);
+          return next(null, self._connection);
         } else {
-          self._pool.getConnection(next);
+          self._gotConnection = true;
+          return self._pool.getConnection(next);
         }
       },
       function beginTransaction(connection, next) {
         self._connection = connection;
-        if (self._mode == 'master') {
+        if (self._mode === 'master') {
           self._connection.beginTransaction(function(err) {
             next(err, null);
           });
@@ -339,7 +348,7 @@ module.exports = BaseAdapter.extends({
   },
 
   _finishConnections: function(method, callback) {
-    logger.trace(util.format('<%s> _finishConnections method=%s', this.__id, method));
+    logger.trace(util.format('<%s> _finishConnections method=%s', this.registryId, method));
     var self = this,
         tasks = [];
 
@@ -359,6 +368,7 @@ module.exports = BaseAdapter.extends({
 
     var _callback = function() {
       delete self._connection;
+      delete self._gotConnection;
       callback(null, null);
     };
 
@@ -366,10 +376,11 @@ module.exports = BaseAdapter.extends({
   },
 
   destroy : function() {
-    logger.trace(util.format('<%s> _destroy', this.__id));
     if (this._connection) {
+      logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
       this._connection.release();
       delete this._connection;
+      delete this._gotConnection;
     }
   },
 
