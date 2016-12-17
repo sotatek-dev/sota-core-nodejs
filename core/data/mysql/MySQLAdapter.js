@@ -20,7 +20,8 @@ module.exports = BaseAdapter.extends({
     // If the adapter is trying to get connection, but it's not finished
     // Just retry execution in the next tick, when the connection is ready
     if (self._gotConnection && !self._connection) {
-      logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection');
+      logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
+                    'Pending query: [' + sqlQuery + ']');
       return setTimeout(function() {
         self._exec(sqlQuery, params, callback);
       }, 20);
