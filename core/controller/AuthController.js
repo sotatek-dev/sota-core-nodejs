@@ -79,6 +79,7 @@ module.exports = BaseController.extends({
         UserModel.add(data, next);
 
       }],
+      // TODO: separate user profile model to application level
       userProfile: ['user', function(ret, next) {
         // If user that associated with fb account is existed, just continue
         if (ret.existedUser) {
@@ -88,6 +89,7 @@ module.exports = BaseController.extends({
 
         UserProfileModel.add({
           user_id: ret.user.id,
+          coin: Const.INIT_COIN_FOR_NEW_USER,
         }, next);
       }],
       commit: ['userProfile', function(ret, next) {
