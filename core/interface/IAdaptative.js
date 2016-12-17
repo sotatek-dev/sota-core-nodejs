@@ -10,6 +10,10 @@ module.exports = {
     throw new Error('I must be implemented in derived class');
   },
 
+  getAlias: function() {
+    return this._alias || this.tableName;
+  },
+
   count: function(options, callback) {
     var self = this;
     var adapter = self.getAdapterForSelect();

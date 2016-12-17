@@ -1,8 +1,9 @@
 
 module.exports = {
-  find: function(model, options, pagination, callback) {
+
+  _parsePaggingOption: function(model, options, pagination) {
     if (!pagination || !pagination.type) {
-      return model.find(options, callback);
+      return null;
     }
 
     options = options || {};
@@ -10,23 +11,26 @@ module.exports = {
     var where = options.where || '',
         additionalWheres = [],
         params = options.params || [],
+        limit = options.limit || pagination.limit,
+        offset = options.offset || pagination.offset,
         field = pagination.field,
         before = pagination.before,
         after = pagination.after,
-        orderBy = (options.orderBy ? (options.orderBy + ', ') : '' ) + pagination.field;
+        orderBy = (options.orderBy ? (options.orderBy + ', ') : '' ) +
+                  model.getAlias() + '.' + pagination.field;
 
     if (pagination.type === 'cursor' || pagination.type === 'brute') {
 
       if (before !== undefined && before !== null) {
-        additionalWheres.push('`' + field + '` > ' + before);
+        additionalWheres.push(util.format('%s.`%s` > %s', model.getAlias(), field, before));
       }
 
       if (after !== undefined && after !== null) {
-        additionalWheres.push('`' + field + '` < ' + after);
+        additionalWheres.push(util.format('%s.`%s` < %s', model.getAlias(), field, after));
         orderBy += ' DESC';
       }
     } else {
-      callback(ErrorFactory.internal('Unsupported pagination type: ' + pagination.type));
+      throw new Error('Unsupported pagination type: ' + pagination.type);
       return;
     }
 
@@ -38,13 +42,36 @@ module.exports = {
       where += '(' + additionalWheres.join(' AND ') + ')';
     }
 
+    return {
+      where: where,
+      params: params,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    };
+  },
+
+  countGroupBy: function(model, groupFields, options, pagination, callback) {
+    if (!pagination || !pagination.type) {
+      return model.countGroupBy(groupFields, options, callback);
+    }
+
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+
+    model.countGroupBy(groupFields, mergedOptions, callback);
+  },
+
+  find: function(model, options, pagination, callback) {
+    if (!pagination || !pagination.type) {
+      return model.find(options, callback);
+    }
+
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+
     async.waterfall([
       function count(next) {
         if (pagination.type === 'brute') {
-          model.count({
-            where: where,
-            params: params,
-          }, next);
+          model.count(_.pick(mergedOptions, ['where', 'params']), next);
         } else {
           next(null, 0);
         }
@@ -54,13 +81,7 @@ module.exports = {
           return next(ErrorFactory.payloadTooLarge('Too many records'));
         }
 
-        model.find({
-          where: where,
-          params: params,
-          limit: pagination.limit,
-          offset: pagination.offset,
-          orderBy: orderBy,
-        }, next);
+        model.find(mergedOptions, next);
       },
     ], callback);
   }
