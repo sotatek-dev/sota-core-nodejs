@@ -15,8 +15,7 @@ module.exports = {
         offset = options.offset || pagination.offset,
         field = pagination.field,
         before = pagination.before,
-        after = pagination.after,
-
+        after = pagination.after;
 
     var orderBy = options.orderBy;
     if (!options.ignorePaginationOrderBy) {
