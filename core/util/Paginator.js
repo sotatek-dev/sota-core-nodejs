@@ -16,8 +16,13 @@ module.exports = {
         field = pagination.field,
         before = pagination.before,
         after = pagination.after,
-        orderBy = (options.orderBy ? (options.orderBy + ', ') : '' ) +
+
+
+    var orderBy = options.orderBy;
+    if (!options.ignorePaginationOrderBy) {
+      orderBy = (options.orderBy ? (options.orderBy + ', ') : '' ) +
                   model.getAlias() + '.' + pagination.field;
+    }
 
     if (pagination.type === 'cursor' || pagination.type === 'brute') {
 
