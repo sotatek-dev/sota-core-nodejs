@@ -31,7 +31,9 @@ module.exports = {
 
       if (after !== undefined && after !== null) {
         additionalWheres.push(util.format('%s.`%s` < %s', model.getAlias(), field, after));
-        orderBy += ' DESC';
+        if (!options.ignorePaginationOrderBy) {
+          orderBy += ' DESC';
+        }
       }
     } else {
       throw new Error('Unsupported pagination type: ' + pagination.type);
