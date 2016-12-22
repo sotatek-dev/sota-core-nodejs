@@ -152,6 +152,10 @@ function extendRequest(req, res) {
 
     return req.exSession.rollback(callback);
   };
+
+  req.__endTimeout = setTimeout(function() {
+    res.sendError('Request timeout.');
+  }, Const.DEFAULT_REQUEST_TIMEOUT);
 }
 
 function extendResponse(req, res) {
@@ -187,6 +191,7 @@ function extendResponse(req, res) {
 
   var end = res.end;
   res.end = function(data, encoding) {
+    clearTimeout(req.__endTimeout);
     res.end = end;
 
     req.exSession.rollback(function() {
