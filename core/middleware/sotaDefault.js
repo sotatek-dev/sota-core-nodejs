@@ -189,12 +189,14 @@ function extendResponse(req, res) {
   res.end = function(data, encoding) {
     res.end = end;
 
-    req.exSession.destroy();
-    delete req.exSession;
-    delete req.allParams;
-    delete req.pagination;
+    req.exSession.rollback(function() {
+      req.exSession.destroy();
+      delete req.exSession;
+      delete req.allParams;
+      delete req.pagination;
 
-    res.end(data, encoding);
+      res.end(data, encoding);
+    });
   };
 }
 
