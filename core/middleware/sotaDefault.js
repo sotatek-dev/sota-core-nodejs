@@ -137,6 +137,8 @@ function extendRequest(req, res) {
     return req.exSession.commit(callback);
   };
 
+  req.commit_promisified = bb.promisify(req.commit);
+
   req.rollback    = function(err, callback) {
     if (typeof err === 'function') {
       callback = err;

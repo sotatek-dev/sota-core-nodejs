@@ -27,8 +27,7 @@ module.exports = Class.singleton({
     if (type === Const.DATA_SOURCE_TYPE.MYSQL) {
       return this._createMySQLAdapter(exSession, key, mode);
     } else {
-      logger.error('AdapterFactory::create unsupported type config=' + util.inspect(config));
-      return null;
+      throw new Error('AdapterFactory::create unsupported type config=' + util.inspect(config));
     }
   },
 
@@ -69,8 +68,7 @@ module.exports = Class.singleton({
     if (type === Const.DATA_SOURCE_TYPE.MYSQL) {
       pool = MySQL.createPool(poolConfig);
     } else {
-      logger.error('AdapterFactory::_createPool unsupported type config=' + util.inspect(config));
-      pool = null;
+      throw new Error('AdapterFactory::_createPool unsupported type config=' + util.inspect(config));
     }
 
     _pools[key] = {};

@@ -25,6 +25,15 @@ module.exports = function(app, ServiceFactory, serviceDirs) {
       }
 
       var module = require(file);
+
+      for (let prop in module.prototype) {
+        if (typeof module.prototype[prop] !== 'function') {
+          continue;
+        }
+
+        module.prototype[prop + '_promisified'] = bb.promisify(module.prototype[prop]);
+      }
+
       ServiceFactory.register(module);
     });
   });
