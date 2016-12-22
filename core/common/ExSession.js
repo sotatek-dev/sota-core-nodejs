@@ -88,6 +88,7 @@ module.exports = Class.extends({
       this._models[i].destroy();
     }
 
+    delete this._sessionId;
     delete this._services;
     delete this._models;
   }

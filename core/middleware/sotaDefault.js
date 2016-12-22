@@ -102,6 +102,8 @@ function _sendError(req, error, httpStatus) {
     error = new BaseError();
   } else if (typeof error === 'string') {
     error = new BaseError(error);
+  } else if (error instanceof Checkit.Error) {
+    this.badRequest(error.toString());
   } else if (error instanceof Error) {
     logger.error('_sendError error: ' + util.inspect(error));
     error = new BaseError(error.toString());
