@@ -54,6 +54,7 @@ module.exports = {
       limit: limit,
       offset: offset,
       orderBy: orderBy,
+      groupBy: options.groupBy,
     };
   },
 
@@ -65,6 +66,16 @@ module.exports = {
     var mergedOptions = this._parsePaggingOption(model, options, pagination);
 
     model.countGroupBy(groupFields, mergedOptions, callback);
+  },
+
+  sumGroupBy: function(model, columns, options, pagination, callback) {
+    if (!pagination || !pagination.type) {
+      return model.sumGroupBy(columns, options, callback);
+    }
+
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+
+    model.sumGroupBy(columns, mergedOptions, callback);
   },
 
   find: function(model, options, pagination, callback) {
