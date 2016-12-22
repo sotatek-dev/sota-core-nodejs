@@ -12,6 +12,7 @@ module.exports = BaseAdapter.extends({
     this._pool          = pool;
     this._connection    = null;
     this._gotConnection = false;
+    this._retryCount    = 0;
   },
 
   _exec : function(sqlQuery, params, callback) {
@@ -22,6 +23,13 @@ module.exports = BaseAdapter.extends({
     if (self._gotConnection && !self._connection) {
       logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
                     'Pending query: [' + sqlQuery + ']');
+
+      // Find the cause and a better solution for this
+      self._retryCount++;
+      if (self._retryCount > 50) {
+        throw new Error('MySQLAdapter::_exec error: maximum retry exceeds');
+      }
+
       return setTimeout(function() {
         self._exec(sqlQuery, params, callback);
       }, 20);
