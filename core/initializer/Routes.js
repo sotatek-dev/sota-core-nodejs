@@ -121,7 +121,22 @@ function getHandler(handlerDef) {
     throw new Error('Invalid beforePolicies for route config: ' + handlerDef);
   }
 
-  // logger.debug(util.format('Route controller=%s, policies=%s', controllerName, beforePolicies));
+  let afterPolicies = handlerDef[2];
 
-  return ControllerClass.handleBy(methodName, beforePolicies);
+  if (!afterPolicies) {
+    afterPolicies = [];
+  }
+
+  if (typeof afterPolicies === 'string') {
+    afterPolicies = afterPolicies.split(',');
+  }
+
+  if (!_.isArray(afterPolicies)) {
+    throw new Error('Invalid afterPolicies for route config: ' + handlerDef);
+  }
+
+  // logger.debug(util.format('Route controller=%s, beforePolicies=%s, afterPolicies=%s',
+  //   controllerName, beforePolicies, afterPolicies));
+
+  return ControllerClass.handleBy(methodName, beforePolicies, afterPolicies);
 }

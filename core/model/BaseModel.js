@@ -87,6 +87,14 @@ var BaseModel = Class.extends({
     return this._exSession;
   },
 
+  getModel : function(classname) {
+    return this._exSession.getModel(classname);
+  },
+
+  getService : function(classname) {
+    return this._exSession.getService(classname);
+  },
+
   getAdapterForSelect: function() {
     if (this.isUseMasterSelect()) {
       return this._masterAdapter;

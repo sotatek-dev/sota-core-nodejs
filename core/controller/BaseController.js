@@ -205,6 +205,22 @@ var BaseController = Class.extends({
 
   },
 
+  ok: function(req, res, err, result) {
+    this._response('ok', req, res, err, result);
+  },
+
+  created: function(req, res, err, result) {
+    this._response('created', req, res, err, result);
+  },
+
+  _response: function(method, req, res, err, result) {
+    if (err) {
+      return req.rollback(err);
+    }
+
+    res[method](result);
+  },
+
 });
 
 module.exports = BaseController;

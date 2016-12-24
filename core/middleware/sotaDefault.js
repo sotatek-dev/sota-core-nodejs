@@ -140,13 +140,15 @@ function extendRequest(req, res) {
   req.commit_promisified = bb.promisify(req.commit);
 
   req.rollback    = function(err, callback) {
+    var error = err;
     if (typeof err === 'function') {
       callback = err;
+      error = ErrorFactory.internal();
     }
 
     if (!callback) {
       callback = function() {
-        res.sendError(err);
+        res.sendError(error);
       };
     }
 
@@ -194,7 +196,12 @@ function extendResponse(req, res) {
     clearTimeout(req.__endTimeout);
     res.end = end;
 
-    req.exSession.rollback(function() {
+    var finishMethod = 'rollback';
+    if (req._needCommit) {
+      finishMethod = 'commit';
+    }
+
+    req.exSession[finishMethod](function() {
       req.exSession.destroy();
       delete req.exSession;
       delete req.allParams;
