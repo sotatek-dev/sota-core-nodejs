@@ -79,28 +79,9 @@ module.exports = BaseController.extends({
         UserModel.add(data, next);
 
       }],
-      // TODO: separate user profile model to application level
-      userProfile: ['user', function(ret, next) {
-        // If user that associated with fb account is existed, just continue
-        if (ret.existedUser) {
-          next(null, null);
-          return;
-        }
-
-        UserProfileModel.add({
-          user_id: ret.user.id,
-          coin: Const.INIT_COIN_FOR_NEW_USER,
-        }, next);
-      }],
-      commit: ['userProfile', function(ret, next) {
-        req.commit(next);
-      }],
     }, function(err, ret) {
       if (err) {
-        req.rollback(function() {
-          res.sendError(err);
-        });
-        return;
+        return req.rollback(err);
       }
 
       if (!ret.user) {
