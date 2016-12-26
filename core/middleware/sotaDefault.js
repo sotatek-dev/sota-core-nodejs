@@ -172,6 +172,9 @@ function extendResponse(req, res) {
   res.noContent = function(body) {
     res.status(204).send(body || {});
   };
+  res.deleted = function() {
+    res.noContent();
+  };
 
   // Error response
   res.badRequest = function(body) {

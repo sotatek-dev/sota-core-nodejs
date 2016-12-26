@@ -397,7 +397,12 @@ var BaseModel = Class.extends({
     }
   },
 
+  // Alias of `remove`
   delete: function(data, callback) {
+    this.remove(data, callback);
+  },
+
+  remove: function(data, callback) {
     var self = this;
     if (data && !isNaN(data)) {
       if (typeof data !== 'number') {

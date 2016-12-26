@@ -213,6 +213,10 @@ var BaseController = Class.extends({
     this._response('created', req, res, err, result);
   },
 
+  deleted: function(req, res, err, result) {
+    this._response('deleted', req, res, err, result);
+  },
+
   _response: function(method, req, res, err, result) {
     if (err) {
       return req.rollback(err);
