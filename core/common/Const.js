@@ -29,6 +29,11 @@ module.exports = {
     }
   },
 
+  BOOLEAN: {
+    TRUE: 1,
+    FALSE: 0,
+  },
+
   MAX_QUERY_RECORDS: 1000,
   DEFAULT_PAGINATION_SIZE: 10,
   DEFAULT_CACHE_TTL: 300 * 1000, // Milliseconds
