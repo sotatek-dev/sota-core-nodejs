@@ -40,8 +40,25 @@ module.exports = BaseService.extends({
     FacebookService.linkUserByToken(fbAcessToken, callback);
   },
 
-  getUserTwitter: function(twAcessToken, callback) {
-    // TODO
+  getUserTwitter: function(tokenKey, tokenSecret, callback) {
+    var self = this;
+    var TwitterService = self.getService('TwitterService');
+
+    async.waterfall([
+      function user(next) {
+        TwitterService.getUserByToken(tokenKey, tokenSecret, next);
+      },
+      function addToken(user, next) {
+        if (!user) {
+          return next('Cannot find or create user during authentication.');
+        }
+        var token = self.generateAccessToken(user);
+        return next(null, {
+          user: user,
+          token: token
+        });
+      },
+    ], callback);
   },
 
   getUserTwitter2: function(twitterProfile, callback) {

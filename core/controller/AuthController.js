@@ -74,6 +74,21 @@ module.exports = BaseController.extends({
     AuthService.getUserFacebook(params.fb_access_token, this.ok.bind(this, req, res));
   },
 
+  twitter: function(req, res) {
+    var self = this;
+    var [err, params] = new Checkit({
+      tokenKey: ['required', 'string'],
+      tokenSecret: ['required', 'string'],
+    }).validateSync(req.allParams);
+
+    if (err) {
+      return res.badRequest(err.toString());
+    }
+
+    var AuthService = req.getService('AuthService');
+    AuthService.getUserTwitter(params.tokenKey, params.tokenSecret, this.ok.bind(this, req, res));
+  },
+
   twitter2: function(req, res, next) {
     passport.authenticate('twitter')(req, res, next);
   },

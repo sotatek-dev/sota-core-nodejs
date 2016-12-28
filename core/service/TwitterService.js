@@ -1,4 +1,5 @@
-var SocialNetworkService = require('./SocialNetworkService');
+var Twitter               = require('twitter');
+var SocialNetworkService  = require('./SocialNetworkService');
 
 module.exports = SocialNetworkService.extends({
   classname : 'TwitterService',
@@ -8,14 +9,43 @@ module.exports = SocialNetworkService.extends({
   },
 
   getUserDefFromInfo: function(twitterInfo) {
-    var info = twitterInfo._json;
+    var info = twitterInfo._json || twitterInfo;
     return {
-      username: twitterInfo.username,
+      username: twitterInfo.screen_name,
       email: info.email || (info.screen_name + '@twitter.com'),
       first_name: info.name,
       last_name: '',
       avatar_url: info.profile_image_url,
     };
   },
+
+  _getTwitterInfo: function(tokenKey, tokenSecret, callback) {
+    var client = new Twitter({
+      consumer_key: process.env.TWITTER_APP_ID,
+      consumer_secret: process.env.TWITTER_APP_SECRET,
+      access_token_key: tokenKey,
+      access_token_secret: tokenSecret,
+    });
+
+    client.get('account/verify_credentials', function(err, twitterProfile, response) {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, twitterProfile);
+    });
+  },
+
+  getUserByToken: function(tokenKey, tokenSecret, callback) {
+    var self = this;
+    async.waterfall([
+      function fbInfo(next) {
+        self._getTwitterInfo(tokenKey, tokenSecret, next);
+      },
+      function getUser(fbInfo, next) {
+        return self.findOrCreateUserBySocialInfo(fbInfo, next);
+      },
+    ], callback);
+  }
 
 });
