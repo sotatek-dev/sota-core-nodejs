@@ -169,6 +169,9 @@ function extendResponse(req, res) {
   res.created = function(body) {
     res.status(201).send(body || {});
   };
+  res.accepted = function(body) {
+    res.status(202).send(body);
+  };
   res.noContent = function(body) {
     res.status(204).send(body || {});
   };
