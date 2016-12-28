@@ -58,4 +58,49 @@ module.exports = BaseService.extends({
     });
   },
 
+  linkUserBySocialInfo: function(userId, info, callback) {
+    var self = this;
+    var UserSocialModel = self.getUserSocialModel();
+    var UserModel = self.getModel('UserModel');
+    var userDef = self.getUserDefFromInfo(info);
+    var socialId = self.getSocialIdFromInfo(info);
+    var result = null;
+
+    async.waterfall([
+      function userSocialExisted(next) {
+        UserSocialModel.findOne({
+          where: 'social_id=?',
+          params: [socialId],
+        }, next);
+      },
+      function user(userSocial, next) {
+        if (userSocial) {
+          return next(ErrorFactory.conflict('Already linked to another account.'));
+        }
+
+        UserModel.findCacheOne(userId, next);
+      },
+      function newUserSocial(user, next) {
+        if (!user) {
+          return next(ErrorFactory.notFound('Cannot find target user.'));
+        }
+
+        result = user;
+        var options = {
+          isForceNew: true,
+        };
+
+        UserSocialModel.add({
+          id: userId,
+          social_id: socialId,
+        }, options, next);
+      },
+    ], function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+       return callback(null, result);
+    });
+  },
+
 });

@@ -18,11 +18,36 @@ module.exports = BaseController.extends({
     }
 
     var FacebookService = req.getService('FacebookService');
-    FacebookService.linkUser(req.user.id, params.fb_access_token, this.ok.bind(this, req, res));
+    FacebookService.linkUserByToken(
+      req.user.id, params.fb_access_token,
+      this.created.bind(this, req, res)
+    );
   },
 
-  linkTwitterAccount2: function(req, res) {
+  linkTwitterAccount: function(req, res) {
+    var self = this;
+    var [err, params] = new Checkit({
+      tokenKey: ['required', 'string'],
+      tokenSecret: ['required', 'string'],
+    }).validateSync(req.allParams);
+
+    if (err) {
+      return res.badRequest(err.toString());
+    }
+
+    var TwitterService = req.getService('TwitterService');
+    TwitterService.linkUserByToken(
+      req.user.id, params.tokenKey, params.tokenSecret,
+      this.created.bind(this, req, res)
+    );
+  },
+
+  unlinkFacebookAccount: function(req, res) {
     // TODO
+  },
+
+  unlinkTwitterAccount: function(req, res) {
+     // TODO
   },
 
 });

@@ -39,13 +39,25 @@ module.exports = SocialNetworkService.extends({
   getUserByToken: function(tokenKey, tokenSecret, callback) {
     var self = this;
     async.waterfall([
-      function fbInfo(next) {
+      function twInfo(next) {
         self._getTwitterInfo(tokenKey, tokenSecret, next);
       },
-      function getUser(fbInfo, next) {
-        return self.findOrCreateUserBySocialInfo(fbInfo, next);
+      function getUser(twInfo, next) {
+        return self.findOrCreateUserBySocialInfo(twInfo, next);
       },
     ], callback);
-  }
+  },
+
+  linkUserByToken: function(userId, tokenKey, tokenSecret, callback) {
+    var self = this;
+    async.waterfall([
+      function twInfo(next) {
+        self._getTwitterInfo(tokenKey, tokenSecret, next);
+      },
+      function getUser(twInfo, next) {
+        return self.linkUserBySocialInfo(userId, twInfo, next);
+      }
+    ], callback);
+  },
 
 });

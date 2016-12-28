@@ -50,8 +50,16 @@ module.exports = SocialNetworkService.extends({
     ], callback);
   },
 
-  linkUserByToken: function(fbAcessToken, callback) {
-
+  linkUserByToken: function(userId, fbAcessToken, callback) {
+    var self = this;
+    async.waterfall([
+      function fbInfo(next) {
+        self._getFacebookInfo(fbAcessToken, next);
+      },
+      function tryToLinkUser(fbInfo, next) {
+        return self.linkUserBySocialInfo(userId, fbInfo, next);
+      }
+    ], callback);
   },
 
 });
