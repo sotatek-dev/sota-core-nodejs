@@ -23,12 +23,14 @@ var BaseQueryBuilder = Class.extends({
   insert : function(data) {
     // logger.trace(this.classname + '::insert data=' + util.inspect(data));
     var self = this,
-        tableName, entities;
+        tableName, entities, isIdIncluded;
     if (data instanceof BaseEntity) {
       tableName = data.tableName;
+      isIdIncluded = data.isNewForced();
       entities = [data];
     } else if (_.isArray(data) && data.length > 0) {
       tableName = data[0].tableName;
+      isIdIncluded = data[0].isNewForced();
       entities = data;
     } else {
       logger.error(self.classname + '::insert invalid data=' +
@@ -42,6 +44,10 @@ var BaseQueryBuilder = Class.extends({
           isNull = entities[0][prop] === null || entities[0][prop] === undefined;
       return isPK || isNull;
     }).concat(entities[0].predefinedCols);
+
+    if (isIdIncluded) {
+      cols.unshift('id');
+    }
 
     var valueStrs = [],
         params = [];

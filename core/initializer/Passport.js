@@ -2,6 +2,7 @@ var util            = require('util');
 var passport        = require('passport');
 var LocalStrategy   = require('passport-local').Strategy;
 var JwtStrategy     = require('passport-jwt').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 var logger          = require('log4js').getLogger('Init.Passport');
 
 module.exports = function(app) {
@@ -96,5 +97,21 @@ module.exports = function(app) {
       });
     }
   ));
+
+  passport.use(new TwitterStrategy({
+    consumerKey: process.env.TWITTER_APP_ID,
+    consumerSecret: process.env.TWITTER_APP_SECRET,
+    callbackURL: util.format('%s:%s/auth/twitter2/callback',
+      process.env.APP_ENDPOINT, process.env.PORT)
+  }, function(token, tokenSecret, profile, cb) {
+    logger.trace('TwitterStrategy callback token: ' + util.inspect(token));
+    logger.trace('TwitterStrategy callback tokenSecret: ' + util.inspect(tokenSecret));
+    logger.trace('TwitterStrategy callback profile: ' + util.inspect(profile.id));
+    cb(null, {
+      token: token,
+      tokenSecret: tokenSecret,
+      profile: profile,
+    });
+  }));
 
 };

@@ -9,6 +9,7 @@ module.exports = Class.extends({
     this._model         = model;
     this._data          = {};
     this._dataOld       = {};
+    this._isNewForced   = false; // Flag to force update id column
 
     this.classname      = model.classname.replace('Model', 'Entity');
     this.tableName      = model.tableName;
@@ -82,6 +83,18 @@ module.exports = Class.extends({
 
   inspect : function(depth) {
     return this.classname + (depth ? '<' + depth + '>' : '') + '(' + this.toString() + ')';
+  },
+
+  setOptions: function(options) {
+    if (!options) {
+      return this;
+    }
+
+    if (options.isForceNew) {
+      this._isNewForced = true;
+    }
+
+    return this;
   },
 
   isDataValid : function() {
@@ -276,7 +289,11 @@ module.exports = Class.extends({
   },
 
   isNew : function() {
-    return !this._data.id || this._data.id < 0;
+    return this._isNewForced || !this._data.id || this._data.id < 0;
+  },
+
+  isNewForced: function() {
+    return this._isNewForced;
   },
 
   isChanged : function() {
@@ -297,6 +314,7 @@ module.exports = Class.extends({
     _.each(this._model.getAttributeNames(), function(property) {
       self._dataOld[property] = self._data[property];
     });
+    self._isNewForced = false;
   },
 
   $extractDataFromEntities : function(entities) {

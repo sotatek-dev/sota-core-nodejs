@@ -17,88 +17,6 @@ module.exports = BaseController.extends({
     });
   },
 
-  facebook: function(req, res) {
-    var self = this;
-    var [err, params] = new Checkit({
-      'fb_access_token': ['required', 'string'],
-    }).validateSync(req.allParams);
-
-    if (err) {
-      return res.badRequest(err.toString());
-    }
-
-    var UserModel = req.getModel('UserModel'),
-        UserProfileModel = req.getModel('UserProfileModel'),
-        secret = process.env.FACEBOOK_APP_SECRET,
-        fbAcessToken = params.fb_access_token,
-        hash = crypto.createHmac('sha256', secret).update(fbAcessToken),
-        appsecretProof = hash.digest('hex'),
-        fields = 'id,name,email,first_name,last_name,gender,link,picture.type(large)';
-        url = util.format(
-          'https://graph.facebook.com/v2.8/me?fields=%s&access_token=%s&appsecret_proof=%s',
-          fields, fbAcessToken, appsecretProof
-        ),
-        fbid = '';
-
-    async.auto({
-      fbInfo: function(next) {
-        request({
-          json: true,
-          url: url
-        }, next);
-      },
-      existedUser: ['fbInfo', function(ret, next) {
-        var result = ret.fbInfo;
-        if (result && result.length && result[0].statusCode === 200) {
-          fbid = result[1].id;
-          UserModel.findOne({
-            where: 'facebook_id=?',
-            params: [fbid],
-          }, next);
-          return;
-        }
-        next('FB authentication failed.');
-      }],
-      user: ['existedUser', function(ret, next) {
-        // If user that associated with fb account is existed, just continue
-        if (ret.existedUser) {
-          next(null, ret.existedUser);
-          return;
-        }
-
-        var profile = ret.fbInfo[1];
-        var data = {
-          facebook_id: profile.id,
-          username: profile.id,
-          email: profile.email || profile.id,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          avatar_url: profile.picture.data.url,
-        };
-
-        UserModel.add(data, next);
-
-      }],
-    }, function(err, ret) {
-      if (err) {
-        return req.rollback(err);
-      }
-
-      if (!ret.user) {
-        res.notFound('Cannot find or create user');
-        return;
-      }
-
-      var user = ret.user,
-          token = self.generateAccessToken(user);
-
-      res.ok({
-        user: user,
-        token: token
-      });
-    });
-  },
-
   login: function(req, res) {
     var self = this,
         redirectUrl = '/';
@@ -125,7 +43,7 @@ module.exports = BaseController.extends({
           return res.sendError(info.message);
         }
 
-        res.sendError(info);
+        return res.sendError(info);
       }
 
       var token = self.generateAccessToken(user);
@@ -138,7 +56,49 @@ module.exports = BaseController.extends({
   },
 
   logout: function(req, res) {
+    // TODO: invalidate the old auth token.
     res.ok();
+  },
+
+  facebook: function(req, res) {
+    var self = this;
+    var [err, params] = new Checkit({
+      fb_access_token: ['required', 'string'],
+    }).validateSync(req.allParams);
+
+    if (err) {
+      return res.badRequest(err.toString());
+    }
+
+    var AuthService = req.getService('AuthService');
+    AuthService.getUserFacebook(params.fb_access_token, this.ok.bind(this, req, res));
+  },
+
+  twitter2: function(req, res, next) {
+    passport.authenticate('twitter')(req, res, next);
+  },
+
+  twitter2CB: function(req, res) {
+    var self = this;
+    var AuthService = req.getService('AuthService');
+
+    passport.authenticate('twitter', {
+      failureRedirect: '/login'
+    }, function(err, data, info) {
+      if (err) {
+        return res.sendError(err);
+      }
+
+      if (data === false) {
+        if (info && info.message) {
+          return res.sendError(info.message);
+        }
+
+        return res.sendError(info);
+      }
+
+      AuthService.getUserTwitter2(data.profile, self.ok.bind(self, req, res));
+    })(req, res);
   },
 
 });

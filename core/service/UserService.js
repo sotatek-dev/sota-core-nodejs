@@ -2,137 +2,49 @@ var UserService = BaseService.extends({
   classname : 'UserService',
 
   register : function(userInfo, callback) {
-    var self = this,
-        UserModel = self.getModel('UserModel');
+    var self = this;
+    var UserModel = self.getModel('UserModel');
 
-    var identifyCols = ['id', 'email'],
-        colName,
-        colValue;
+    var whereClauses = [];
+    var params = [];
+    var identifyCols = ['id', 'email'];
 
     for (var i = 0; i < identifyCols.length; i++) {
-      colName = identifyCols[i];
-      colValue = userInfo[colName];
+      var colName = identifyCols[i];
+      var colValue = userInfo[colName];
       if (colValue) {
-        break;
+        whereClauses.push('`' + colName + '`=?');
+        params.push(colValue);
       }
     }
 
-    if (!colValue) {
+    if (!params.length) {
       callback(ErrorFactory.badRequest('No lookup information.'));
       return;
     }
 
-    async.auto({
-      find: function(next) {
+    async.waterfall([
+      function findUser(next) {
         UserModel.findOne({
-          where   : colName + '=?',
-          params  : [colValue],
+          where   : whereClauses.join(' OR '),
+          params  : params,
         }, next);
       },
-      register: ['find', function(ret, next) {
-        if (!!ret.find) {
-          next(ErrorFactory.conflict('Email already taken.'));
-          return;
+      function register(user, next) {
+        if (user) {
+          var errMsg = 'Conflict register information.';
+          if (user.id === userInfo.id) {
+            errMsg = 'User id was existed.';
+          } else if (user.email === userInfo.email) {
+            errMsg = 'Email has been taken.';
+          }
+
+          return next(ErrorFactory.conflict(errMsg));
         }
 
         UserModel.add(userInfo, next);
-      }],
-    }, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, ret.register);
-
-    });
-  },
-
-  getList : function(callback) {
-    var self = this;
-    var UserModel = self.getModel('UserModel');
-
-    async.auto({
-      list : function(next) {
-        UserModel.find({
-          where : '1=1'
-        }, next);
       },
-    }, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, ret.list);
-    });
-  },
-
-  insertRandom : function(callback) {
-    var self = this;
-    var UserModel = self.getModel('UserModel');
-
-    async.auto({
-      getLast : function(next) {
-        UserModel.selectOne({
-          orderBy : 'id desc'
-        }, next);
-      },
-      insertNext : ['getLast', function(ret, next) {
-        var lastUserId = ret.getLast ? ret.getLast.id : 0;
-        var nextUserId = lastUserId + 1;
-        UserModel.insert({
-          username    : 'user' + nextUserId,
-          first_name  : 'First ' + nextUserId,
-          last_name   : 'Last ' + nextUserId,
-        }, next);
-      }],
-    }, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, ret.insertNext);
-
-    });
-  },
-
-  delete : function(userId, callback) {
-    var self = this;
-    var UserModel = self.getModel('UserModel');
-
-    UserModel.delete({
-      where : 'id=' + userId,
-    }, callback);
-  },
-
-  updateOne : function(userId, data, callback) {
-    var self = this;
-    var UserModel = self.getModel('UserModel');
-    var entity;
-
-    async.auto({
-      getOne : function(next) {
-        UserModel.selectOne({
-          where : 'id=' + userId
-        }, next);
-      },
-      update : ['getOne', function(ret, next) {
-        entity = ret.getOne;
-        for (var p in data) {
-          entity[p] = data[p];
-        }
-        entity.save(next);
-      }],
-    }, function(err, ret) {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      callback(null, ret.update);
-    });
+    ], callback);
   },
 
 });

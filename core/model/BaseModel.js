@@ -106,9 +106,9 @@ var BaseModel = Class.extends({
     return this.tableName;
   },
 
-  _constructEntity : function(data) {
+  _constructEntity : function(data, options) {
     var entity = new this.Entity(this, data);
-    return entity;
+    return entity.setOptions(options);
   },
 
   _isEntityObject : function(data) {
@@ -323,7 +323,12 @@ var BaseModel = Class.extends({
    * @param {Object|Array|BaseEntity} entity
    * @param {Function} callback
    */
-  add : function(data, callback) {
+  add : function(data, options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = null;
+    }
+
     var self = this;
     if (self._isEntityObject(data)) {
       data.save(callback);
@@ -333,7 +338,7 @@ var BaseModel = Class.extends({
         entities = data;
       } else {
         entities = _.map(data, function(rawData) {
-          return self._constructEntity(rawData);
+          return self._constructEntity(rawData, options);
         });
       }
 
@@ -346,7 +351,7 @@ var BaseModel = Class.extends({
         self._reloadAfterBatchInsert(ret, callback);
       });
     } else if (typeof data === 'object') {
-      self._constructEntity(data).save(callback);
+      self._constructEntity(data, options).save(callback);
     } else {
       var errMsg = self.classname + '::insert invalid data=' + util.inspect(data);
       callback(errMsg);
