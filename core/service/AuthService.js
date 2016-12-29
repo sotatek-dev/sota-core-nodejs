@@ -13,6 +13,19 @@ module.exports = BaseService.extends({
     });
   },
 
+  _signTokenAndReturn: function(user, callback) {
+    var self = this;
+    if (!user) {
+      return callback('Cannot find or create user during authentication.');
+    }
+
+    var token = self.generateAccessToken(user);
+    return callback(null, {
+      user: user,
+      token: token
+    });
+  },
+
   getUserFacebook: function(fbAcessToken, callback) {
     var self = this;
     var FacebookService = self.getService('FacebookService');
@@ -22,22 +35,9 @@ module.exports = BaseService.extends({
         FacebookService.getUserByToken(fbAcessToken, next);
       },
       function addToken(user, next) {
-        if (!user) {
-          return next('Cannot find or create user during authentication.');
-        }
-        var token = self.generateAccessToken(user);
-        return next(null, {
-          user: user,
-          token: token
-        });
+        self._signTokenAndReturn(user, next);
       },
     ], callback);
-  },
-
-  linkUserFacebook: function(fbAcessToken, callback) {
-    var FacebookService = self.getService('FacebookService');
-
-    FacebookService.linkUserByToken(fbAcessToken, callback);
   },
 
   getUserTwitter: function(tokenKey, tokenSecret, callback) {
@@ -49,14 +49,21 @@ module.exports = BaseService.extends({
         TwitterService.getUserByToken(tokenKey, tokenSecret, next);
       },
       function addToken(user, next) {
-        if (!user) {
-          return next('Cannot find or create user during authentication.');
-        }
-        var token = self.generateAccessToken(user);
-        return next(null, {
-          user: user,
-          token: token
-        });
+        self._signTokenAndReturn(user, next);
+      },
+    ], callback);
+  },
+
+  getUserGoogle: function(accessToken, refreshToken, callback) {
+    var self = this;
+    var GoogleService = self.getService('GoogleService');
+
+    async.waterfall([
+      function user(next) {
+        GoogleService.getUserByToken(accessToken, refreshToken, next);
+      },
+      function addToken(user, next) {
+        self._signTokenAndReturn(user, next);
       },
     ], callback);
   },

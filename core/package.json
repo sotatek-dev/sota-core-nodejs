@@ -37,6 +37,7 @@
     "express-validator": "^2.21.0",
     "formidable": "^1.0.17",
     "generic-pool": "^3.1.1",
+    "googleapis": "15.0.0",
     "gulp": "^3.9.1",
     "hbs": "^4.0.1",
     "imagemin": "^5.2.2",
