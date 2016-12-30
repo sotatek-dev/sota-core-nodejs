@@ -176,7 +176,9 @@ function extendResponse(req, res) {
     res.status(204).send(body || {});
   };
   res.deleted = function() {
-    res.noContent();
+    // TODO: 200 or 204 status?
+    res.ok({deleted: true});
+    // res.noContent();
   };
 
   // Error response
