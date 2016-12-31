@@ -12,6 +12,7 @@ module.exports = BaseAdapter.extends({
     this._pool          = pool;
     this._connection    = null;
     this._gotConnection = false;
+    this._isFinished    = false;
     this._retryCount    = 0;
   },
 
@@ -48,6 +49,7 @@ module.exports = BaseAdapter.extends({
       },
       function beginTransaction(connection, next) {
         self._connection = connection;
+        self._isFinished = false;
         if (self._mode === 'master') {
           self._connection.beginTransaction(function(err) {
             next(err, null);
@@ -391,6 +393,7 @@ module.exports = BaseAdapter.extends({
       this._connection.release();
       delete this._connection;
       delete this._gotConnection;
+      delete this._isFinished;
     }
   },
 

@@ -66,8 +66,8 @@ Utils.nowInSeconds = function() {
 };
 
 Utils.getUploadedLink = function(filename) {
-  return util.format('%s:%d/uploads/%s',
-          process.env.APP_ENDPOINT, process.env.PORT, filename);
+  return util.format('%s/uploads/%s',
+          process.env.APP_ENDPOINT, filename);
 };
 
 Utils.escapeSqlColumn = function(column) {

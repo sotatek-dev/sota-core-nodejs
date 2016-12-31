@@ -101,8 +101,7 @@ module.exports = function(app) {
   passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_APP_ID,
     consumerSecret: process.env.TWITTER_APP_SECRET,
-    callbackURL: util.format('%s:%s/auth/twitter2/callback',
-      process.env.APP_ENDPOINT, process.env.PORT)
+    callbackURL: util.format('%s/auth/twitter2/callback', process.env.APP_ENDPOINT)
   }, function(token, tokenSecret, profile, cb) {
     logger.trace('TwitterStrategy callback token: ' + util.inspect(token));
     logger.trace('TwitterStrategy callback tokenSecret: ' + util.inspect(tokenSecret));

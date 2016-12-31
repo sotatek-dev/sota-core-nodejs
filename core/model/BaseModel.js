@@ -321,6 +321,8 @@ var BaseModel = Class.extends({
 
   /**
    * @param {Object|Array|BaseEntity} entity
+   * @param {Object}
+        isForceNew: boolean, determine will insert entity with predefined id or not
    * @param {Function} callback
    */
   add : function(data, options, callback) {
