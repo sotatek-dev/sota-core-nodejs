@@ -45,20 +45,22 @@ module.exports = function(app, ControllerFactory, config) {
     handlerDef = BaseController.createDefaultFindOne(model);
     app.get(route, handlerDef);
 
+    // Don't expose the create/update/delete APIs to the public
+
     // Insert/add
-    route = '/' + apiName;
-    handlerDef = BaseController.createDefaultAdd(model);
-    app.post(route, handlerDef);
+    // route = '/' + apiName;
+    // handlerDef = BaseController.createDefaultAdd(model);
+    // app.post(route, handlerDef);
 
     // Update
-    route = '/' + apiName + '/:id';
-    handlerDef = BaseController.createDefaultUpdate(model);
-    app.put(route, handlerDef);
+    // route = '/' + apiName + '/:id';
+    // handlerDef = BaseController.createDefaultUpdate(model);
+    // app.put(route, handlerDef);
 
     // Remove/Delete
-    route = '/' + apiName + '/:id';
-    handlerDef = BaseController.createDefaultDelete(model);
-    app.delete(route, handlerDef);
+    // route = '/' + apiName + '/:id';
+    // handlerDef = BaseController.createDefaultDelete(model);
+    // app.delete(route, handlerDef);
   }
 
   // If there's no user-defined login function, use built-int default login
