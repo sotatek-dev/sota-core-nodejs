@@ -16,6 +16,7 @@
     "angular-animate": "^1.5.8",
     "angular-local-storage": "^0.5.0",
     "async": "^2.1.2",
+    "aws-sdk": "2.7.20",
     "bcrypt": "^0.8.7",
     "bcryptjs": "^2.3.0",
     "bluebird": "3.4.6",
