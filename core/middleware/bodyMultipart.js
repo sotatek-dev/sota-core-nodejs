@@ -1,8 +1,7 @@
 
 module.exports = function(app, config, options) {
   options = options || {
-    keepExtensions: true,
-    uploadDir: path.join(app.get('rootDir'), 'public/uploads'),
+    keepExtensions: true
   };
   var multiparty = require('multiparty'),
       typeis = require('type-is');
@@ -48,6 +47,7 @@ module.exports = function(app, config, options) {
       _.forEach(_.keys(files), function(key) {
         req.files[key] = files[key][0];
       });
+
       next();
     });
   };
