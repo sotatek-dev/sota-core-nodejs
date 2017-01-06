@@ -23,7 +23,7 @@ module.exports = BaseAdapter.extends({
     // Just retry execution in the next tick, when the connection is ready
     if (self._gotConnection && !self._connection) {
       logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
-                    'Pending query: [' + sqlQuery + ']');
+                    '. Pending query: [' + sqlQuery + ']');
 
       // Find the cause and a better solution for this
       self._retryCount++;

@@ -26,6 +26,32 @@ class BaseCache {
     throw new Error('Implement me.');
   }
 
+  setObject(key, value, meta, callback) {
+    this.set(key, JSON.stringify(value), meta, callback);
+  }
+
+  getObject(key, callback) {
+    this.get(key, function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+
+      if (_.isNil(ret)) {
+        return callback(null, null);
+      }
+
+      var result = null;
+      try {
+        result = JSON.parse(ret);
+      } catch (e) {
+        logger.error('Invalid cached object for key: ' + key);
+      }
+
+      return callback(null, result);
+
+    });
+  }
+
 }
 
 module.exports = BaseCache;
