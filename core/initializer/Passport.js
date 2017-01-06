@@ -52,8 +52,7 @@ module.exports = function(app) {
   };
 
   passport.use(new JwtStrategy(opts, function(req, jwtPayload, done) {
-    var UserModel = req.getModel('UserModel');
-    UserModel.findCacheOne(jwtPayload.userId, function(err, user) {
+    CacheFactory.getOneUser(jwtPayload.userId, function(err, user) {
       if (err) {
         return done(err, false);
       }

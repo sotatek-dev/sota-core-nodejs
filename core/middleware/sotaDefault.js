@@ -1,3 +1,4 @@
+var passport        = require('passport');
 var ExSession       = require('../common/ExSession');
 var BaseError       = require('../error/BaseError');
 
@@ -220,13 +221,35 @@ function extendResponse(req, res) {
   };
 }
 
+function tryAuthenticate(req, res, next) {
+  passport.authenticate('jwt', {
+    session: false
+  }, function(err, user, info) {
+    if (err) {
+      return next(err);
+    }
+
+    if (user && typeof user === 'object') {
+      req.user = user;
+    }
+
+    next();
+
+  })(req, res, next);
+};
+
 module.exports = function() {
 
   return function(req, res, next) {
-    extendRequest(req, res);
-    extendResponse(req, res);
+    tryAuthenticate(req, res, function(err) {
+      if (err) {
+        return next(err);
+      }
 
-    next();
+      extendRequest(req, res);
+      extendResponse(req, res);
+      next();
+    });
   };
 
 };
