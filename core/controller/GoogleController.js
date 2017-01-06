@@ -1,14 +1,9 @@
 var BaseController  = require('./BaseController');
-var passport        = require('passport');
-var jwt             = require('jsonwebtoken');
-var crypto          = require('crypto');
-var request         = require('request');
 
 module.exports = BaseController.extends({
   classname: 'GoogleController',
 
   login: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       accessToken: ['required', 'string'],
       refreshToken: ['required', 'string'],
@@ -26,7 +21,6 @@ module.exports = BaseController.extends({
   },
 
   link: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       accessToken: ['required', 'string'],
       refreshToken: ['required', 'string'],
@@ -44,7 +38,6 @@ module.exports = BaseController.extends({
   },
 
   unlink: function(req, res) {
-    var self = this;
     var userId = req.user.id;
 
     var UserGoogleModel = req.getModel('UserGoogleModel');

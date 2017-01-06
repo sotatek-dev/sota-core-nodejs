@@ -36,7 +36,10 @@ module.exports = BaseAdapter.extends({
       }, 20);
     }
 
-    logger.info(util.format('<%s> _exec sqlQuery=[%s], params=[%s]', this.registryId, sqlQuery, params));
+    logger.info(util.format(
+      '<%s> _exec sqlQuery=[%s], params=[%s]',
+      this.registryId, sqlQuery, params)
+    );
 
     async.waterfall([
       function getConnection(next) {

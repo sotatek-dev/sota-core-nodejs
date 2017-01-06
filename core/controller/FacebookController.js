@@ -1,14 +1,9 @@
 var BaseController  = require('./BaseController');
-var passport        = require('passport');
-var jwt             = require('jsonwebtoken');
-var crypto          = require('crypto');
-var request         = require('request');
 
 module.exports = BaseController.extends({
   classname: 'FacebookController',
 
   login: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       fb_access_token: ['required', 'string'],
     }).validateSync(req.allParams);
@@ -22,7 +17,6 @@ module.exports = BaseController.extends({
   },
 
   link: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       fb_access_token: ['required', 'string'],
     }).validateSync(req.allParams);
@@ -39,7 +33,6 @@ module.exports = BaseController.extends({
   },
 
   unlink: function(req, res) {
-    var self = this;
     var userId = req.user.id;
 
     var UserFacebookModel = req.getModel('UserFacebookModel');

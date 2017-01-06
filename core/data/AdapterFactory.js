@@ -1,7 +1,7 @@
 var Class               = require('sota-class').Class;
 var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
-var logger              = require('log4js').getLogger('AdapterFactory');
+// var logger              = require('log4js').getLogger('AdapterFactory');
 
 var _nextId = 0,
     _registry = {},
@@ -68,7 +68,7 @@ module.exports = Class.singleton({
     if (type === Const.DATA_SOURCE_TYPE.MYSQL) {
       pool = MySQL.createPool(poolConfig);
     } else {
-      throw new Error('AdapterFactory::_createPool unsupported type config=' + util.inspect(config));
+      throw new Error('AdapterFactory::_createPool unsupport type config=' + util.inspect(config));
     }
 
     _pools[key] = {};

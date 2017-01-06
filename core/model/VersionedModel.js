@@ -35,7 +35,7 @@ module.exports = BaseModel.extends({
 
         self._select({
           limit: 9999
-        }, next)
+        }, next);
       }],
       recache: ['data', function(ret, next) {
         if (!ret.cached) {

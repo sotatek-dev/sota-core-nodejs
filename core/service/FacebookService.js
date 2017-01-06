@@ -28,7 +28,11 @@ module.exports = SocialNetworkService.extends({
       'https://graph.facebook.com/v2.8/me?fields=%s&access_token=%s&appsecret_proof=%s',
       fields, fbAcessToken, appsecretProof
     );
-    request({ json: true, url: url }, function(err, req, fbInfo) {
+    var requestDef = {
+      json: true, url: url
+    };
+
+    request(requestDef, function(err, req, fbInfo) {
       logger.trace('_getFacebookInfo fbInfo=' + util.inspect(fbInfo));
       if (!fbInfo || !fbInfo.id) {
         return callback('FB authentication failed.');

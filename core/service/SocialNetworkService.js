@@ -62,7 +62,6 @@ module.exports = BaseService.extends({
     var self = this;
     var UserSocialModel = self.getUserSocialModel();
     var UserModel = self.getModel('UserModel');
-    var userDef = self.getUserDefFromInfo(info);
     var socialId = self.getSocialIdFromInfo(info);
     var result = null;
 

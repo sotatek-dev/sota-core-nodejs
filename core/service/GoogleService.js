@@ -1,5 +1,3 @@
-var crypto                = require('crypto');
-var request               = require('request');
 var google                = require('googleapis');
 var SocialNetworkService  = require('./SocialNetworkService');
 var plus                  = google.plus('v1');

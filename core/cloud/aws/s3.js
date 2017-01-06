@@ -1,6 +1,4 @@
-var multiparty    = require('multiparty');
 var AWS           = require('aws-sdk');
-var logger        = require('log4js').getLogger('Cloud.S3');
 var randomstring  = require('randomstring');
 var mime          = require('mime-types');
 

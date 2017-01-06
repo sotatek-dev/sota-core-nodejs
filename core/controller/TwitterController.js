@@ -1,14 +1,10 @@
 var BaseController  = require('./BaseController');
 var passport        = require('passport');
-var jwt             = require('jsonwebtoken');
-var crypto          = require('crypto');
-var request         = require('request');
 
 module.exports = BaseController.extends({
   classname: 'TwitterController',
 
   login: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       tokenKey: ['required', 'string'],
       tokenSecret: ['required', 'string'],
@@ -23,7 +19,6 @@ module.exports = BaseController.extends({
   },
 
   link: function(req, res) {
-    var self = this;
     var [err, params] = new Checkit({
       tokenKey: ['required', 'string'],
       tokenSecret: ['required', 'string'],
@@ -41,7 +36,6 @@ module.exports = BaseController.extends({
   },
 
   unlink: function(req, res) {
-    var self = this;
     var userId = req.user.id;
 
     var UserTwitterModel = req.getModel('UserTwitterModel');
