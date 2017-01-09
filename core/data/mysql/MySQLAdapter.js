@@ -382,6 +382,7 @@ module.exports = BaseAdapter.extends({
     }
 
     var _callback = function() {
+      self._retryCount = 0;
       delete self._connection;
       delete self._gotConnection;
       callback(null, null);
@@ -394,6 +395,7 @@ module.exports = BaseAdapter.extends({
     if (this._connection) {
       logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
       this._connection.release();
+      delete this._retryCount;
       delete this._connection;
       delete this._gotConnection;
       delete this._isFinished;
