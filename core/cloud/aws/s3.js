@@ -51,7 +51,7 @@ class S3 {
     });
   }
 
-  static _uploadImage(file, bucket, callback) {
+  static _uploadImage(file, bucket, callback, finishUploadCB) {
     this._uploadFile(file, bucket, callback, function(err, ret) {
       if (err) {
         // TODO: rollback/delete the posted media
@@ -63,7 +63,7 @@ class S3 {
     });
   }
 
-  static _uploadVideo(file, bucket, callback) {
+  static _uploadVideo(file, bucket, callback, finishUploadCB) {
     var self = this;
     this._uploadFile(file, bucket, callback, function(err, ret) {
       if (err) {
@@ -74,11 +74,12 @@ class S3 {
 
       logger.trace('S3::_uploadVideo finished: ' + ret.Key);
 
-      self._transcodeVideo(ret.Key);
+      self._transcodeVideo(ret.Key, finishUploadCB);
     });
   }
 
-  static _transcodeVideo(key, onFailedCB) {
+  static _transcodeVideo(key, callback) {
+    var thumbnailPattern = path.basename(key, path.extname(key)) + '_{count}';
     // Transcode video file to HLS format
     ElasticTranscoder.createJob({
       PipelineId: process.env.S3_TRANSCODER_PIPELINE,
@@ -88,17 +89,31 @@ class S3 {
       Output: {
         Key: key,
         PresetId: '1351620000001-200040',
-        ThumbnailPattern: path.basename(key, path.extname(key)) + '_{count}',
+        ThumbnailPattern: thumbnailPattern,
       },
     }, function(err, ret) {
       if (err) {
         // TODO: rollback/delete the posted media
         logger.error('S3::_transcodeVideo failed. err=' + util.inspect(err));
-        onFailedCB();
+        callback(err);
         return;
       }
 
       logger.trace('S3::_transcodeVideo finished: ' + util.inspect(ret));
+      var fileUrl = util.format(
+        'https://s3-ap-southeast-1.amazonaws.com/%s/%s',
+        process.env.S3_BUCKET_VIDEO, key
+      );
+
+      var thumbnailUrl = util.format(
+        'https://s3-ap-southeast-1.amazonaws.com/%s/%s',
+        process.env.S3_BUCKET_THUMBNAIL, thumbnailPattern.replace('{count}', '00001') + '.png'
+      );
+
+      return callback(null, {
+        fileUrl: fileUrl,
+        thumbnailUrl: thumbnailUrl
+      });
     });
   }
 
