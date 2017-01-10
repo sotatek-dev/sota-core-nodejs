@@ -59,12 +59,10 @@ class S3 {
         return;
       }
 
-      logger.error('S3::_uploadImage finished. ret=' + util.inspect(ret));
-      var extension = path.extname(file.path);
-      var filename = randomstring.generate(40) + extension;
+      logger.trace('S3::_uploadImage finished. ret=' + util.inspect(ret));
       var fileUrl = util.format(
         'https://s3-ap-southeast-1.amazonaws.com/%s/%s',
-        bucket, filename
+        ret.Bucket, ret.Key
       );
 
       return finishUploadCB(null, {
