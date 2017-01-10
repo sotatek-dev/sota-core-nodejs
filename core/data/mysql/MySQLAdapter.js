@@ -22,13 +22,14 @@ module.exports = BaseAdapter.extends({
     // If the adapter is trying to get connection, but it's not finished
     // Just retry execution in the next tick, when the connection is ready
     if (self._gotConnection && !self._connection) {
-      logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
-                    '. Pending query: [' + sqlQuery + ']');
+      // logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
+      //               '. Pending query: [' + sqlQuery + ']');
 
       // Find the cause and a better solution for this
       self._retryCount++;
       if (self._retryCount > 50) {
-        throw new Error('MySQLAdapter::_exec error: maximum retry exceeds');
+        throw new Error('MySQLAdapter::_exec error: maximum retry exceeds' +
+                        '. Query: [' + sqlQuery + ']');
       }
 
       return setTimeout(function() {
