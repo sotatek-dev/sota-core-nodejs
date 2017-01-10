@@ -59,7 +59,18 @@ class S3 {
         return;
       }
 
-      logger.trace('S3::_uploadImage finished: ' + ret.Key);
+      logger.error('S3::_uploadImage finished. ret=' + util.inspect(ret));
+      var extension = path.extname(file.path);
+      var filename = randomstring.generate(40) + extension;
+      var fileUrl = util.format(
+        'https://s3-ap-southeast-1.amazonaws.com/%s/%s',
+        bucket, filename
+      );
+
+      return finishUploadCB(null, {
+        fileUrl: fileUrl,
+        thumbnailUrl: fileUrl
+      });
     });
   }
 
