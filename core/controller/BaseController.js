@@ -1,13 +1,9 @@
 var ControllerFactory   = require('./ControllerFactory');
 var errorHandler        = require('../policy/errorHandler');
-var logger              = require('log4js').getLogger('BaseController');
+// var logger              = require('log4js').getLogger('BaseController');
 
 var BaseController = Class.extends({
   classname : 'BaseController',
-
-  initialize: function() {
-    logger.debug('BaseController::initialize');
-  },
 
   $handleBy: function(func, beforePolicies, afterPolicies) {
     if (!beforePolicies) {

@@ -12,6 +12,6 @@ client.flushdb(function (err, succeeded) {
   if (err) {
     logger.error('Something went wrong when flushing redis db: ' + err);
   }
-  console.log('Finished flushing redis: ' + succeeded);
+  logger.info('Finished flushing redis: ' + succeeded);
   process.exit(0);
 });
