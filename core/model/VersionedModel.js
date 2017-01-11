@@ -57,6 +57,10 @@ module.exports = BaseModel.extends({
     this.getAll(callback);
   },
 
+  findById: function(id, callback) {
+    this.findCacheOne(id, callback);
+  },
+
   findCacheOne: function(id, callback) {
     var self = this;
 
