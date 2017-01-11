@@ -1,9 +1,8 @@
-var ExSession   = require('../common/ExSession');
 var BaseEntity  = require('../entity/BaseEntity');
 var logger      = require('log4js').getLogger('Cache.getEntity');
 
 /**
- * This cache method is not ready to use yet
+ * This cache method is not really ready to use yet
  * TODO: find the way to update cache whenever the DB is updated
  */
 module.exports = function(model, id, callback) {
@@ -19,7 +18,7 @@ module.exports = function(model, id, callback) {
       if (cached) {
         try {
           result = JSON.parse(cached);
-        } catch(e) {
+        } catch (e) {
           logger.error(util.format('Invalid cached entity: tableName=%s, id=%s', tableName, id));
           logger.error(e);
         }

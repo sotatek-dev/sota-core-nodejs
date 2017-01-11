@@ -30,6 +30,7 @@ PolicyManager       = require('./policy/PolicyManager');
 ModelFactory        = require('./model/ModelFactory');
 ServiceFactory      = require('./service/ServiceFactory');
 AdapterFactory      = require('./data/AdapterFactory');
+getText             = require('./factory/LocalizationFactory').getText;
 
 // TODO: remove global scope of logger
 logger              = require('log4js').getLogger('SotaServer');
@@ -109,6 +110,17 @@ var SotaServer = Class.extends({
       middlewareDirs.push(appMiddlewareDir);
     }
     _realConfig.middlewareDirs = middlewareDirs;
+
+    /**
+     * Localization
+     */
+    let localizationDirs = [],
+        appLocalizationDir = path.resolve(rootDir, 'app', 'localizations');
+    localizationDirs.push(path.resolve(rootDir, 'core', 'localization'));
+    if (FileUtils.isDirectorySync(appLocalizationDir)) {
+      localizationDirs.push(appLocalizationDir);
+    }
+    _realConfig.localizationDirs = localizationDirs;
 
     /**
      * Policies are stored in:
@@ -239,6 +251,7 @@ var SotaServer = Class.extends({
     var myApp = require('./initializer/Express')(_realConfig);
     var myServer = require('http').createServer(myApp);
 
+    this._initLocalization(myApp);
     this._initMiddlewares(myApp);
     this._initPolicies(myApp);
     this._loadControllers(myApp);
@@ -258,6 +271,11 @@ var SotaServer = Class.extends({
       myServer.on('error', this.onError.bind(this));
       myServer.on('listening', this.onListening.bind(this));
     }.bind(this));
+  },
+
+  _initLocalization: function(myApp) {
+    var init = require('./initializer/Localization');
+    init(myApp, _realConfig.localizationDirs);
   },
 
   _initMiddlewares: function(myApp) {

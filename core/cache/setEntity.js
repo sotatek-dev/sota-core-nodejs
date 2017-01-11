@@ -1,6 +1,4 @@
-var ExSession   = require('../common/ExSession');
 var BaseEntity  = require('../entity/BaseEntity');
-var logger      = require('log4js').getLogger('Cache.getEntity');
 
 module.exports = function(model, id, entity, callback) {
   var tableName = model.tableName;
