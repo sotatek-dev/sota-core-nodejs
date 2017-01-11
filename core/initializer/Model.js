@@ -22,6 +22,7 @@ module.exports = function(app, ModelFactory, adaptersConfig, modelSchema, modelD
     _.forEach(files, function(file) {
       if (file.indexOf('BaseModel') > -1 ||
           file.indexOf('VersionedModel') > -1 ||
+          file.indexOf('CachedModel') > -1 ||
           file.indexOf('ModelFactory') > -1) {
         // Ignore non-model classes
         return;

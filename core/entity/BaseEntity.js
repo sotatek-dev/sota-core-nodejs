@@ -276,7 +276,7 @@ module.exports = Class.extends({
     self.updatedBy = self._model.getExSession().getUserId();
 
     if (callback && typeof callback === 'function') {
-      callback();
+      callback(null, this);
     }
   },
 
@@ -284,7 +284,7 @@ module.exports = Class.extends({
     this._refreshLocal();
 
     if (callback && typeof callback === 'function') {
-      callback();
+      callback(null, this);
     }
   },
 

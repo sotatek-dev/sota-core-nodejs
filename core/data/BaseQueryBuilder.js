@@ -89,6 +89,20 @@ var BaseQueryBuilder = Class.extends({
     return sql;
   },
 
+  updateOneById: function(tableName, id, data) {
+    var self = this;
+    var params = [];
+    var setClauses = [];
+    for (let col in data) {
+      setClauses.push(self._escapeColumn(col) + '=?');
+      params.push(data[col]);
+    }
+    params.push(id);
+    var sql = util.format('UPDATE %s SET %s WHERE id=?', tableName, setClauses.join(','));
+
+    return [sql, params];
+  },
+
   updateOne : function(entity) {
     var self = this,
         tableName = entity.tableName,

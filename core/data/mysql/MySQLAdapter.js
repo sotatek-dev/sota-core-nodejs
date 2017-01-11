@@ -152,6 +152,16 @@ module.exports = BaseAdapter.extends({
 
   },
 
+  updateOneById: function(tableName, id, data, callback) {
+    var [sqlQuery, params] = QueryBuilder.updateOneById(tableName, id, data);
+
+    if (!sqlQuery) {
+      callback(this.classname + '::updateOneById something went wrong. Couldn\'t build query.');
+    }
+
+    this._exec(sqlQuery, params, callback);
+  },
+
   updateOne : function(entity, callback) {
     var [sqlQuery, params] = QueryBuilder.updateOne(entity);
 

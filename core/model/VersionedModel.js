@@ -57,4 +57,18 @@ module.exports = BaseModel.extends({
     this.getAll(callback);
   },
 
+  findCacheOne: function(id, callback) {
+    var self = this;
+
+    async.waterfall([
+      function getAll(next) {
+        self.getAll(next);
+      },
+      function getOne(entities, next) {
+        var result = _.find(entities, e => _.isEqual(id, e.id)) || null;
+        next(null, result);
+      }
+    ], callback);
+  },
+
 });

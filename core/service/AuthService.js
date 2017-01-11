@@ -21,6 +21,7 @@ module.exports = BaseService.extends({
 
     var token = self.generateAccessToken(user);
     return callback(null, {
+      user: user,
       token: token
     });
   },
@@ -85,6 +86,7 @@ module.exports = BaseService.extends({
         }
         var token = self.generateAccessToken(user);
         return next(null, {
+          user: user,
           token: token
         });
       }
