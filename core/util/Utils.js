@@ -65,13 +65,12 @@ Utils.nowInSeconds = function() {
   return Utils.nowInMilis()/1000|0;
 };
 
-Utils.getUploadedLink = function(filename) {
-  return util.format('%s/uploads/%s',
-          process.env.APP_ENDPOINT, filename);
-};
-
 Utils.escapeSqlColumn = function(column) {
   return '`' + column + '`';
+};
+
+Utils.getS3FileUrl = function(region, bucket, fileName) {
+  return util.format('https://s3-%s.amazonaws.com/%s/%s', region, bucket, fileName);
 };
 
 module.exports = Utils;
