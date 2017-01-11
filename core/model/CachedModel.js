@@ -17,7 +17,7 @@ module.exports = BaseModel.extends({
 
     async.auto({
       cached: function(next) {
-        CacheFactory.getEntity(self.classname, id, next);
+        CacheFactory.getEntity(self, id, next);
       },
       find: ['cached', function(ret, next) {
         if (!ret.cached) {
