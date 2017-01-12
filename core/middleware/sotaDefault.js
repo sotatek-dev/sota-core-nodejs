@@ -134,6 +134,10 @@ function extendRequest(req, res) {
     return req.exSession.getModel(name);
   };
 
+  req.isAuthenticated = function() {
+    return !!(req.user && req.user.id);
+  };
+
   req.commit      = function(callback) {
     return req.exSession.commit(callback);
   };

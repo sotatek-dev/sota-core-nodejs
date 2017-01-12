@@ -18,9 +18,14 @@ class RedisCache extends BaseCache {
   set(key, value, meta, callback) {
     if (typeof meta === 'function') {
       callback = meta;
+      meta = null;
     }
 
     client.set(key, value, callback);
+    if (meta && meta.ttl) {
+      let ttlInSeconds = ~~(meta.ttl / 1000);
+      client.expire(key, ttlInSeconds);
+    }
   }
 
   get(key, callback) {
