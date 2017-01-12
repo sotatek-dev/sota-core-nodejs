@@ -106,7 +106,7 @@ var BaseModel = Class.extends({
     return this.tableName;
   },
 
-  _constructEntity : function(data, options) {
+  constructEntity : function(data, options) {
     var entity = new this.Entity(this, data);
     return entity.setOptions(options);
   },
@@ -130,7 +130,7 @@ var BaseModel = Class.extends({
         var rawDatas = ret.select;
         var entities = [];
         _.each(rawDatas, function(rawData) {
-          entities.push(self._constructEntity(rawData));
+          entities.push(self.constructEntity(rawData));
         });
         next(null, entities);
       }],
@@ -340,7 +340,7 @@ var BaseModel = Class.extends({
         entities = data;
       } else {
         entities = _.map(data, function(rawData) {
-          return self._constructEntity(rawData, options);
+          return self.constructEntity(rawData, options);
         });
       }
 
@@ -353,7 +353,7 @@ var BaseModel = Class.extends({
         self._reloadAfterBatchInsert(ret, callback);
       });
     } else if (typeof data === 'object') {
-      self._constructEntity(data, options).save(callback);
+      self.constructEntity(data, options).save(callback);
     } else {
       var errMsg = self.classname + '::insert invalid data=' + util.inspect(data);
       callback(errMsg);

@@ -72,6 +72,10 @@ module.exports = Class.extends({
     return this._data;
   },
 
+  getModel: function() {
+    return this._model;
+  },
+
   // toJSON alias
   getData : function() {
     return this.toJSON();
@@ -165,7 +169,13 @@ module.exports = Class.extends({
       if (typeof data[columnName] === 'string' && data[columnName] === '_NULL') {
         self._data[property] = null;
       } else {
-        self._data[property] = data[columnName];
+        var modelSchema = getModelSchema();
+        var isNumber = false;
+        if (modelSchema && modelSchema[self._model.classname]) {
+          var colDef = modelSchema[self._model.classname][columnName];
+          isNumber = colDef ? (colDef.type === 'number') : false;
+        }
+        self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
       }
 
       /*jshint loopfunc: true */

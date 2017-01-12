@@ -8,31 +8,29 @@ var logger      = require('log4js').getLogger('Cache.getEntity');
 module.exports = function(model, id, callback) {
   var tableName = model.tableName;
   var key = util.format('entity-%s-%s', tableName, id);
+  var isCacheHit = false;
   var result = null;
 
   async.waterfall([
     function cached(next) {
-      RedisCache.get(key, next);
+      RedisCache.hgetall(key, next);
     },
-    function get(cached, next) {
+    function data(cached, next) {
       if (cached) {
-        try {
-          result = JSON.parse(cached);
-        } catch (e) {
-          logger.error(util.format('Invalid cached entity: tableName=%s, id=%s', tableName, id));
-          logger.error(e);
-        }
-        return next(null, result);
+        isCacheHit = true;
+        var entity = model.constructEntity(cached);
+        return next(null, entity);
       }
 
       model.findOne(id, next);
     },
     function recache(entity, next) {
-      if (entity instanceof BaseEntity) {
-        result = entity.toJSON();
+      result = entity;
+      if (isCacheHit) {
+        return next(null, result);
       }
 
-      RedisCache.set(JSON.stringify(result), next);
+      RedisCache.hmset(key, result.toJSON(), next);
     },
   ], function (err) {
     if (err) {

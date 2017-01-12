@@ -22,10 +22,41 @@ class RedisCache extends BaseCache {
     }
 
     client.set(key, value, callback);
+
+    var ttl = Const.DEFAULT_CACHE_TTL;
     if (meta && meta.ttl) {
-      let ttlInSeconds = ~~(meta.ttl / 1000);
-      client.expire(key, ttlInSeconds);
+      ttl = meta.ttl;
     }
+    client.expire(key, ~~(ttl/1000));
+  }
+
+  hmset(key, obj, meta, callback) {
+    if (typeof meta === 'function') {
+      callback = meta;
+      meta = null;
+    }
+
+    var args = [key];
+    for (let prop in obj) {
+      let value = obj[prop];
+      if (_.isNil(value)) {
+        continue;
+      }
+      args.push(prop);
+      args.push(value);
+    }
+    args.push(callback);
+    client.hmset.apply(client, args);
+
+    var ttl = Const.DEFAULT_CACHE_TTL;
+    if (meta && meta.ttl) {
+      ttl = meta.ttl;
+    }
+    client.expire(key, ~~(ttl/1000));
+  }
+
+  hgetall(key, callback) {
+    client.hgetall(key, callback);
   }
 
   get(key, callback) {

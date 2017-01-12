@@ -5,6 +5,10 @@ var socketIO      = require('socket.io');
 module.exports = function(app, server, dirs) {
   logger.trace('Start initializing SocketIO...');
   var io = socketIO(server);
+  io.engine.ws = new (require('uws').Server)({
+      noServer: true,
+      perMessageDeflate: false
+  });
 
   var jwtSecret = app.get('jwtSecret');
   _.each(dirs, function(dir) {

@@ -12,28 +12,8 @@ module.exports = BaseModel.extends({
     throw new Error('Method is not supported.');
   },
 
-  // findCacheOne: function(id, callback) {
-  //   var self = this;
-
-  //   async.auto({
-  //     cached: function(next) {
-  //       CacheFactory.getEntity(self, id, next);
-  //     },
-  //     find: ['cached', function(ret, next) {
-  //       if (!ret.cached) {
-  //         return self.findOne(id, next);
-  //       }
-
-  //       next(null, ret.cached);
-  //     }],
-  //     recached: ['find', function(ret, next) {
-  //       if (ret.cached) {
-  //         return next(null, ret.cached);
-  //       }
-
-  //       CacheFactory.setEntity(this, id, ret.find.toJSON(), next);
-  //     }],
-  //   }, callback);
-  // },
+  findCacheOne: function(id, callback) {
+    CacheFactory.getEntity(this, id, callback);
+  },
 
 });
