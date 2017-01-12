@@ -44,6 +44,14 @@ module.exports = function(app) {
       return req.headers['x-auth-token'];
     }
 
+    if (req.body && req.body[jwtBodyField]) {
+      return req.body[jwtBodyField];
+    }
+
+    if (req.query && req.query[jwtBodyField]) {
+      return req.query[jwtBodyField];
+    }
+
     if (req.allParams && req.allParams[jwtBodyField]) {
       return req.allParams[jwtBodyField];
     }

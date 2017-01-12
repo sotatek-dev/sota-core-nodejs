@@ -1,6 +1,7 @@
 var SocketManager = require('../socket/SocketManager');
 var logger        = require('log4js').getLogger('Init.Socket');
 var socketIO      = require('socket.io');
+var redis         = require('socket.io-redis');
 
 module.exports = function(app, server, dirs) {
   logger.trace('Start initializing SocketIO...');
@@ -8,6 +9,17 @@ module.exports = function(app, server, dirs) {
   io.engine.ws = new (require('uws').Server)({
       noServer: true,
       perMessageDeflate: false
+  });
+
+  io.adapter(redis({
+    host: process.env.REDIS_SOCKET_HUB_ADDRESS,
+    port: process.env.REDIS_SOCKET_HUB_PORT,
+  }));
+
+  io.sockets.on('connection', function(socket) {
+    socket.on('message', function(data) {
+      socket.broadcast.emit('message', data);
+    });
   });
 
   var jwtSecret = app.get('jwtSecret');
