@@ -268,6 +268,7 @@ module.exports = Class.extends({
         return;
       }
 
+      self.getModel().setLocalCache(self);
       callback(err, self);
     });
   },

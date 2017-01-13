@@ -40,6 +40,7 @@ var BaseModel = Class.extends({
     }
 
     this._exSession       = exSession;
+    this._localCache      = {};
     this._useMasterSelect = false;
     this._masterConfig    = masterConfig;
     this._slaveConfig     = slaveConfig;
@@ -106,6 +107,31 @@ var BaseModel = Class.extends({
     return this.tableName;
   },
 
+  setLocalCache: function(entities) {
+    var self = this;
+
+    if (this._isEntityObject(entities)) {
+      this._setOneLocalCache(entities);
+      return;
+    }
+
+    if (_.isArray(entities)) {
+      _.each(entities, function(entity) {
+        self._setOneLocalCache(entity);
+      });
+      return;
+    }
+  },
+
+  _setOneLocalCache: function(entity) {
+    if (!this._isEntityObject(entity)) {
+      logger.error('setLocalCache: invalid entity: ' + util.inspect(entity));
+      return false;
+    }
+
+    this._localCache[entity.id] = entity;
+  },
+
   constructEntity : function(data, options) {
     var entity = new this.Entity(this, data);
     return entity.setOptions(options);
@@ -167,7 +193,7 @@ var BaseModel = Class.extends({
   _updateBatch : function(options, callback) {
     var now = Utils.now();
     var userId = this._exSession.getUserId();
-    options.set += ', created_at=' + now + ', updated_by=' + userId;
+    options.set += ', updated_at=' + now + ', updated_by=' + userId;
     this._masterAdapter.updateBatch(this.tableName, options, callback);
   },
 
@@ -194,8 +220,8 @@ var BaseModel = Class.extends({
 
   /**
    * Same specs with findOne, but will try to get data from cache first instead of db
-   * Currently it's just an alias of findOne
-   * TODO: implement cache mechanism
+   * In BaseModel it's just an alias of findOne
+   * The caching mechanism is just implemented in CachedModel only
    */
   findCacheOne: function(id, callback) {
     this.findOne(id, callback);
@@ -205,8 +231,18 @@ var BaseModel = Class.extends({
    * @param {number} id - The id of record that we want to find
    */
   findOne : function(id, callback) {
+    var self = this;
     var options;
     if (typeof id === 'number' || typeof id === 'string') {
+      /**
+       * Look up in the local cache first.
+       * If the entity is already selected and builted in the same session, just return it
+       */
+      if (self._localCache[id]) {
+        logger.trace(util.format('cache hit: %s<%s>', self.classname, id));
+        return callback(null, self._localCache[id]);
+      }
+
       options = {
         where   : 'id=?',
         params  : [id],
@@ -216,14 +252,19 @@ var BaseModel = Class.extends({
     }
 
     options.limit = 1;
-    this._select(options, function(err, ret) {
+    self._select(options, function(err, ret) {
       if (err) {
         callback(err);
         return;
       }
 
       if (_.isArray(ret) && ret.length > 0) {
-        callback(err, ret[0]);
+        var entity = ret[0];
+        /**
+         * Cache the result entity
+         */
+        self._localCache[entity.id] = entity;
+        callback(err, entity);
       } else {
         callback(err, null);
       }
@@ -289,16 +330,6 @@ var BaseModel = Class.extends({
     });
   },
 
-  // Find alias
-  select : function(options, callback) {
-    this.find(options, callback);
-  },
-
-  // FindOne alias
-  selectOne : function(id, callback) {
-    this.findOne(id, callback);
-  },
-
   /**
    * @param {Integer} id
    * @param {Function} callback
@@ -313,10 +344,19 @@ var BaseModel = Class.extends({
       return;
     }
 
+    var self = this;
+
     this.find({
       where: this.whereIn('id', ids.length),
       params: ids
-    }, callback);
+    }, function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+
+      self.setLocalCache(ret);
+      callback(null, ret);
+    });
   },
 
   /**
@@ -369,7 +409,7 @@ var BaseModel = Class.extends({
     var insertId = ret.insertId,
         count = ret.affectedRows;
 
-    this.setUseMasterSelect(true).select({
+    this.setUseMasterSelect(true).find({
       where: 'id >= ? and id <= ?',
       params: [insertId, insertId + count - 1],
     }, callback);
@@ -496,6 +536,7 @@ var BaseModel = Class.extends({
     delete this._slaveAdapter;
     delete this._exSession;
     delete this._collections;
+    delete this._localCache;
   },
 
 }).implements([IAdaptative]);

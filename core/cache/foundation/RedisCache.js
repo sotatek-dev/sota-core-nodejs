@@ -63,6 +63,10 @@ class RedisCache extends BaseCache {
     client.get(key, callback);
   }
 
+  incrby(key, value, callback) {
+    client.incrby(key, value, callback);
+  }
+
   remove(key, callback) {
     client.del(key, callback);
   }

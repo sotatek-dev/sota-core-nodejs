@@ -26,6 +26,11 @@ module.exports = function(model, id, callback) {
         return next(null, result);
       }
 
+      if (!result) {
+        logger.error(util.format('Cannot find %s<%s>', model.classname, id));
+        return callback(null, null);
+      }
+
       RedisCache.hmset(key, result.toJSON(), next);
     },
   ], function (err) {
