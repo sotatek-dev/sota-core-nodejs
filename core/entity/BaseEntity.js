@@ -175,7 +175,13 @@ module.exports = Class.extends({
           var colDef = modelSchema[self._model.classname][columnName];
           isNumber = colDef ? (colDef.type === 'number') : false;
         }
-        self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
+
+        if (!_.isNil(data[columnName])) {
+          self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
+        } else {
+          self._data[property] = data[columnName];
+        }
+
       }
 
       /*jshint loopfunc: true */
