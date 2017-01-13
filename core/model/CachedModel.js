@@ -6,8 +6,11 @@ module.exports = BaseModel.extends({
 
   $Entity: CachedEntity,
 
-  findCacheOne: function(id, callback) {
-    CacheFactory.getEntity(this, id, callback);
+  findCacheOne: function($super, data, callback) {
+    if (typeof data === 'number' || typeof data === 'string') {
+      return CacheFactory.getEntity(this, data, callback);
+    }
+    $super(data, callback);
   },
 
   _updateBatch: function($super, options, callback) {

@@ -1,7 +1,7 @@
-var BaseEntity  = require('./BaseEntity');
-var bcrypt      = require('bcryptjs');
+var CachedEntity  = require('./CachedEntity');
+var bcrypt        = require('bcryptjs');
 
-module.exports = BaseEntity.extends({
+module.exports = CachedEntity.extends({
   classname: 'UserEntity',
 
   isValidPassword: function(password) {

@@ -30,7 +30,7 @@ module.exports = BaseService.extends({
       },
       user: ['userSocial', function(ret, next) {
         if (ret.userSocial) {
-          return UserModel.findOne(ret.userSocial.id, next);
+          return UserModel.findCacheOne(ret.userSocial.id, next);
         }
 
         UserService.register(userDef, next);
