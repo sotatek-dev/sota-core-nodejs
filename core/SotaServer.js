@@ -42,7 +42,7 @@ logger              = require('log4js').getLogger('SotaServer');
 var _realConfig = {};
 getModelSchema = function() {
   return _realConfig.modelSchema;
-}
+};
 
 var SotaServer = Class.extends({
   classname : 'SotaServer',

@@ -404,14 +404,6 @@ var BaseModel = Class.extends({
     }
   },
 
-  updateOne: function(id, data, callback) {
-    if (!_.isPlainObject(data)) {
-      throw new Error('CachedModel::updateOne data should be a plain object');
-    }
-
-    this._masterAdapter.updateOneById(this.tableName, id, data, callback);
-  },
-
   // Alias of `remove`
   delete: function(data, callback) {
     this.remove(data, callback);

@@ -64,8 +64,7 @@ class RedisCache extends BaseCache {
   }
 
   remove(key, callback) {
-    this.removeSync(key);
-    callback(null, true);
+    client.del(key, callback);
   }
 
   removeSync(key) {

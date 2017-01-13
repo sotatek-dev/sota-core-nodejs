@@ -1,10 +1,5 @@
-var BaseEntity  = require('../entity/BaseEntity');
 var logger      = require('log4js').getLogger('Cache.getEntity');
 
-/**
- * This cache method is not really ready to use yet
- * TODO: find the way to update cache whenever the DB is updated
- */
 module.exports = function(model, id, callback) {
   var tableName = model.tableName;
   var key = util.format('entity-%s-%s', tableName, id);
@@ -18,6 +13,7 @@ module.exports = function(model, id, callback) {
     function data(cached, next) {
       if (cached) {
         isCacheHit = true;
+        logger.trace(util.format('cache hit: %s<%s>', model.classname, id));
         var entity = model.constructEntity(cached);
         return next(null, entity);
       }
