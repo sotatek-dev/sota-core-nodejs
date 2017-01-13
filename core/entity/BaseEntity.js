@@ -173,7 +173,7 @@ module.exports = Class.extends({
         var isNumber = false;
         if (modelSchema && modelSchema[self._model.classname]) {
           var colDef = modelSchema[self._model.classname][columnName];
-          isNumber = colDef ? (colDef.type === 'number') : false;
+          isNumber = (colDef ? (colDef.type === 'number') : false) || columnName === 'id';
         }
 
         if (!_.isNil(data[columnName])) {
