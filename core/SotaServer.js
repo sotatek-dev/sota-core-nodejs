@@ -1,36 +1,37 @@
-fs                  = require('fs');
-path                = require('path');
-util                = require('util');
-_                   = require('lodash');
-co                  = require('co');
-bb                  = require('bluebird');
-async               = require('async');
-moment              = require('moment');
-Checkit             = require('cc-checkit');
-imagemin            = require('imagemin');
-imageminMozjpeg     = require('imagemin-mozjpeg');
-imageminPngquant    = require('imagemin-pngquant');
-Class               = require('sota-class').Class;
-Interface           = require('sota-class').Interface;
+fs                      = require('fs');
+path                    = require('path');
+util                    = require('util');
+_                       = require('lodash');
+co                      = require('co');
+bb                      = require('bluebird');
+async                   = require('async');
+moment                  = require('moment');
+Checkit                 = require('cc-checkit');
+imagemin                = require('imagemin');
+imageminMozjpeg         = require('imagemin-mozjpeg');
+imageminPngquant        = require('imagemin-pngquant');
+Class                   = require('sota-class').Class;
+Interface               = require('sota-class').Interface;
 
-CacheFactory        = require('./cache/foundation/CacheFactory');
-LocalCache          = require('./cache/foundation/LocalCache');
-RedisCache          = require('./cache/foundation/RedisCache');
-Const               = require('./common/Const');
-FileUtils           = require('./util/FileUtils');
-Utils               = require('./util/Utils');
+CacheFactory            = require('./cache/foundation/CacheFactory');
+LocalCache              = require('./cache/foundation/LocalCache');
+RedisCache              = require('./cache/foundation/RedisCache');
+Const                   = require('./common/Const');
+FileUtils               = require('./util/FileUtils');
+Utils                   = require('./util/Utils');
 
-BaseController      = require('./controller/BaseController');
-BaseEntity          = require('./entity/BaseEntity');
-BaseModel           = require('./model/BaseModel');
-BaseService         = require('./service/BaseService');
-ErrorFactory        = require('./error/ErrorFactory');
-ControllerFactory   = require('./controller/ControllerFactory');
-PolicyManager       = require('./policy/PolicyManager');
-ModelFactory        = require('./model/ModelFactory');
-ServiceFactory      = require('./service/ServiceFactory');
-AdapterFactory      = require('./data/AdapterFactory');
-getText             = require('./factory/LocalizationFactory').getText;
+BaseController          = require('./controller/BaseController');
+BaseEntity              = require('./entity/BaseEntity');
+BaseModel               = require('./model/BaseModel');
+BaseService             = require('./service/BaseService');
+ErrorFactory            = require('./error/ErrorFactory');
+ControllerFactory       = require('./controller/ControllerFactory');
+PolicyManager           = require('./policy/PolicyManager');
+ModelFactory            = require('./model/ModelFactory');
+ServiceFactory          = require('./service/ServiceFactory');
+AdapterFactory          = require('./data/AdapterFactory');
+ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
+getText                 = require('./factory/LocalizationFactory').getText;
 
 // TODO: remove global scope of logger
 logger              = require('log4js').getLogger('SotaServer');
@@ -207,6 +208,16 @@ var SotaServer = Class.extends({
     _realConfig.cacheDirs = cacheDirs;
 
     /**
+     * External service handlers
+     */
+    let externalServiceDirs = [],
+        appExternalServiceDir = path.resolve(rootDir, 'app', 'external_services');
+    if (FileUtils.isDirectorySync(appExternalServiceDir)) {
+      externalServiceDirs.push(appExternalServiceDir);
+    }
+    _realConfig.externalServiceDirs = externalServiceDirs;
+
+    /**
      * Sockets:
      * - app/sockets/
      */
@@ -260,6 +271,7 @@ var SotaServer = Class.extends({
     this._loadControllers(myApp);
     this._loadModels(myApp);
     this._loadServices(myApp);
+    this._loadExternalServices(myApp);
     this._setupLodash(myApp);
     this._setupCheckit(myApp);
     this._setupPassport(myApp);
@@ -320,6 +332,11 @@ var SotaServer = Class.extends({
     var init = require('./initializer/Service'),
         serviceDirs = _realConfig.serviceDirs;
     init(myApp, ServiceFactory, serviceDirs);
+  },
+
+  _loadExternalServices: function(myApp) {
+    var init = require('./initializer/ExternalService');
+    init(myApp, ExternalServiceAdapter, _realConfig.externalServiceDirs);
   },
 
   _setupLodash: function() {

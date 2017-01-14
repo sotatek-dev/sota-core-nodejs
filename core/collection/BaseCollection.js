@@ -6,7 +6,7 @@ module.exports = Class.extends({
   classname: 'BaseCollection',
 
   initialize: function(model, alias) {
-    logger.trace('created collection from model: ' + model.classname + ' as: ' + alias);
+    // logger.trace('created collection from model: ' + model.classname + ' as: ' + alias);
 
     if (!model || !model.tableName) {
       throw new Error('initialize: invalid model');
@@ -74,6 +74,7 @@ module.exports = Class.extends({
       }).join(' OR ') + ')';
     }
 
+    logger.error(util.format('Invalid conditions format: %j', conditions));
     throw new Error('Invalid conditions format.');
   },
 

@@ -15,6 +15,14 @@ module.exports = function(app, CacheFactory, dirs) {
     }
 
     _.forEach(files, function(file) {
+      if (file.indexOf('CacheFactory') > -1 ||
+          file.indexOf('BaseCache') > -1 ||
+          file.indexOf('LocalCache') > -1 ||
+          file.indexOf('RedisCache') > -1) {
+        // Ignore non-cache handler
+        return;
+      }
+
       if (!FileUtils.isFileSync(file)) {
         throw new Error('Invalid cache file: ' + file);
       }

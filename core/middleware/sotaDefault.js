@@ -209,10 +209,15 @@ function extendResponse(req, res) {
     clearTimeout(req.__endTimeout);
     res.end = end;
 
-    var finishMethod = 'rollback';
-    if (req._needCommit) {
-      finishMethod = 'commit';
-    }
+    // var finishMethod = 'rollback';
+    // if (req._needCommit) {
+    //   finishMethod = 'commit';
+    // }
+
+    /**
+     * We just try to commit in all requests
+     */
+     var finishMethod = 'commit';
 
     req.exSession[finishMethod](function() {
       req.exSession.destroy();
