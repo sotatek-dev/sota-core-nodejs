@@ -27,10 +27,10 @@ module.exports = BaseAdapter.extends({
 
       // Find the cause and a better solution for this
       self._retryCount++;
-      if (self._retryCount > 50) {
-        throw new Error('MySQLAdapter::_exec error: maximum retry exceeds' +
-                        '. Query: [' + sqlQuery + ']');
-      }
+      // if (self._retryCount > 50) {
+      //   throw new Error('MySQLAdapter::_exec error: maximum retry exceeds' +
+      //                   '. Query: [' + sqlQuery + ']');
+      // }
 
       return setTimeout(function() {
         self._exec(sqlQuery, params, callback);
