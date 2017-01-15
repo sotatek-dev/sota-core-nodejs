@@ -18,7 +18,6 @@ module.exports = function(model, id, callback) {
         return next(null, entity);
       }
 
-      logger.warn('Find in db [' + model.tableName + ']: ' + id);
       model.findById(id, next);
     },
     function recache(entity, next) {
