@@ -107,7 +107,8 @@ module.exports = Class.extends({
     try {
       var token = socket.request._query.auth_token;
       if (!token) {
-        logger.warn(util.format('_authenticate invalid token: %s', token));
+        logger.warn(util.format('%s::_authenticate invalid token: %s',
+          self.classname, util.inspect(token)));
         socket.emit('disconnect');
         return;
       }
