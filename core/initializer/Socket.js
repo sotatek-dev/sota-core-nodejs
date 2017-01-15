@@ -6,7 +6,7 @@ var redis         = require('socket.io-redis');
 module.exports = function(app, server, dirs) {
   logger.trace('Start initializing SocketIO...');
   var io = socketIO(server);
-  io.engine.ws = new (require('uws').Server)({
+  io.engine.ws = new (require('ws').Server)({
       noServer: true,
       perMessageDeflate: false
   });
