@@ -107,16 +107,10 @@ module.exports = Class.extends({
     try {
       var token = socket.request._query.auth_token;
       var jwtPayload = jwt.decode(token, jwtSecret);
-      var UserModel = ModelFactory.create('UserModel', new ExSession());
-      UserModel.findCacheOne(jwtPayload.userId, function(err, user) {
-        // When a model is not got from request, need to destroy manually
-        // to prevent connection leak
-        // TODO: Implement a generic mechanism to handle this
-        UserModel.destroy();
-        delete UserModel;
-
+      CacheFactory.getOneUser(jwtPayload.userId, function(err, user) {
         if (err) {
           logger.error(err);
+          socket.emit('disconnect');
           return next(err, false);
         }
 
@@ -127,6 +121,7 @@ module.exports = Class.extends({
         if (!user) {
           let e = ErrorFactory.notFound('User not found: ' + jwtPayload.userId);
           logger.error(e);
+          socket.emit('disconnect');
           return next(e);
         }
 
@@ -143,7 +138,7 @@ module.exports = Class.extends({
               .to(socket.id).emit('error', e);
         };
 
-        socket.user = user.toJSON();
+        socket.user = user;
         socket.exSession = exSession;
 
         next(null, true);

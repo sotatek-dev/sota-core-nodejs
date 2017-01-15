@@ -16,19 +16,12 @@ module.exports = function(app) {
   // Deserialize user for the session: id to entity
   passport.deserializeUser(function(id, done) {
     logger.debug('Passport::deserializeUser: ' + id);
-    var UserModel = ModelFactory.create('UserModel');
-    UserModel.findById(id, function(err, user) {
-      // When a model is not got from request, need to destroy manually
-      // to prevent connection leak
-      // TODO: Implement a generic mechanism to handle this
-      UserModel.destroy();
-      delete UserModel;
-
+    CacheFactory.getOneUser(id, function(err, user) {
       if (err) {
         return done(err);
       }
 
-      done(err, user.toJSON());
+      done(err, user);
     });
   });
 
