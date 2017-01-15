@@ -23,6 +23,10 @@ module.exports = Class.extends({
     return this._exSession.getService(classname);
   },
 
+  getExSession: function() {
+    return this._exSession;
+  },
+
   destroy : function() {
     delete this._exSession;
   },
