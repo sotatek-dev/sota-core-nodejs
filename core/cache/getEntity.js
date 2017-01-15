@@ -13,12 +13,13 @@ module.exports = function(model, id, callback) {
     function data(cached, next) {
       if (cached) {
         isCacheHit = true;
-        logger.trace(util.format('cache hit: %s<%s>', model.classname, id));
+        logger.trace(util.format('cache hit: %s<%s> data=%j', model.classname, id, cached));
         var entity = model.constructEntity(cached);
         return next(null, entity);
       }
 
-      model.findOne(id, next);
+      logger.warn('Find in db [' + model.tableName + ']: ' + id);
+      model.findById(id, next);
     },
     function recache(entity, next) {
       result = entity;
@@ -31,7 +32,7 @@ module.exports = function(model, id, callback) {
         return callback(null, null);
       }
 
-      RedisCache.hmset(key, result.toJSON(), next);
+      CacheFactory.setEntity(model, id, result, next);
     },
   ], function (err) {
     if (err) {

@@ -125,7 +125,10 @@ function extendRequest(req, res) {
   res.send        = _sendResponse.bind(res, req);
   res.sendError   = _sendError.bind(res, req);
 
-  req.exSession   = new ExSession({user: req.user});
+  req.exSession   = new ExSession({
+    user: req.user,
+    useLocalCache: true,
+  });
   req.getService  = function(name) {
     return req.exSession.getService(name);
   };

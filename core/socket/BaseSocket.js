@@ -106,6 +106,11 @@ module.exports = Class.extends({
 
     try {
       var token = socket.request._query.auth_token;
+      if (!token) {
+        logger.warn(util.format('_authenticate invalid token: %s', token));
+        socket.emit('disconnect');
+        return;
+      }
       var jwtPayload = jwt.decode(token, jwtSecret);
       CacheFactory.getOneUser(jwtPayload.userId, function(err, user) {
         if (err) {

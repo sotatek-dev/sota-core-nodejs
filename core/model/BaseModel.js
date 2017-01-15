@@ -71,6 +71,10 @@ var BaseModel = Class.extends({
     return this._useMasterSelect;
   },
 
+  isUseLocalCache: function() {
+    return this._exSession.isUseLocalCache();
+  },
+
   setUseMasterSelect : function(flag) {
     this._useMasterSelect = !!flag;
     return this;
@@ -109,6 +113,10 @@ var BaseModel = Class.extends({
 
   setLocalCache: function(entities) {
     var self = this;
+
+    if (!self.isUseLocalCache()) {
+      return;
+    }
 
     if (this._isEntityObject(entities)) {
       this._setOneLocalCache(entities);
@@ -238,7 +246,7 @@ var BaseModel = Class.extends({
        * Look up in the local cache first.
        * If the entity is already selected and builted in the same session, just return it
        */
-      if (self._localCache[id]) {
+      if (this.isUseLocalCache() && self._localCache[id]) {
         logger.trace(util.format('cache hit: %s<%s>', self.classname, id));
         return callback(null, self._localCache[id]);
       }
@@ -263,7 +271,9 @@ var BaseModel = Class.extends({
         /**
          * Cache the result entity
          */
-        self._localCache[entity.id] = entity;
+         if (self.isUseLocalCache()) {
+          self._localCache[entity.id] = entity;
+         }
         callback(err, entity);
       } else {
         callback(err, null);

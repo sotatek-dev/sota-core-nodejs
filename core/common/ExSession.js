@@ -49,6 +49,10 @@ module.exports = Class.extends({
     return this._info.user.id;
   },
 
+  isUseLocalCache: function() {
+    return !!this._info.useLocalCache;
+  },
+
   commit: function(callback) {
     var models = _.values(this._models);
     async.forEach(models, function(model, next) {
