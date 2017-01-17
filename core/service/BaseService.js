@@ -8,7 +8,7 @@ module.exports = Class.extends({
 
   initialize : function(exSession) {
     this.registryId = ++registryId;
-    logger.trace('BaseService<' + this.classname + '>::initialize registryId=' + this.registryId);
+    logger.trace(this.classname + '::initialize registryId=' + this.registryId);
     if (!exSession) {
       throw new Error('Invalid exSession: ' + exSession);
     }
