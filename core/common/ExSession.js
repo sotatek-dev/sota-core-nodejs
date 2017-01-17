@@ -1,5 +1,5 @@
 var Class           = require('sota-class').Class;
-var shortid         = require('shortid');
+var uuid            = require('uuid');
 var AdapterFactory  = require('../data/AdapterFactory');
 
 module.exports = Class.extends({
@@ -7,7 +7,7 @@ module.exports = Class.extends({
 
   initialize: function(sessionInfo) {
     this._info = sessionInfo || {};
-    this._sessionId = shortid.generate();
+    this._sessionId = uuid.v4();
   },
 
   getSessionId: function() {

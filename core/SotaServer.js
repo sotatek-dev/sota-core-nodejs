@@ -7,9 +7,6 @@ bb                      = require('bluebird');
 async                   = require('async');
 moment                  = require('moment');
 Checkit                 = require('cc-checkit');
-imagemin                = require('imagemin');
-imageminMozjpeg         = require('imagemin-mozjpeg');
-imageminPngquant        = require('imagemin-pngquant');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;
 

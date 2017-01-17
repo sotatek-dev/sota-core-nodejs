@@ -182,7 +182,7 @@ var BaseController = Class.extends({
       async.auto({
         del: function(next) {
           if (id > 0) {
-            model.delete(id, next);
+            model.remove(id, next);
           } else {
             next(null, null);
           }

@@ -60,7 +60,7 @@ module.exports = function(app, ControllerFactory, config) {
     // Remove/Delete
     // route = '/' + apiName + '/:id';
     // handlerDef = BaseController.createDefaultDelete(model);
-    // app.delete(route, handlerDef);
+    // app.remove(route, handlerDef);
   }
 
   // If there's no user-defined login function, use built-int default login

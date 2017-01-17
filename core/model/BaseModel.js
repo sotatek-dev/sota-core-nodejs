@@ -111,6 +111,14 @@ var BaseModel = Class.extends({
     return this.tableName;
   },
 
+  constructEntity : function(data, options) {
+    var entity = new this.Entity(this, data);
+    return entity.setOptions(options);
+  },
+
+  /**
+   * @param {BaseEntity|Array} entities
+   */
   setLocalCache: function(entities) {
     var self = this;
 
@@ -131,6 +139,9 @@ var BaseModel = Class.extends({
     }
   },
 
+  /**
+   * @param {BaseEntity} entity
+   */
   _setOneLocalCache: function(entity) {
     if (!this._isEntityObject(entity)) {
       logger.error('setLocalCache: invalid entity: ' + util.inspect(entity));
@@ -138,11 +149,6 @@ var BaseModel = Class.extends({
     }
 
     this._localCache[entity.id] = entity;
-  },
-
-  constructEntity : function(data, options) {
-    var entity = new this.Entity(this, data);
-    return entity.setOptions(options);
   },
 
   _isEntityObject : function(data) {
@@ -454,11 +460,6 @@ var BaseModel = Class.extends({
     }
   },
 
-  // Alias of `remove`
-  delete: function(data, callback) {
-    this.remove(data, callback);
-  },
-
   remove: function(data, callback) {
     var self = this;
     if (data && !isNaN(data)) {
@@ -466,7 +467,7 @@ var BaseModel = Class.extends({
         data = parseInt(data);
       }
 
-      self.delete({
+      self.remove({
         where   : 'id=?',
         params  : [data],
       }, callback);
