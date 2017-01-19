@@ -207,7 +207,12 @@ var BaseModel = Class.extends({
   _updateBatch : function(options, callback) {
     var now = Utils.now();
     var userId = this._exSession.getUserId();
-    options.set += ', updated_at=' + now + ', updated_by=' + userId;
+    if (_.includes(this.predefinedCols, 'updated_at')) {
+      options.set += ', updated_at=' + now;
+    }
+    if (_.includes(this.predefinedCols, 'updated_by')) {
+      options.set += ', updated_by=' + userId;
+    }
     this._masterAdapter.updateBatch(this.tableName, options, callback);
   },
 
