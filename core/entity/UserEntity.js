@@ -9,7 +9,7 @@ module.exports = CachedEntity.extends({
   },
 
   toJSON: function($super) {
-    this._data.fullName = this._data.firstName + ' ' + this._data.lastName;
+    this._data.fullName = (this._data.firstName || '') + ' ' + (this._data.lastName || '');
     return $super();
   },
 

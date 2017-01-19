@@ -1,4 +1,3 @@
-var BaseEntity  = require('../entity/BaseEntity');
 var logger      = require('log4js').getLogger('Cache.removeEntity');
 
 module.exports = function(model, id, callback) {
