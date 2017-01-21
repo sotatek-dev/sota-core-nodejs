@@ -4,6 +4,11 @@ var ExSession         = require('../common/ExSession');
 var SocketIOWrapper   = require('./SocketIOWrapper');
 var logger            = require('log4js').getLogger('BaseSocket');
 
+var client = redis.createClient({
+  host: process.env.REDIS_SOCKET_HUB_ADDRESS,
+  port: process.env.REDIS_SOCKET_HUB_PORT,
+});
+
 module.exports = Class.extends({
   classname: 'BaseSocket',
   _namespace: '/',
@@ -154,6 +159,27 @@ module.exports = Class.extends({
       logger.error(e);
       return next(e, false);
     }
+  },
+
+  getRedisHubClient: function() {
+    return client;
+  },
+
+  publishToHub: function(channel, eventType, eventData) {
+    if (typeof channel !== 'string') {
+      throw new Error('Invalid channel to publish: ' + eventData);
+    }
+
+    if (typeof eventData !== 'string') {
+      throw new Error('Invalid eventData to publish: ' + eventData);
+    }
+
+    var message = [this.classname, eventType, eventData].join('|');
+    client.publish(channel, message);
+  },
+
+  onReceivedMsgFromHub: function(data) {
+    throw new Error('Implement me in derived class.');
   },
 
 }).implements([SocketIOWrapper]);

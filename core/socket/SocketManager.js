@@ -1,10 +1,39 @@
 var Class     = require('sota-class').Class;
 var logger    = require('log4js').getLogger('SocketManager');
+var uuid      = require('uuid');
 
 var _registers = {};
+var _socketServerId = uuid.v4();
 
-module.exports = Class.singleton({
+var sub = redis.createClient({
+  host: process.env.REDIS_SOCKET_HUB_ADDRESS,
+  port: process.env.REDIS_SOCKET_HUB_PORT,
+});
+
+var SocketManager = Class.singleton({
   classname: 'SocketManager',
+
+  initialize: function() {
+    logger.trace('SocketManager::initialize: ' + _socketServerId);
+    var channel = 'server:' + _socketServerId;
+    sub.subscribe(channel);
+    sub.on('message', function(channel, data) {
+      if (!data) {
+        return;
+      }
+      logger.debug(util.format(
+        'on received message from channel [%s], data=%s', channel, util.inspect(data)));
+      var params = data.split('|');
+      var handlerClassname = params[0];
+      var eventType = params[1];
+      var eventData = params[2];
+      SocketManager.getInstance(handlerClassname).onReceivedMsgFromHub(eventType, eventData);
+    });
+  },
+
+  getSocketServerId: function() {
+    return ('server:' + _socketServerId);
+  },
 
   create: function(SocketClass, server, jwtSecret) {
     var classname = SocketClass.classname;
@@ -30,3 +59,5 @@ module.exports = Class.singleton({
   },
 
 });
+
+module.exports = SocketManager;

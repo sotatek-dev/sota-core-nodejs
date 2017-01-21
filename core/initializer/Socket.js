@@ -1,7 +1,7 @@
 var SocketManager = require('../socket/SocketManager');
 var logger        = require('log4js').getLogger('Init.Socket');
 var socketIO      = require('socket.io');
-var redis         = require('socket.io-redis');
+var redisio       = require('socket.io-redis');
 
 module.exports = function(app, server, dirs) {
   logger.trace('Start initializing SocketIO...');
@@ -11,7 +11,7 @@ module.exports = function(app, server, dirs) {
       perMessageDeflate: false
   });
 
-  io.adapter(redis({
+  io.adapter(redisio({
     host: process.env.REDIS_SOCKET_HUB_ADDRESS,
     port: process.env.REDIS_SOCKET_HUB_PORT,
   }));
@@ -32,6 +32,11 @@ module.exports = function(app, server, dirs) {
     _.forEach(files, function(file) {
       if (!FileUtils.isFileSync(file)) {
         throw new Error('Invalid socket file: ' + file);
+      }
+
+      if (file.indexOf('SocketManager') > -1) {
+        // Ignore non-socket classes
+        return;
       }
 
       var module = require(file);

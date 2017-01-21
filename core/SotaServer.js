@@ -6,6 +6,7 @@ co                      = require('co');
 bb                      = require('bluebird');
 async                   = require('async');
 moment                  = require('moment');
+redis                   = require('redis');
 Checkit                 = require('cc-checkit');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;
@@ -27,6 +28,7 @@ PolicyManager           = require('./policy/PolicyManager');
 ModelFactory            = require('./model/ModelFactory');
 ServiceFactory          = require('./service/ServiceFactory');
 AdapterFactory          = require('./data/AdapterFactory');
+SocketManager           = require('./socket/SocketManager');
 ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
 getText                 = require('./factory/LocalizationFactory').getText;
 

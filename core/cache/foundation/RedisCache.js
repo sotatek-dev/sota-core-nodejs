@@ -1,13 +1,12 @@
 var BaseCache = require('./BaseCache');
-var redis     = require('redis');
 var logger    = require('log4js').getLogger('RedisCache');
 
 'use strict';
 
 var client = redis.createClient({
-      host: process.env.REDIS_SERVER_ADDRESS,
-      port: process.env.REDIS_SERVER_PORT,
-    });
+  host: process.env.REDIS_SERVER_ADDRESS,
+  port: process.env.REDIS_SERVER_PORT,
+});
 
 client.on('error', function(err) {
   logger.error('On redis error: ' + err);
