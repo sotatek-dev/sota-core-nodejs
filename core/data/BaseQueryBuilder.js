@@ -252,19 +252,15 @@ var BaseQueryBuilder = Class.extends({
     var ret = '';
     var columns = options.columns;
     if (columns && columns.length) {
-      var pKeys = options.model.primaryKeys;
-      if (_.intersection(columns, pKeys).length !== pKeys.length) {
-        logger.error(this.classname + '::_buildColumns \
-                      all primary keys must be in select criteria');
-        return null;
+      if (typeof columns === 'string') {
+        return columns;
       }
 
-      _.each(columns, function(column) {
-        ret += self._escapeColumn(column) + ',';
-      });
-      ret = ret.slice(0, -1); // Remove last colon
+      if (_.isArray(columns)) {
+        return columns.join(',');
+      }
     } else {
-      ret += '* ';
+      ret += '*';
     }
 
     return ret;

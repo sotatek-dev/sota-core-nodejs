@@ -14,6 +14,12 @@ module.exports = {
     return this._alias || this.tableName;
   },
 
+  find: function(options, callback) {
+    var self = this;
+    var adapter = self.getAdapterForSelect();
+    adapter.select(self.getFromClause(), options, callback);
+  },
+
   count: function(options, callback) {
     var self = this;
     var adapter = self.getAdapterForSelect();
