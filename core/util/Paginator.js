@@ -49,6 +49,7 @@ module.exports = {
     }
 
     return {
+      columns: options.columns,
       where: where,
       params: params,
       limit: limit,
