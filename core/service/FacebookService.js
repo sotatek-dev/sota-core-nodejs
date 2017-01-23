@@ -13,8 +13,7 @@ module.exports = SocialNetworkService.extends({
     return {
       username: fbInfo.id,
       email: fbInfo.email || fbInfo.id,
-      first_name: fbInfo.first_name,
-      last_name: fbInfo.last_name,
+      full_name: fbInfo.first_name + ' ' + fbInfo.last_name,
       avatar_url: fbInfo.picture.data.url,
     };
   },

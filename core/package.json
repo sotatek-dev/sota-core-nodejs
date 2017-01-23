@@ -7,7 +7,7 @@
     "url": ""
   },
   "scripts": {
-    "test": "make test"
+    "test": "node_modules/.bin/mocha test/*"
   },
   "author": "An Nguyen <nguyenhuuan@gmail.com>",
   "license": "MIT",

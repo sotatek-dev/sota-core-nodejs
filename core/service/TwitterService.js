@@ -13,8 +13,7 @@ module.exports = SocialNetworkService.extends({
     return {
       username: twitterInfo.screen_name,
       email: info.email || (info.screen_name + '@twitter.com'),
-      first_name: info.name,
-      last_name: '',
+      full_name: info.name,
       avatar_url: info.profile_image_url,
     };
   },

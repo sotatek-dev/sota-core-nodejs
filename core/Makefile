@@ -23,9 +23,9 @@ check-syntax-jshint:
 	--config="node-style-guide/.jshintrc" \
 	common/ controller/ data/ entity/ error/ model/ service/ util/
 
-unittest:
+test:
 	node_modules/.bin/mocha test/*
 
-covertest:
+coverage:
 	istanbul cover _mocha -R test/*
 	open coverage/lcov-report/index.html

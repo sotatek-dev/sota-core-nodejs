@@ -14,8 +14,7 @@ module.exports = SocialNetworkService.extends({
     return {
       username: info.id,
       email: info.email || info.id,
-      first_name: info.name ? info.name.givenName : info.displayName,
-      last_name: info.name ? info.name.familyName : '',
+      full_name: info.displayName,
       avatar_url: info.image ? info.image.url : null,
     };
   },

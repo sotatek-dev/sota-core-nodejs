@@ -98,8 +98,8 @@ module.exports = Class.extends({
 
       if (socket.exSession) {
         socket.exSession.rollback(function() {
-            socket.exSession.destroy();
-            delete socket.exSession;
+          socket.exSession.destroy();
+          delete socket.exSession;
         });
       }
     });
