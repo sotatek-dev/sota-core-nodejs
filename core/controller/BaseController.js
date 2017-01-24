@@ -193,7 +193,7 @@ var BaseController = Class.extends({
           return;
         }
 
-        res.noContent(ret.del);
+        res.deleted(ret.del);
       });
     };
 
