@@ -1,5 +1,5 @@
 var BaseCache = require('./BaseCache');
-var logger    = require('log4js').getLogger('RedisCache');
+var logger    = log4js.getLogger('RedisCache');
 
 'use strict';
 

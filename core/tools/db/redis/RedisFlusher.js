@@ -1,7 +1,8 @@
 require('dotenv').config();
 
 var redis     = require('redis');
-var logger    = require('log4js').getLogger('RedisFlusher');
+var log4js    = require('log4js');
+var logger    = log4js.getLogger('RedisFlusher');
 
 var client = redis.createClient({
   host: process.env.REDIS_SERVER_ADDRESS,

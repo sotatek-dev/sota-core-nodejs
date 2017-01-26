@@ -1,5 +1,5 @@
 var Class       = require('sota-class').Class;
-var logger      = require('log4js').getLogger('BaseService');
+var logger      = log4js.getLogger('BaseService');
 
 var registryId = 0;
 

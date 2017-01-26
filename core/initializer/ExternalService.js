@@ -1,5 +1,5 @@
 var path        = require('path');
-var logger      = require('log4js').getLogger('Init.ExternalService');
+var logger      = log4js.getLogger('Init.ExternalService');
 
 module.exports = function(app, ExternalServiceAdapter, dirs) {
   _.each(dirs, function(dir) {

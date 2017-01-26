@@ -1,5 +1,5 @@
 var BaseEntity  = require('../entity/BaseEntity');
-var logger      = require('log4js').getLogger('Cache.setEntity');
+var logger      = log4js.getLogger('Cache.setEntity');
 
 module.exports = function(model, id, entity, callback) {
   async.waterfall([

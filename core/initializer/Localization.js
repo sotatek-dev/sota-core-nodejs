@@ -1,6 +1,6 @@
 var path        = require('path');
 var setText     = require('../factory/LocalizationFactory').setText;
-var logger      = require('log4js').getLogger('Init.Localization');
+var logger      = log4js.getLogger('Init.Localization');
 
 module.exports = function(app, dirs) {
   _.each(dirs, function(dir) {

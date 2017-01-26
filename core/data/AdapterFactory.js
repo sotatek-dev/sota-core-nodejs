@@ -1,7 +1,7 @@
 var Class               = require('sota-class').Class;
 var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
-// var logger              = require('log4js').getLogger('AdapterFactory');
+// var logger              = log4js.getLogger('AdapterFactory');
 
 var _nextId = 0,
     _registry = {},

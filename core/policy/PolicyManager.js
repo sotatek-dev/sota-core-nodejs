@@ -1,4 +1,4 @@
-var logger    = require('log4js').getLogger('PolicyManager');
+var logger    = log4js.getLogger('PolicyManager');
 var Class     = require('sota-class').Class;
 
 module.exports = Class.singleton({

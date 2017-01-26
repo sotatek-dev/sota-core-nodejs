@@ -1,6 +1,6 @@
 var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
-var logger              = require('log4js').getLogger('MySQLAdapter');
+var logger              = log4js.getLogger('MySQLAdapter');
 
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
@@ -55,6 +55,7 @@ module.exports = BaseAdapter.extends({
         self._connection = connection;
         self._isFinished = false;
         if (self._mode === 'master') {
+          logger.trace(util.format('<%s> beginTransaction', self.registryId));
           self._connection.beginTransaction(function(err) {
             next(err, null);
           });
@@ -405,11 +406,23 @@ module.exports = BaseAdapter.extends({
   destroy : function() {
     if (this._connection) {
       logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
-      this._connection.release();
-      delete this._retryCount;
-      delete this._connection;
-      delete this._gotConnection;
-      delete this._isFinished;
+      if (this._isFinished) {
+        this._connection.release();
+        delete this._retryCount;
+        delete this._connection;
+        delete this._gotConnection;
+        delete this._isFinished;
+        return;
+      }
+
+      var self = this;
+      self._isFinished = true;
+      self.commit(function() {
+        delete self._retryCount;
+        delete self._connection;
+        delete self._gotConnection;
+        delete self._isFinished;
+      });
     }
   },
 

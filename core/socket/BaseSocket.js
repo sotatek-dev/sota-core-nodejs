@@ -2,7 +2,7 @@ var jwt               = require('jwt-simple');
 var Class             = require('sota-class').Class;
 var ExSession         = require('../common/ExSession');
 var SocketIOWrapper   = require('./SocketIOWrapper');
-var logger            = require('log4js').getLogger('BaseSocket');
+var logger            = log4js.getLogger('BaseSocket');
 
 var client = redis.createClient({
   host: process.env.REDIS_SOCKET_HUB_ADDRESS,

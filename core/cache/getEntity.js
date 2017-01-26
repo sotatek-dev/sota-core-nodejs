@@ -1,4 +1,4 @@
-var logger      = require('log4js').getLogger('Cache.getEntity');
+var logger      = log4js.getLogger('Cache.getEntity');
 
 module.exports = function(model, id, callback) {
   var tableName = model.tableName;

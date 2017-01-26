@@ -1,6 +1,7 @@
 var crypto                = require('crypto');
 var request               = require('request');
 var SocialNetworkService  = require('./SocialNetworkService');
+var logger                = log4js.getLogger('FacebookService');
 
 module.exports = SocialNetworkService.extends({
   classname : 'FacebookService',

@@ -2,7 +2,7 @@ var Class               = require('sota-class').Class;
 var BaseEntity          = require('../entity/BaseEntity');
 var BaseCollection      = require('../collection/BaseCollection');
 var IAdaptative         = require('../interface/IAdaptative');
-var logger              = require('log4js').getLogger('BaseModel');
+var logger              = log4js.getLogger('BaseModel');
 
 var BaseModel = Class.extends({
   classname   : 'BaseModel',

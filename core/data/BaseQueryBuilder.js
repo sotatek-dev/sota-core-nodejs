@@ -1,6 +1,6 @@
 var Class             = require('sota-class').Class;
 var BaseEntity        = require('../entity/BaseEntity');
-var logger            = require('log4js').getLogger('BaseQueryBuilder');
+var logger            = log4js.getLogger('BaseQueryBuilder');
 
 /**
  * Based on MySQL syntax.

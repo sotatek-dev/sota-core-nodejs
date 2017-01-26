@@ -1,5 +1,5 @@
 var SocketManager = require('../socket/SocketManager');
-var logger        = require('log4js').getLogger('Init.Socket');
+var logger        = log4js.getLogger('Init.Socket');
 var socketIO      = require('socket.io');
 var redisio       = require('socket.io-redis');
 

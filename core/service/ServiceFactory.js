@@ -1,5 +1,5 @@
 var Class     = require('sota-class').Class;
-var logger    = require('log4js').getLogger('ServiceFactory');
+var logger    = log4js.getLogger('ServiceFactory');
 
 /**
  * Hide real private objects from rest of the world

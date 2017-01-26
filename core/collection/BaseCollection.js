@@ -1,6 +1,6 @@
 var Class         = require('sota-class').Class;
 var IAdaptative   = require('../interface/IAdaptative');
-var logger        = require('log4js').getLogger('BaseCollection');
+var logger        = log4js.getLogger('BaseCollection');
 
 module.exports = Class.extends({
   classname: 'BaseCollection',

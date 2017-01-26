@@ -1,4 +1,4 @@
-// var logger = require('log4js').getLogger('PolicyPaginate');
+// var logger = log4js.getLogger('PolicyPaginate');
 
 module.exports = function(req, res, next) {
   var [err, params] = new Checkit({

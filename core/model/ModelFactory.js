@@ -1,5 +1,5 @@
 var Class       = require('sota-class').Class;
-var logger      = require('log4js').getLogger('ModelFactory');
+var logger      = log4js.getLogger('ModelFactory');
 
 /**
  * Hide real private objects from rest of the world
@@ -61,8 +61,10 @@ module.exports = Class.singleton({
   create: function(classname, exSession) {
     if (_registers[classname]) {
       var modelClass = _registers[classname];
-      var masterConfig = this.getAdapterConfig(modelClass.dsConfig.write),
-          slaveConfig = this.getAdapterConfig(modelClass.dsConfig.read);
+      var wConfigName = process.env.NODE_ENV === 'test' ? 'mysql-test' : modelClass.dsConfig.write;
+      var rConfigName = process.env.NODE_ENV === 'test' ? 'mysql-test' : modelClass.dsConfig.read;
+      var masterConfig = this.getAdapterConfig(wConfigName);
+      var slaveConfig = this.getAdapterConfig(rConfigName);
       return new _registers[classname](exSession, masterConfig, slaveConfig);
     }
   },

@@ -12,6 +12,10 @@ Checkit                 = require('cc-checkit');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;
 
+// TODO: remove global scope of logger
+log4js = require('log4js');
+logger = log4js.getLogger('SotaServer');
+
 CacheFactory            = require('./cache/foundation/CacheFactory');
 LocalCache              = require('./cache/foundation/LocalCache');
 RedisCache              = require('./cache/foundation/RedisCache');
@@ -32,9 +36,6 @@ AdapterFactory          = require('./data/AdapterFactory');
 SocketManager           = require('./socket/SocketManager');
 ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
 getText                 = require('./factory/LocalizationFactory').getText;
-
-// TODO: remove global scope of logger
-logger              = require('log4js').getLogger('SotaServer');
 
 /**
  * Hide real configuration object from rest of the world

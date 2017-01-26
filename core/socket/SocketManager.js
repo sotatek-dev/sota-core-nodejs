@@ -1,5 +1,5 @@
 var Class     = require('sota-class').Class;
-var logger    = require('log4js').getLogger('SocketManager');
+var logger    = log4js.getLogger('SocketManager');
 var uuid      = require('uuid');
 
 var _registers = {};

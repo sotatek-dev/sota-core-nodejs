@@ -1,5 +1,5 @@
 // Final error handler if one of policies is not validated
-var logger    = require('log4js').getLogger('PolicyErrorHandler');
+var logger    = log4js.getLogger('PolicyErrorHandler');
 var BaseError = require('../error/BaseError');
 
 module.exports = function(err, req, res) {

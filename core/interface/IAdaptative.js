@@ -1,4 +1,4 @@
-var logger = require('log4js').getLogger('IAdaptative');
+var logger = log4js.getLogger('IAdaptative');
 
 module.exports = {
 

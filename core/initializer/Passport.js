@@ -3,7 +3,7 @@ var passport        = require('passport');
 var LocalStrategy   = require('passport-local').Strategy;
 var JwtStrategy     = require('passport-jwt').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
-var logger          = require('log4js').getLogger('Init.Passport');
+var logger          = log4js.getLogger('Init.Passport');
 
 module.exports = function(app) {
 

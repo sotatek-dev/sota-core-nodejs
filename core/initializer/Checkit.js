@@ -1,4 +1,4 @@
-var logger = require('log4js').getLogger('Init.Checkit');
+var logger = log4js.getLogger('Init.Checkit');
 
 module.exports = function(Checkit, dirs) {
   var subs = ['validator', 'transformer'];

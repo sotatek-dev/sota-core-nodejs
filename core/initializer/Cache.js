@@ -1,5 +1,5 @@
 var path        = require('path');
-var logger      = require('log4js').getLogger('Init.Cache');
+var logger      = log4js.getLogger('Init.Cache');
 
 module.exports = function(app, CacheFactory, dirs) {
   _.each(dirs, function(dir) {
