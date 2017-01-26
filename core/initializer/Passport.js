@@ -61,7 +61,7 @@ module.exports = function(app) {
         done(null, user);
       } else {
         logger.error('User not found jwtPayload=' + util.inspect(jwtPayload));
-        done(ErrorFactory.unauthorized('User not found.'));
+        done(ErrorFactory.unauthorized('User not found: id=' + jwtPayload.userId));
       }
     });
   }));
@@ -84,7 +84,7 @@ module.exports = function(app) {
 
         if (!user) {
           logger.error('User not found email=' + email);
-          return done(ErrorFactory.notFound('User not found.'));
+          return done(ErrorFactory.notFound('User not found: email=' + email));
         }
 
         if (!user.isValidPassword(password)) {

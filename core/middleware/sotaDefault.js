@@ -255,6 +255,14 @@ module.exports = function() {
   return function(req, res, next) {
     tryAuthenticate(req, res, function(err) {
       if (err) {
+        if (err instanceof BaseError) {
+          res.status(err.getHttpStatus())
+              .send({
+                code : err.getCode(),
+                msg  : err.getMsg(),
+              });
+          return;
+        }
         return next(err);
       }
 
