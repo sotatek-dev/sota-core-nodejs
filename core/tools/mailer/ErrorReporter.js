@@ -15,7 +15,7 @@ module.exports = function(err, revision) {
   );
 
   var transporter = nodemailer.createTransport(config);
-  // TODO: configurable these fields
+  // TODO: make these fields configurable
   var mailOptions = {
     from: '"SotaTek Tester" <sotatek.test@gmail.com>',
     to: 'nguyenhuuan@gmail.com',

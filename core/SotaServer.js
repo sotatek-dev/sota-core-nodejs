@@ -55,9 +55,10 @@ var revision = require('child_process')
 var SotaServer = Class.extends({
   classname : 'SotaServer',
 
-  initialize: function(config) {
+  initialize: function(config, callback) {
     // logger.trace('SotaServer::initialize config=' + util.inspect(config));
 
+    this._initCallback = callback;
     this._resolveConfig(config);
     this._initExpress();
   },
@@ -292,6 +293,11 @@ var SotaServer = Class.extends({
       myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
       myServer.on('error', this.onError.bind(this));
       myServer.on('listening', this.onListening.bind(this));
+
+      if (typeof this._initCallback === 'function') {
+        this._initCallback();
+        delete this._initCallback;
+      }
     }.bind(this));
   },
 
