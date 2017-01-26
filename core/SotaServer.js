@@ -37,6 +37,8 @@ SocketManager           = require('./socket/SocketManager');
 ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
 getText                 = require('./factory/LocalizationFactory').getText;
 
+var ErrorReporter       = require('./tools/mailer/ErrorReporter');
+
 /**
  * Hide real configuration object from rest of the world
  * No one should be able to touch it
@@ -45,6 +47,10 @@ var _realConfig = {};
 getModelSchema = function() {
   return _realConfig.modelSchema;
 };
+
+var revision = require('child_process')
+  .execSync('git rev-parse HEAD')
+  .toString().trim();
 
 var SotaServer = Class.extends({
   classname : 'SotaServer',
@@ -379,6 +385,7 @@ var SotaServer = Class.extends({
       logger.error('############## process begin uncaught exception info ##############');
       logger.error(err);
       logger.error('############## process  end  uncaught exception info ##############');
+      ErrorReporter(err, revision);
     });
   },
 
