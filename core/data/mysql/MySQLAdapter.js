@@ -404,6 +404,12 @@ module.exports = BaseAdapter.extends({
   },
 
   destroy : function() {
+    if (this._isDestroyed) {
+      return;
+    }
+
+    this._isDestroyed = true;
+
     if (this._connection) {
       logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
       if (this._isFinished) {
@@ -412,16 +418,17 @@ module.exports = BaseAdapter.extends({
         delete this._connection;
         delete this._gotConnection;
         delete this._isFinished;
+        delete self._isDestroyed;
         return;
       }
 
       var self = this;
-      self._isFinished = true;
       self.commit(function() {
         delete self._retryCount;
         delete self._connection;
         delete self._gotConnection;
         delete self._isFinished;
+        delete self._isDestroyed;
       });
     }
   },

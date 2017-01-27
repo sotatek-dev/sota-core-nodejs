@@ -17,7 +17,13 @@ module.exports = {
   find: function(options, callback) {
     var self = this;
     var adapter = self.getAdapterForSelect();
-    adapter.select(self.getFromClause(), options, callback);
+    adapter.select(self.getFromClause(), options, function(err, ret) {
+      if (err) {
+        return callback(err);
+      }
+
+      callback(null, self.constructCollection(ret));
+    });
   },
 
   count: function(options, callback) {

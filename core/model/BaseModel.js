@@ -540,7 +540,7 @@ var BaseModel = Class.extends({
       this._masterAdapter.destroy();
     }
 
-    if (this._slaveAdapter) {
+    if (this._slaveAdapter && this._slaveAdapter !== this._masterAdapter) {
       this._slaveAdapter.destroy();
     }
 

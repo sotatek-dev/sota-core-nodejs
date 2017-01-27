@@ -26,11 +26,13 @@ module.exports = {
     if (pagination.type === 'cursor' || pagination.type === 'brute') {
 
       if (before !== undefined && before !== null) {
-        additionalWheres.push(util.format('%s.`%s` > %s', model.getAlias(), field, before));
+        additionalWheres.push(util.format('%s.`%s` > ?', model.getAlias(), field));
+        params.push(before);
       }
 
       if (after !== undefined && after !== null) {
-        additionalWheres.push(util.format('%s.`%s` < %s', model.getAlias(), field, after));
+        additionalWheres.push(util.format('%s.`%s` < ?', model.getAlias(), field));
+        params.push(after);
         if (!options.ignorePaginationOrderBy) {
           orderBy += ' DESC';
         }
