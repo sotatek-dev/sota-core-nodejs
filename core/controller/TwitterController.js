@@ -38,8 +38,8 @@ module.exports = BaseController.extends({
   unlink: function(req, res) {
     var userId = req.user.id;
 
-    var UserTwitterModel = req.getModel('UserTwitterModel');
-    UserTwitterModel.remove(userId, this.deleted.bind(this, req, res));
+    var TwitterService = req.getService('TwitterService');
+    TwitterService.unlink(userId, this.deleted.bind(this, req, res));
   },
 
   login2: function(req, res, next) {

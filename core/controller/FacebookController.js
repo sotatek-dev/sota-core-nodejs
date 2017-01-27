@@ -35,8 +35,8 @@ module.exports = BaseController.extends({
   unlink: function(req, res) {
     var userId = req.user.id;
 
-    var UserFacebookModel = req.getModel('UserFacebookModel');
-    UserFacebookModel.remove(userId, this.deleted.bind(this, req, res));
+    var FacebookService = req.getService('FacebookService');
+    FacebookService.unlink(userId, this.deleted.bind(this, req, res));
   },
 
 });

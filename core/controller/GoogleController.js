@@ -40,8 +40,8 @@ module.exports = BaseController.extends({
   unlink: function(req, res) {
     var userId = req.user.id;
 
-    var UserGoogleModel = req.getModel('UserGoogleModel');
-    UserGoogleModel.remove(userId, this.deleted.bind(this, req, res));
+    var GoogleService = req.getModel('GoogleService');
+    GoogleService.unlink(userId, this.deleted.bind(this, req, res));
   },
 
 });
