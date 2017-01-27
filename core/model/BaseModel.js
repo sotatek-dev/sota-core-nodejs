@@ -282,9 +282,9 @@ var BaseModel = Class.extends({
         /**
          * Cache the result entity
          */
-         if (self.isUseLocalCache()) {
+        if (self.isUseLocalCache()) {
           self._localCache[entity.id] = entity;
-         }
+        }
         callback(err, entity);
       } else {
         callback(err, null);
