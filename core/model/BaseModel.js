@@ -44,8 +44,8 @@ var BaseModel = Class.extends({
     this._useMasterSelect = false;
     this._masterConfig    = masterConfig;
     this._slaveConfig     = slaveConfig;
-    this._masterAdapter   = AdapterFactory.create(exSession, masterConfig, 'master');
-    this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig, 'slave');
+    this._masterAdapter   = AdapterFactory.create(exSession, masterConfig, 'w');
+    this._slaveAdapter    = AdapterFactory.create(exSession, slaveConfig, 'r');
 
     this._collections     = [];
   },

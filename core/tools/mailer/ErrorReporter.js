@@ -24,7 +24,7 @@ module.exports = function(err, revision) {
   };
 
   transporter.sendMail(mailOptions, done);
-}
+};
 
 function done(err, info) {
   if (err) {

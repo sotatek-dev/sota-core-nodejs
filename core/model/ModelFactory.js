@@ -61,8 +61,12 @@ module.exports = Class.singleton({
   create: function(classname, exSession) {
     if (_registers[classname]) {
       var modelClass = _registers[classname];
-      var wConfigName = process.env.NODE_ENV === 'test' ? 'mysql-test' : modelClass.dsConfig.write;
-      var rConfigName = process.env.NODE_ENV === 'test' ? 'mysql-test' : modelClass.dsConfig.read;
+      var wConfigName = modelClass.dsConfig.write;
+      var rConfigName = modelClass.dsConfig.read;
+      if (process.env.NODE_ENV === 'test') {
+        wConfigName += '-test';
+        rConfigName += '-test';
+      }
       var masterConfig = this.getAdapterConfig(wConfigName);
       var slaveConfig = this.getAdapterConfig(rConfigName);
       return new _registers[classname](exSession, masterConfig, slaveConfig);

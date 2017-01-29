@@ -21,11 +21,12 @@ module.exports = BaseAdapter.extends({
 
     // If the adapter is trying to get connection, but it's not finished
     // Just retry execution in the next tick, when the connection is ready
+    // Find the cause and a better solution for this
     if (self._gotConnection && !self._connection) {
-      // logger.trace('Adapter <' + self.registryId + '>: wait for next tick to get connection' +
-      //               '. Pending query: [' + sqlQuery + ']');
+      // logger.trace(util.format(
+      //   'Adapter <%s>: wait for next tick to get connection. Pending query: [%s]',
+      //   self.registryId, sqlQuery));
 
-      // Find the cause and a better solution for this
       self._retryCount++;
       // if (self._retryCount > 50) {
       //   throw new Error('MySQLAdapter::_exec error: maximum retry exceeds' +
@@ -54,7 +55,7 @@ module.exports = BaseAdapter.extends({
       function beginTransaction(connection, next) {
         self._connection = connection;
         self._isFinished = false;
-        if (self._mode === 'master') {
+        if (self._mode === 'w') {
           logger.trace(util.format('<%s> beginTransaction', self.registryId));
           self._connection.beginTransaction(function(err) {
             next(err, null);
@@ -362,7 +363,6 @@ module.exports = BaseAdapter.extends({
     if (this._isFinished) {
       return callback();
     }
-    this._isFinished = true;
     this._finishConnections('commit', callback);
   },
 
@@ -370,37 +370,34 @@ module.exports = BaseAdapter.extends({
     if (this._isFinished) {
       return callback();
     }
-    this._isFinished = true;
     this._finishConnections('rollback', callback);
   },
 
   _finishConnections: function(method, callback) {
     logger.trace(util.format('<%s> _finishConnections method=%s', this.registryId, method));
-    var self = this,
-        tasks = [];
+    var self = this;
+    self._isFinished = true;
 
-    if (this._connection) {
-      tasks.push(function(next) {
-        async.waterfall([
-          function finish(_next) {
-            self._connection[method](_next);
-          },
-          function release(rows, fields, _next) {
-            self._connection.release();
-            _next();
-          }
-        ], next);
+    if (self._connection) {
+      self._connection[method](function(err) {
+        if (err) {
+          logger.error(err);
+          return self._finishConnections(method, callback);
+        }
+
+        self._connection.release();
+        self._retryCount = 0;
+        delete self._connection;
+        delete self._gotConnection;
+        callback(null, null);
       });
-    }
-
-    var _callback = function() {
+      return;
+    } else {
       self._retryCount = 0;
       delete self._connection;
       delete self._gotConnection;
       callback(null, null);
-    };
-
-    async.parallel(tasks, _callback);
+    }
   },
 
   destroy : function() {
@@ -410,19 +407,19 @@ module.exports = BaseAdapter.extends({
 
     this._isDestroyed = true;
 
-    if (this._connection) {
+    var self = this;
+    if (self._connection) {
       logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
-      if (this._isFinished) {
-        this._connection.release();
-        delete this._retryCount;
-        delete this._connection;
-        delete this._gotConnection;
-        delete this._isFinished;
+      if (self._isFinished) {
+        self._connection.release();
+        delete self._retryCount;
+        delete self._connection;
+        delete self._gotConnection;
+        delete self._isFinished;
         delete self._isDestroyed;
         return;
       }
 
-      var self = this;
       self.commit(function() {
         delete self._retryCount;
         delete self._connection;
