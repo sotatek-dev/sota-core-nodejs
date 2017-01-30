@@ -20,7 +20,7 @@ module.exports = Class.extends({
     }
 
     if (!this._services[classname]) {
-      this._services[classname] = new (ServiceFactory.get(classname))(this);
+      this._services[classname] = ServiceFactory.create(classname, this);
     }
 
     return this._services[classname];
