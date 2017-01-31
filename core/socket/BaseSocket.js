@@ -35,7 +35,7 @@ module.exports = Class.extends({
 
   _onConnection: function(socket) {
     var self = this;
-    logger.fatal(util.format('[%s]: user [%s](id:%d) connected! (socketId: %s)',
+    logger.trace(util.format('[%s]: user [%s](id:%d) connected! (socketId: %s)',
                   self._namespace, socket.user.username, socket.user.id, socket.id));
 
     // Default behavior
@@ -125,8 +125,8 @@ module.exports = Class.extends({
           return next(err, false);
         }
 
-        logger.fatal(util.format('BaseSocket::_authenticate token: %s', token));
-        logger.fatal(util.format('BaseSocket::_authenticate jwtPayload: %s',
+        logger.trace(util.format('BaseSocket::_authenticate token: %s', token));
+        logger.trace(util.format('BaseSocket::_authenticate jwtPayload: %s',
           util.inspect(jwtPayload)));
 
         if (!user) {
