@@ -3,8 +3,7 @@ var MySQLAdapter        = require('./mysql/MySQLAdapter');
 var MySQL               = require('mysql');
 // var logger              = log4js.getLogger('AdapterFactory');
 
-var _nextId = 0,
-    _registry = {},
+var _registry = {},
     _pools = {};
 
 module.exports = Class.singleton({
@@ -39,7 +38,6 @@ module.exports = Class.singleton({
     var sessionId = exSession.getSessionId();
     if (!_registry[key][sessionId]) {
       var adapter = new MySQLAdapter(exSession, _pools[key].instance, mode);
-      adapter.registryId = ++_nextId;
       _registry[key][sessionId] = adapter;
     }
 

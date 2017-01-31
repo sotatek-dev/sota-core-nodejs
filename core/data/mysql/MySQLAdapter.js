@@ -2,6 +2,9 @@ var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
 var logger              = log4js.getLogger('MySQLAdapter');
 
+var _DEBUG_ADAPTERS = [];
+var _nextId = 0;
+
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
 
@@ -13,33 +16,46 @@ module.exports = BaseAdapter.extends({
     this._connection    = null;
     this._gotConnection = false;
     this._isFinished    = false;
+    this._isDestroyed   = false;
     this._retryCount    = 0;
+    this.registryId     = ++_nextId;
   },
 
   _exec : function(sqlQuery, params, callback) {
     var self = this;
 
-    // If the adapter is trying to get connection, but it's not finished
-    // Just retry execution in the next tick, when the connection is ready
-    // Find the cause and a better solution for this
-    if (self._gotConnection && !self._connection) {
+    /**
+     * If:
+     * - the adapter is trying to get connection, but it's not finished
+     * - the connection is in finishing process, but is not released completely
+     * Then:
+     * - Just retry execution in the next tick, when everything is settled up
+     * -> Is there any better solution for this?
+     */
+    if ((self._gotConnection && !self._connection) ||
+        (self._isFinished && self._connection)) {
       // logger.trace(util.format(
       //   'Adapter <%s>: wait for next tick to get connection. Pending query: [%s]',
       //   self.registryId, sqlQuery));
 
+      // Should we throw error if the connection has to wait for a too long time?
       self._retryCount++;
-      // if (self._retryCount > 50) {
-      //   throw new Error('MySQLAdapter::_exec error: maximum retry exceeds' +
-      //                   '. Query: [' + sqlQuery + ']');
-      // }
+      if (self._retryCount > 5000) {
+        throw new Error(util.format('%s::_exec maximum retry exceeds. Query: [%s]',
+          self.classname, sqlQuery));
+      }
 
       return setTimeout(function() {
         self._exec(sqlQuery, params, callback);
       }, 20);
     }
 
+    _DEBUG_ADAPTERS.push(this.registryId);
+    _DEBUG_ADAPTERS = _.compact(_.uniq(_DEBUG_ADAPTERS));
+    logger.debug('_exec current active adapters: ' + util.inspect(_DEBUG_ADAPTERS));
+
     logger.info(util.format(
-      '<%s> _exec sqlQuery=[%s], params=[%s]',
+      '<%s>::_exec sqlQuery=[%s], params=[%s]',
       this.registryId, sqlQuery, params)
     );
 
@@ -48,13 +64,13 @@ module.exports = BaseAdapter.extends({
         if (self._connection) {
           return next(null, self._connection);
         } else {
+          self._isFinished = false;
           self._gotConnection = true;
           return self._pool.getConnection(next);
         }
       },
       function beginTransaction(connection, next) {
         self._connection = connection;
-        self._isFinished = false;
         if (self._mode === 'w') {
           logger.trace(util.format('<%s> beginTransaction', self.registryId));
           self._connection.beginTransaction(function(err) {
@@ -360,74 +376,128 @@ module.exports = BaseAdapter.extends({
   },
 
   commit: function(callback) {
-    if (this._isFinished) {
-      return callback();
-    }
     this._finishConnections('commit', callback);
   },
 
   rollback: function(callback) {
-    if (this._isFinished) {
-      return callback();
-    }
     this._finishConnections('rollback', callback);
   },
 
+  /**
+   * Each times commit/rollback methods are invoked from ExSession
+   * All the corresponding method of generated models are invoked as well
+   * So these methods of one adapter can be called multiple times from different models
+   * The _isFinished flag is used to mark the adapter that is in finishing process already
+   */
   _finishConnections: function(method, callback) {
-    logger.trace(util.format('<%s> _finishConnections method=%s', this.registryId, method));
-    var self = this;
-    self._isFinished = true;
-
-    if (self._connection) {
-      self._connection[method](function(err) {
-        if (err) {
-          logger.error(err);
-          return self._finishConnections(method, callback);
-        }
-
-        self._connection.release();
-        self._retryCount = 0;
-        delete self._connection;
-        delete self._gotConnection;
-        callback(null, null);
-      });
-      return;
-    } else {
-      self._retryCount = 0;
-      delete self._connection;
-      delete self._gotConnection;
-      callback(null, null);
+    if (this._isFinished) {
+      return callback(null, null);
     }
-  },
 
-  destroy : function() {
-    if (this._isDestroyed) {
+    this._isFinished = true;
+    logger.trace(util.format('%s::_finishConnections id=<%s> method=%s',
+      this.classname, this.registryId, method));
+    var self = this;
+
+    if (!self._connection) {
+      self._recycleConnection(callback);
       return;
     }
 
-    this._isDestroyed = true;
-
-    var self = this;
-    if (self._connection) {
-      logger.trace(util.format('<%s> destroy and release connection.', this.registryId));
-      if (self._isFinished) {
-        self._connection.release();
-        delete self._retryCount;
-        delete self._connection;
-        delete self._gotConnection;
-        delete self._isFinished;
-        delete self._isDestroyed;
+    self._connection[method](function(err) {
+      /**
+       * If error happens, should try again or just continue to recycle connection?
+       */
+      if (err) {
+        logger.error(err);
+        self._finishConnections(method, callback);
         return;
       }
 
-      self.commit(function() {
-        delete self._retryCount;
-        delete self._connection;
-        delete self._gotConnection;
-        delete self._isFinished;
-        delete self._isDestroyed;
-      });
+      self._recycleConnection(callback);
+    });
+
+    return;
+  },
+
+  /**
+   * If the request timeout, or somehow the commit/rollback methods are not invoked
+   * The destroy method may come first
+   * This case is treated as an unexpected error
+   * All changes will be rolled-back before the connection is released
+   */
+  destroy : function() {
+    /**
+     * Since the destroy methods can be called multiple-times from multi models
+     * We need a flag to mark the destroying process is being done
+     */
+    if (this._isDestroyed) {
+      return;
     }
+    this._isDestroyed = true;
+    // logger.trace(util.format('%s::destroy id=[%s]', this.classname, this.registryId));
+
+    var self = this;
+
+    /**
+     * If the connection is finished normally
+     * Or the connection was never created
+     * Everything will be ended gracefully
+     */
+    if (!self._connection) {
+      self._destroy();
+      return;
+    }
+
+    /**
+     * If the connection is not finished completely
+     * But the rollback/commit is already called
+     */
+    if (self._isFinished) {
+      self._connection.release();
+      self._destroy();
+      return;
+    }
+
+    /**
+     * Otherwise, just try to finish DB connection before destroying process
+     */
+    self.rollback(function() {
+      self._destroy();
+    });
+
+    return;
+  },
+
+  _recycleConnection: function(callback) {
+    _DEBUG_ADAPTERS = _.pull(_DEBUG_ADAPTERS, this.registryId);
+    logger.trace(util.format(
+      '%s::_recycleConnection release connection id=[%s], current left adapters=%s',
+      this.classname, this.registryId, util.inspect(_DEBUG_ADAPTERS)));
+
+    if (this._connection) {
+      this._connection.release();
+    }
+
+    this._retryCount = 0;
+    this._connection = null;
+    this._gotConnection = false;
+
+    return callback(null, null);
+  },
+
+  /**
+   * Physically reallocate all properties of this adapter object
+   */
+  _destroy: function() {
+    logger.debug(util.format('%s::_destroy id=[%s]', this.classname, this.registryId));
+    delete this._mode;
+    delete this._pool;
+    delete this._retryCount;
+    delete this._connection;
+    delete this._gotConnection;
+    delete this._isFinished;
+    delete this._isDestroyed;
   },
 
 });
