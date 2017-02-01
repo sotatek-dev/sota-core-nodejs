@@ -40,7 +40,13 @@ module.exports = BaseAdapter.extends({
 
       // Should we throw error if the connection has to wait for a too long time?
       self._retryCount++;
-      if (self._retryCount > 5000) {
+      if (self._retryCount > 50) {
+        if (self._gotConnection && !self._connection) {
+          logger.error('_exec waiting for getting connection but failed...');
+        }
+        if (self._isFinished && self._connection) {
+          logger.error('_exec connection is finishing but not complete...');
+        }
         throw new Error(util.format('%s::_exec maximum retry exceeds. Query: [%s]',
           self.classname, sqlQuery));
       }
@@ -497,7 +503,6 @@ module.exports = BaseAdapter.extends({
     delete this._connection;
     delete this._gotConnection;
     delete this._isFinished;
-    delete this._isDestroyed;
   },
 
 });
