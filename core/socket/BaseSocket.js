@@ -130,7 +130,7 @@ module.exports = Class.extends({
           util.inspect(jwtPayload)));
 
         if (!user) {
-          let e = ErrorFactory.notFound('User not found: ' + jwtPayload.userId);
+          let e = ErrorFactory.unauthorized('User not found: ' + jwtPayload.userId);
           logger.error(e);
           socket.emit('disconnect');
           return next(e);
