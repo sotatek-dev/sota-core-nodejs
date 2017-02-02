@@ -39,9 +39,11 @@ module.exports = {
   },
 
   MAX_QUERY_RECORDS: 1000,
-  DEFAULT_PAGINATION_SIZE: 10,
-  DEFAULT_CACHE_TTL: 300 * 1000, // Milliseconds
-  DEFAULT_REQUEST_TIMEOUT: 60 * 1000,
+  DEFAULT_PAGINATION_SIZE: 10,            // Records
+  DEFAULT_CACHE_TTL: 300 * 1000,          // Milliseconds
+  DEFAULT_REQUEST_TIMEOUT: 60 * 1000,     // Milliseconds
+
+  PENDING_QUERY_TIMEOUT: 20,              // Milliseconds
 
   MINUTE_IN_MILLISECONDS  : 1000 * 60,
   HOUR_IN_MILLISECONDS    : 1000 * 60 * 60,

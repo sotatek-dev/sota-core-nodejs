@@ -2,8 +2,8 @@ var BaseAdapter         = require('../BaseAdapter');
 var QueryBuilder        = require('./MySQLQueryBuilder');
 var logger              = log4js.getLogger('MySQLAdapter');
 
-var _DEBUG_ADAPTERS = [];
 var _nextId = 0;
+var _DEBUG_ADAPTERS = [];
 
 module.exports = BaseAdapter.extends({
   classname : 'MySQLAdapter',
@@ -25,6 +25,17 @@ module.exports = BaseAdapter.extends({
     var self = this;
 
     /**
+     * If the business handler is socket
+     * There're cases that the socket disconnects, means the ExSession is destroyed
+     * While other queries are still being in process
+     * Just return an error for this case
+     */
+    if (self._isDestroyed) {
+      logger.error(this.classname + '::_exec adapter is already destroyed id=' + self.registryId);
+      return callback(new Error('DB connection has been terminated.'));
+    }
+
+    /**
      * If:
      * - the adapter is trying to get connection, but it's not finished
      * - the connection is in finishing process, but is not released completely
@@ -34,7 +45,7 @@ module.exports = BaseAdapter.extends({
      */
     if ((self._gotConnection && !self._connection) ||
         (self._isFinished && self._connection)) {
-      // logger.trace(util.format(
+      // logger.fatal(util.format(
       //   'Adapter <%s>: wait for next tick to get connection. Pending query: [%s]',
       //   self.registryId, sqlQuery));
 
@@ -53,16 +64,18 @@ module.exports = BaseAdapter.extends({
 
       return setTimeout(function() {
         self._exec(sqlQuery, params, callback);
-      }, 20);
+      }, Const.PENDING_QUERY_TIMEOUT);
     }
 
+    /**
+     * Finally, here comes the real handler for connection/query to DB
+     */
     _DEBUG_ADAPTERS.push(this.registryId);
     _DEBUG_ADAPTERS = _.compact(_.uniq(_DEBUG_ADAPTERS));
-    logger.debug('_exec current active adapters: ' + util.inspect(_DEBUG_ADAPTERS));
 
     logger.info(util.format(
-      '<%s>::_exec sqlQuery=[%s], params=[%s]',
-      this.registryId, sqlQuery, params)
+      '<%s>::_exec sqlQuery=[%s], params=[%s], active adapters: %s',
+      this.registryId, sqlQuery, params, util.inspect(_DEBUG_ADAPTERS))
     );
 
     async.waterfall([
@@ -87,15 +100,18 @@ module.exports = BaseAdapter.extends({
         }
       },
       function(ret, next) {
-        self._connection.query(sqlQuery, params, next);
-      },
-      function(rows, fields, next) {
-        next(null, rows);
+        self._connection.query(sqlQuery, params, function(err, rows, fields) {
+          if (err) {
+            return next(err);
+          }
+
+          return next(null, rows);
+        });
       },
     ], function(err, rows) {
       if (err) {
         logger.error('Something went wrong when running query: [' + sqlQuery + ']');
-        logger.error('<' + self.registryId + '>::exec err=' + err);
+        logger.error('<' + self.registryId + '>::exec err=' + util.inspect(err));
         callback(err);
         return;
       }
@@ -496,7 +512,6 @@ module.exports = BaseAdapter.extends({
    * Physically reallocate all properties of this adapter object
    */
   _destroy: function() {
-    logger.debug(util.format('%s::_destroy id=[%s]', this.classname, this.registryId));
     delete this._mode;
     delete this._pool;
     delete this._retryCount;

@@ -1,12 +1,14 @@
 var BaseError = require('./BaseError');
 
-module.exports = BaseError.extends({
-  classname: 'PayloadTooLargeError',
+class PayloadTooLargeError extends BaseError {
 
-  initialize: function($super, msg, code) {
+  constructor(msg, code) {
+    super();
     this._httpStatus  = 413;
     this._code        = code || -1;
     this._msg         = msg || 'Payload Too Large';
-  },
+  }
 
-});
+}
+
+module.exports = PayloadTooLargeError;

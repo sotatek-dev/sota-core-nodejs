@@ -1,12 +1,14 @@
 var BaseError = require('./BaseError');
 
-module.exports = BaseError.extends({
-  classname: 'InternalError',
+class InternalError extends BaseError {
 
-  initialize: function($super, msg, code) {
+  constructor(msg, code) {
+    super();
     this._httpStatus  = 500;
     this._code        = code || -1;
     this._msg         = msg || 'Internal Server Error.';
-  },
+  }
 
-});
+}
+
+module.exports = InternalError;

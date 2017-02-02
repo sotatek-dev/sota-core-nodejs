@@ -1,6 +1,7 @@
 var passport        = require('passport');
 var ExSession       = require('../common/ExSession');
 var BaseError       = require('../error/BaseError');
+var InternalError   = require('../error/InternalError');
 
 function _purifyEntity(data) {
 
@@ -100,17 +101,19 @@ function _sendResponse(req, data) {
 
 function _sendError(req, error, httpStatus) {
   if (!error) {
-    error = new BaseError();
+    error = new InternalError();
   } else if (typeof error === 'string') {
-    error = new BaseError(error);
+    error = new InternalError(error);
   } else if (error instanceof Checkit.Error) {
     this.badRequest(error.toString());
+  } else if (error instanceof BaseError) {
+    // Don't need to do any extra thing...
   } else if (error instanceof Error) {
     logger.error('_sendError error: ' + util.inspect(error));
-    error = new BaseError(error.toString());
-  } else if (!(error instanceof BaseError)) {
+    error = new InternalError(error.toString());
+  } else {
     logger.error('_sendError smt went wrong unkown error type: ' + util.inspect(error));
-    error = new BaseError();
+    error = new InternalError();
   }
 
   this.status(httpStatus ? httpStatus : error.getHttpStatus())

@@ -1,45 +1,31 @@
 var Class = require('sota-class').Class;
 
-var BaseError = Class.extends({
-  classname : 'BaseError',
+class BaseError extends Error {
 
-  $_TYPE : 'UNKOWN',
+  constructor() {
+    super();
+  }
 
-  initialize : function(msg, code) {
-    var base = Const.ERROR_TYPE[this._TYPE];
-    this._httpStatus  = base.STATUS;
-    this._code        = base.CODE;
-    this._msg         = base.MSG;
-
-    if (msg && typeof msg === 'string') {
-      this._msg = msg;
-    }
-
-    if (typeof code === 'number') {
-      this._code = code;
-    }
-  },
-
-  getHttpStatus : function() {
+  getHttpStatus() {
     return this._httpStatus;
-  },
+  }
 
-  getCode : function() {
+  getCode() {
     return this._code;
-  },
+  }
 
-  getMsg : function() {
+  getMsg() {
     return this._msg;
-  },
+  }
 
-  toJSON: function() {
+  toJSON() {
     return {
       httpStatus: this._httpStatus,
       code: this._code,
       msg: this._msg,
     };
-  },
+  }
 
-});
+};
 
 module.exports = BaseError;
