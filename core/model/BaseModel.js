@@ -376,7 +376,11 @@ var BaseModel = Class.extends({
       }
 
       self.setLocalCache(ret);
-      callback(null, ret);
+      var keyedRecords = _.keyBy(ret, 'id');
+      var result = _.compact(_.map(ids, function(id) {
+        return keyedRecords[id];
+      }));
+      callback(null, result);
     });
   },
 
