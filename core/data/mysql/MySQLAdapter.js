@@ -45,9 +45,9 @@ module.exports = BaseAdapter.extends({
      */
     if ((self._gotConnection && !self._connection) ||
         (self._isFinished && self._connection)) {
-      // logger.fatal(util.format(
-      //   'Adapter <%s>: wait for next tick to get connection. Pending query: [%s]',
-      //   self.registryId, sqlQuery));
+      logger.trace(util.format(
+        'Adapter <%s>: wait for next tick to get connection. Pending query: [%s]',
+        self.registryId, sqlQuery));
 
       // Should we throw error if the connection has to wait for a too long time?
       self._retryCount++;
@@ -73,7 +73,7 @@ module.exports = BaseAdapter.extends({
     _DEBUG_ADAPTERS.push(this.registryId);
     _DEBUG_ADAPTERS = _.compact(_.uniq(_DEBUG_ADAPTERS));
 
-    logger.info(util.format(
+    logger.debug(util.format(
       '<%s>::_exec sqlQuery=[%s], params=[%s], active adapters: %s',
       this.registryId, sqlQuery, params, util.inspect(_DEBUG_ADAPTERS))
     );

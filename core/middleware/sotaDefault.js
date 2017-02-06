@@ -95,7 +95,7 @@ function _sendResponse(req, data) {
   data = _envelopData(data);
 
   var response = (typeof data === 'object') ? _envelopResponse(data) : data;
-  logger.trace(req.method + ' ' + req.url + ' Response:\n' + JSON.stringify(response));
+  logger.info(req.method + ' ' + req.url + ' Response:\n' + JSON.stringify(response));
   this._originSend.apply(this, [response]);
 }
 

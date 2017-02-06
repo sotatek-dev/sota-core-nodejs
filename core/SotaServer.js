@@ -14,6 +14,23 @@ Interface               = require('sota-class').Interface;
 
 // TODO: remove global scope of logger
 log4js = require('log4js');
+var logConfig = {
+  "appenders": [
+    {
+      "type": "clustered",
+      "appenders": [
+        {
+          "type": "logLevelFilter",
+          "level": process.env.LOG_LEVEL || "WARN",
+          "appender": {
+            "type": "console"
+          }
+        }
+      ]
+    }
+  ]
+};
+log4js.configure(logConfig);
 logger = log4js.getLogger('SotaServer');
 
 CacheFactory            = require('./cache/foundation/CacheFactory');
