@@ -143,10 +143,11 @@ module.exports = Class.extends({
         });
 
         socket.rollback = function(e) {
+          logger.warn(util.format('%s: something went wrong, err=%j', self.classname, e));
           exSession.rollback();
-          self._io
-              .of(self._namespace)
-              .to(socket.id).emit('error', e);
+          if (e) {
+            self._io.of(self._namespace).to(socket.id).emit('error', e);
+          }
         };
 
         socket.user = user;

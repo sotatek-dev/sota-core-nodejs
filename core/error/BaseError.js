@@ -1,10 +1,6 @@
 var Class = require('sota-class').Class;
 
-class BaseError extends Error {
-
-  constructor() {
-    super();
-  }
+class BaseError {
 
   getHttpStatus() {
     return this._httpStatus;
