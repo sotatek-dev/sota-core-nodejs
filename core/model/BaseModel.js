@@ -12,7 +12,7 @@ var BaseModel = Class.extends({
   $primaryKeys      : ['id'],     // Currently it's always `id`
   $pkAutoIncrement  : true,       // Always true
   $predefinedCols   : ['created_at', 'updated_at', 'created_by', 'updated_by'],
-  $excludedCols     : ['createdAt', 'updatedAt', 'createdBy', 'updatedBy'],
+  $excludedCols     : ['created_at', 'updated_at', 'created_by', 'updated_by'],
 
   /**
    * Customizable properties will be defined in derived model

@@ -16,7 +16,11 @@ module.exports = Class.extends({
     this.primaryKeys    = model.primaryKeys;
     this.columns        = model.columns;
     this.predefinedCols = model.predefinedCols;
-    this.excludedCols   = model.excludedCols || [];
+
+    var excludedCols   = model.excludedCols || [];
+    this.excludedProps = _.map(excludedCols, function(columnName) {
+      return Utils.convertToCamelCase(columnName);
+    });
 
     if (!data.id) {
       data.id = 0;
@@ -41,6 +45,7 @@ module.exports = Class.extends({
 
   excludeFromResult: function(columnName) {
     var self = this;
+    var propertyName = Utils.convertToCamelCase(columnName);
     if (_.isArray(columnName)) {
       _.forEach(columnName, function(col) {
         self.excludeFromResult(col);
@@ -48,25 +53,26 @@ module.exports = Class.extends({
       return self;
     }
 
-    if (!_.includes(this.excludedCols, columnName)) {
-      this.excludedCols.push(columnName);
+    if (!_.includes(this.excludedProps, propertyName)) {
+      this.excludedProps.push(propertyName);
     }
 
     return this;
   },
 
   includeToResult: function(columnName) {
-    if (_.includes(this.excludedCols, columnName)) {
-      _.remove(this.excludedCols, function(e) {
-        return e === columnName;
+    var propertyName = Utils.convertToCamelCase(columnName);
+    if (_.includes(this.excludedProps, propertyName)) {
+      _.remove(this.excludedProps, function(e) {
+        return e === propertyName;
       });
     }
     return this;
   },
 
   toJSON: function() {
-    if (this.excludedCols.length > 0) {
-      return _.omit(this._data, this.excludedCols);
+    if (this.excludedProps.length > 0) {
+      return _.omit(this._data, this.excludedProps);
     }
 
     return this._data;
