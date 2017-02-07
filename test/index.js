@@ -47,6 +47,7 @@ before(function(done) {
 afterEach(cleanDBAndFlushCache);
 
 requireDir('core', { recurse: true });
+requireDir('usercases', { recurse: true });
 
 function cleanDBAndFlushCache(done) {
   logger.info('Cleaning the test DB after each test...');
