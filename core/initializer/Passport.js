@@ -98,19 +98,21 @@ module.exports = function(app) {
     }
   ));
 
-  passport.use(new TwitterStrategy({
-    consumerKey: process.env.TWITTER_APP_ID,
-    consumerSecret: process.env.TWITTER_APP_SECRET,
-    callbackURL: util.format('%s/auth/twitter2/callback', process.env.APP_ENDPOINT)
-  }, function(token, tokenSecret, profile, cb) {
-    logger.trace('TwitterStrategy callback token: ' + util.inspect(token));
-    logger.trace('TwitterStrategy callback tokenSecret: ' + util.inspect(tokenSecret));
-    logger.trace('TwitterStrategy callback profile: ' + util.inspect(profile.id));
-    cb(null, {
-      token: token,
-      tokenSecret: tokenSecret,
-      profile: profile,
-    });
-  }));
+  if (process.env.TWITTER_APP_ID && process.env.TWITTER_APP_SECRET) {
+    passport.use(new TwitterStrategy({
+      consumerKey: process.env.TWITTER_APP_ID,
+      consumerSecret: process.env.TWITTER_APP_SECRET,
+      callbackURL: util.format('%s/auth/twitter2/callback', process.env.APP_ENDPOINT)
+    }, function(token, tokenSecret, profile, cb) {
+      logger.trace('TwitterStrategy callback token: ' + util.inspect(token));
+      logger.trace('TwitterStrategy callback tokenSecret: ' + util.inspect(tokenSecret));
+      logger.trace('TwitterStrategy callback profile: ' + util.inspect(profile.id));
+      cb(null, {
+        token: token,
+        tokenSecret: tokenSecret,
+        profile: profile,
+      });
+    }));
+  }
 
 };

@@ -1,4 +1,5 @@
 core/node_modules
-config/Config.js
+config/Local.js
 node_modules
 core/coverage
+.env
