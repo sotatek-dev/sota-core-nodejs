@@ -32,13 +32,4 @@ module.exports = function(app, CacheFactory, dirs) {
     });
 
   });
-
-  // TODO: find a better way to cache and refresh masterdata version
-  function refreshSettings() {
-    CacheFactory.getDataVersion(function() {
-      setTimeout(refreshSettings, 10000);
-    });
-  }
-
-  setTimeout(refreshSettings, 1);
 };
