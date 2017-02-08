@@ -146,7 +146,7 @@ module.exports = Class.extends({
           logger.warn(util.format('%s: something went wrong, err=%j', self.classname, e));
           exSession.rollback();
           if (e) {
-            self._io.of(self._namespace).to(socket.id).emit('error', e);
+            self._io.of(self._namespace).to(socket.id).emit('socketError', e);
           }
         };
 
