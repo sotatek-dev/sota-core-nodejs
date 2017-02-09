@@ -20,6 +20,10 @@ module.exports = BaseModel.extends({
         return callback(err);
       }
 
+      if (!ret) {
+        return callback(null, 1);
+      }
+
       callback(null, parseInt(ret.value));
     });
   },
