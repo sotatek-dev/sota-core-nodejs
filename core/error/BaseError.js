@@ -14,6 +14,12 @@ class BaseError {
     return this._extraInfo;
   }
 
+  setExtraInfo(extraInfo) {
+    var originInfo = this._extraInfo || {};
+    this._extraInfo = _.assign(originInfo, extraInfo);
+    return this;
+  }
+
   toJSON() {
     return {
       httpStatus  : this._httpStatus,
