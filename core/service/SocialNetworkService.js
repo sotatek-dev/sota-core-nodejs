@@ -47,6 +47,10 @@ module.exports = BaseService.extends({
         UserSocialModel.add({
           id: ret.user.id,
           social_id: socialId,
+          access_token: info.access_token,
+          refresh_token: info.refresh_token,
+          token: info.token,
+          token_secret: info.token_secret,
         }, options, next);
       }],
     }, function(err, ret) {

@@ -53,6 +53,7 @@ module.exports = SocialNetworkService.extends({
         self._getFacebookInfo(fbAcessToken, next);
       },
       function getUser(fbInfo, next) {
+        fbInfo.access_token = fbAcessToken;
         return self.findOrCreateUserBySocialInfo(fbInfo, next);
       },
     ], callback);

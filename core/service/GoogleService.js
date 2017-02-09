@@ -50,6 +50,8 @@ module.exports = SocialNetworkService.extends({
         self._getGoogleInfo(accessToken, refreshToken, next);
       },
       function getUser(info, next) {
+        info.access_token = accessToken;
+        info.refresh_token = refreshToken;
         return self.findOrCreateUserBySocialInfo(info, next);
       },
     ], callback);

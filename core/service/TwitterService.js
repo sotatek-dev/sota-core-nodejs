@@ -42,6 +42,8 @@ module.exports = SocialNetworkService.extends({
         self._getTwitterInfo(tokenKey, tokenSecret, next);
       },
       function getUser(twInfo, next) {
+        twInfo.token = tokenKey;
+        twInfo.token_secret = tokenSecret;
         return self.findOrCreateUserBySocialInfo(twInfo, next);
       },
     ], callback);
