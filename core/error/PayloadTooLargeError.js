@@ -2,11 +2,11 @@ var BaseError = require('./BaseError');
 
 class PayloadTooLargeError extends BaseError {
 
-  constructor(msg, code) {
+  constructor(msg, extraInfo) {
     super();
     this._httpStatus  = 413;
-    this._code        = code || -1;
     this._msg         = msg || 'Payload Too Large';
+    this._extraInfo   = extraInfo;
   }
 
 }

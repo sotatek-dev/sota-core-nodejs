@@ -6,19 +6,19 @@ class BaseError {
     return this._httpStatus;
   }
 
-  getCode() {
-    return this._code;
-  }
-
   getMsg() {
     return this._msg;
   }
 
+  getExtraInfo() {
+    return this._extraInfo;
+  }
+
   toJSON() {
     return {
-      httpStatus: this._httpStatus,
-      code: this._code,
-      msg: this._msg,
+      httpStatus  : this._httpStatus,
+      msg         : this._msg,
+      extraInfo   : this._extraInfo || null,
     };
   }
 

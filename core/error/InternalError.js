@@ -2,11 +2,11 @@ var BaseError = require('./BaseError');
 
 class InternalError extends BaseError {
 
-  constructor(msg, code) {
+  constructor(msg, extraInfo) {
     super();
     this._httpStatus  = 500;
-    this._code        = code || -1;
     this._msg         = msg || 'Internal Server Error.';
+    this._extraInfo   = extraInfo;
   }
 
 }

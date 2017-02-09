@@ -9,32 +9,32 @@ var TooLargeError     = require('./PayloadTooLargeError');
 module.exports = Class.singleton({
   classname: 'ErrorFactory',
 
-  badRequest: function(msg, code) {
-    return new BadRequestError(msg, code);
+  badRequest: function(msg, extraInfo) {
+    return new BadRequestError(msg, extraInfo);
   },
 
-  unauthorized: function(msg, code) {
-    return new UnauthorizedError(msg, code);
+  unauthorized: function(msg, extraInfo) {
+    return new UnauthorizedError(msg, extraInfo);
   },
 
-  forbidden: function(msg, code) {
-    return new ForbiddenError(msg, code);
+  forbidden: function(msg, extraInfo) {
+    return new ForbiddenError(msg, extraInfo);
   },
 
-  notFound: function(msg, code) {
-    return new NotFoundError(msg, code);
+  notFound: function(msg, extraInfo) {
+    return new NotFoundError(msg, extraInfo);
   },
 
-  conflict: function(msg, code) {
-    return new ConflictError(msg, code);
+  conflict: function(msg, extraInfo) {
+    return new ConflictError(msg, extraInfo);
   },
 
-  payloadTooLarge: function(msg, code) {
-    return new TooLargeError(msg, code);
+  payloadTooLarge: function(msg, extraInfo) {
+    return new TooLargeError(msg, extraInfo);
   },
 
-  internal: function(msg, code) {
-    return new InternalError(msg, code);
+  internal: function(msg, extraInfo) {
+    return new InternalError(msg, extraInfo);
   },
 
 });

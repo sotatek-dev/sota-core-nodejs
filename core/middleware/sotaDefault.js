@@ -62,26 +62,28 @@ function _envelopData(data) {
 }
 
 function _envelopResponse(data) {
-  if (!data.code) { // No error
+  var now = Utils.now();
+  if (data instanceof BaseError) {
     return {
-      meta        : {
-        code: 0,
-        serverTime : Utils.now(),
-        masterdataVersion: LocalCache.getSync('dataVersion') || 1,
-      },
-      data        : data.data || null,
-      pagination  : data.pagination,
-      global      : data.global,
-    };
-  } else { // Send error
-    return {
-      meta : {
-        code        : data.code,
-        msg         : data.msg,
-        serverTime  : Utils.now(),
+      meta: {
+        code: -1,
+        msg: data.getMsg(),
+        extraInfo: data.getExtraInfo(),
+        serverTime: now,
       }
-    };
+    }
   }
+
+  return {
+    meta        : {
+      code: 0,
+      serverTime: now,
+      masterdataVersion: LocalCache.getSync('dataVersion') || 1,
+    },
+    data        : data.data || null,
+    pagination  : data.pagination,
+    global      : data.global,
+  };
 }
 
 function _sendResponse(req, data) {
@@ -91,8 +93,10 @@ function _sendResponse(req, data) {
 
   this._isSending = true;
 
-  data = _purifyEntity(data);
-  data = _envelopData(data);
+  if (!(data instanceof BaseError)) {
+    data = _purifyEntity(data);
+    data = _envelopData(data);
+  }
 
   var response = (typeof data === 'object') ? _envelopResponse(data) : data;
   logger.info(req.method + ' ' + req.url + ' Response:\n' + JSON.stringify(response));
@@ -117,10 +121,7 @@ function _sendError(req, error, httpStatus) {
   }
 
   this.status(httpStatus ? httpStatus : error.getHttpStatus())
-      .send({
-        code : error.getCode(),
-        msg  : error.getMsg(),
-      });
+      .send(error);
 }
 
 function extendRequest(req, res) {
@@ -260,10 +261,7 @@ module.exports = function() {
       if (err) {
         if (err instanceof BaseError) {
           res.status(err.getHttpStatus())
-              .send({
-                code : err.getCode(),
-                msg  : err.getMsg(),
-              });
+              .send(err);
           return;
         }
         return next(err);
