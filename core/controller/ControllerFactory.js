@@ -64,7 +64,6 @@ module.exports = Class.singleton({
       async.series(arrFns, function(err) {
 
         if (err) {
-          logger.error('error(s): ' + util.inspect(err));
           errorFn(err, req, res);
         }
 
