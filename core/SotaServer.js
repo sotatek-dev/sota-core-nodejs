@@ -1,6 +1,7 @@
 fs                      = require('fs');
 path                    = require('path');
 util                    = require('util');
+crypto                  = require('crypto');
 
 _                       = require('lodash');
 co                      = require('co');
@@ -8,6 +9,7 @@ bb                      = require('bluebird');
 async                   = require('async');
 moment                  = require('moment');
 redis                   = require('redis');
+request                 = require('superagent');
 Checkit                 = require('cc-checkit');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;

@@ -160,6 +160,6 @@ module.exports = BaseService.extends({
 
       callback(null, count);
     });
-  }
+  },
 
 });

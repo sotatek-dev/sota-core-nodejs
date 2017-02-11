@@ -47,6 +47,7 @@
     "socket.io": "^1.5.1",
     "socket.io-redis": "3.0.0",
     "sota-class": "^1.0.2",
+    "superagent": "3.4.1",
     "twitter": "1.7.0",
     "uuid": "3.0.1",
     "uws": "0.12.0",

@@ -1,5 +1,3 @@
-var crypto                = require('crypto');
-var request               = require('request');
 var SocialNetworkService  = require('./SocialNetworkService');
 var logger                = log4js.getLogger('FacebookService');
 
@@ -28,22 +26,22 @@ module.exports = SocialNetworkService.extends({
     var hash = crypto.createHmac('sha256', secret).update(fbAcessToken);
     var appsecretProof = hash.digest('hex');
     var fields = 'id,name,email,first_name,last_name,gender,link,picture.type(large),age_range';
-    var url = util.format(
-      'https://graph.facebook.com/v2.8/me?fields=%s&access_token=%s&appsecret_proof=%s',
-      fields, fbAcessToken, appsecretProof
-    );
-    var requestDef = {
-      json: true, url: url
-    };
 
-    request(requestDef, function(err, req, fbInfo) {
-      logger.trace('_getFacebookInfo fbInfo=' + util.inspect(fbInfo));
-      if (!fbInfo || !fbInfo.id) {
-        return callback('FB authentication failed.');
-      }
+    request
+      .get('https://graph.facebook.com/v2.8/me')
+      .query({
+        fields: fields,
+        access_token: fbAcessToken,
+        appsecret_proof: appsecretProof
+      })
+      .accept('json')
+      .end(function(err, res) {
+        if (err) {
+          return callback('FB authentication failed. err=' + util.inspect(err));
+        }
 
-      return callback(null, fbInfo);
-    });
+        return callback(null, res.body);
+      });
   },
 
   getUserByToken: function(fbAcessToken, callback) {
