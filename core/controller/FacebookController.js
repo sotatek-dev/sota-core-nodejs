@@ -9,7 +9,7 @@ module.exports = BaseController.extends({
     }).validateSync(req.allParams);
 
     if (err) {
-      return res.badRequest(err.toString());
+      return res.unauthorized(err.toString());
     }
 
     var AuthService = req.getService('AuthService');

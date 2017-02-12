@@ -61,4 +61,13 @@ module.exports = SocialNetworkService.extends({
     ], callback);
   },
 
+  getTwitterClient: function(tokenKey, tokenSecret) {
+    return new Twitter({
+      consumer_key: process.env.TWITTER_APP_ID,
+      consumer_secret: process.env.TWITTER_APP_SECRET,
+      access_token_key: tokenKey,
+      access_token_secret: tokenSecret,
+    });
+  },
+
 });
