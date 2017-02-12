@@ -8,7 +8,8 @@ module.exports = {
 
     options = options || {};
 
-    var where = options.where || '',
+    var having = options.having || [],
+        where = options.where || '',
         additionalWheres = [],
         params = options.params || [],
         limit = options.limit || pagination.limit,
@@ -23,7 +24,8 @@ module.exports = {
                   model.getAlias() + '.' + pagination.field;
     }
 
-    if (pagination.type === 'cursor' || pagination.type === 'brute') {
+    if (pagination.type === 'cursor' ||
+        pagination.type === 'brute') {
 
       if (before !== undefined && before !== null) {
         additionalWheres.push(util.format('%s.`%s` > ?', model.getAlias(), field));
@@ -35,6 +37,49 @@ module.exports = {
         params.push(after);
         if (!options.ignorePaginationOrderBy) {
           orderBy += ' DESC';
+        }
+      }
+    } else if (pagination.type === 'cursor2') {
+
+      if (before !== undefined && before !== null) {
+        var comparator = '<';
+        if (options.isReverseOrder) {
+          comparator = '>';
+        }
+
+        if (!options.isHavingCondition) {
+          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator));
+        } else {
+          having.push(util.format('`%s` %s ?', field, comparator));
+        }
+
+        params.push(before);
+
+        if (!options.ignorePaginationOrderBy) {
+          if (!options.isReverseOrder) {
+            orderBy += ' DESC';
+          }
+        }
+      }
+
+      if (after !== undefined && after !== null) {
+        var comparator = '>';
+        if (options.isReverseOrder) {
+          comparator = '<';
+        }
+
+        if (!options.isHavingCondition) {
+          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator));
+        } else {
+          having.push(util.format('`%s` %s ?', field, comparator));
+        }
+
+        params.push(after);
+
+        if (!options.ignorePaginationOrderBy) {
+          if (options.isReverseOrder) {
+            orderBy += ' DESC';
+          }
         }
       }
     } else {
@@ -58,6 +103,7 @@ module.exports = {
       offset: offset,
       orderBy: orderBy,
       groupBy: options.groupBy,
+      having: having,
     };
   },
 
@@ -104,5 +150,40 @@ module.exports = {
         model.find(mergedOptions, next);
       },
     ], callback);
-  }
+  },
+
+  getPagingInfo: function(result, inputPagination) {
+    if (!result || !result.length) {
+      return null;
+    }
+
+    if (!inputPagination.field || typeof inputPagination.field !== 'string') {
+      return null;
+    }
+
+    var prop = Utils.convertToCamelCase(inputPagination.field);
+
+    var head = _.head(result);
+    var before = Utils.encrypt(head[prop]);
+
+    var last = _.last(result);
+    var after = Utils.encrypt(last[prop]);
+
+    var previous, next;
+
+    var currentUrl = inputPagination.currentUrl;
+    if (currentUrl && typeof currentUrl === 'string') {
+      var linkingChar = currentUrl.indexOf('?') > -1 ? '&' : '?';
+      previous = currentUrl + util.format('%sp_before=%s', linkingChar, before);
+      next = currentUrl + util.format('%sp_after=%s', linkingChar, after);
+    }
+
+    return {
+      before: before,
+      after: after,
+      previous: previous,
+      next: next,
+    };
+  },
+
 };

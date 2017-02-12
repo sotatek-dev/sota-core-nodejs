@@ -42,6 +42,13 @@ module.exports = function(req, res, next) {
       var msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
     }
+  } else if (type === 'cursor2') {
+    if (req.pagination.before && req.pagination.after) {
+      var msg = 'Both p_before and p_after cannot be defined at the same time';
+      return next(ErrorFactory.badRequest(msg));
+    }
+    req.pagination.before = Utils.decrypt(req.pagination.before);
+    req.pagination.after = Utils.decrypt(req.pagination.after);
   } else if (type === 'brute') {
     // No limit in brute-mode
     req.pagination.limit = -1;
@@ -51,6 +58,8 @@ module.exports = function(req, res, next) {
   } else {
     return next(ErrorFactory.badRequest('Unsupported pagination type: ' + type));
   }
+
+  req.pagination.currentUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
 
   next();
 

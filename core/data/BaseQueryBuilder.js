@@ -291,6 +291,19 @@ var BaseQueryBuilder = Class.extends({
       }
     }
 
+    if (options.having) {
+      if (typeof options.having === 'string') {
+        clause += (' HAVING ' + options.having);
+      } else if (_.isArray(options.having)) {
+        if (options.having.length > 0) {
+          clause += ' HAVING ';
+          clause += options.having.join(' AND ');
+        }
+      } else {
+        throw new Error('Invalid having options: ' + options.having);
+      }
+    }
+
     if (options.orderBy) {
       if (typeof options.orderBy === 'string') {
         clause += (' ORDER BY ' + options.orderBy);
