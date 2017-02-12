@@ -8,7 +8,6 @@ module.exports = function(req, res, next) {
     p_field: ['string'],
     p_before: ['string'],
     p_after: ['string'],
-    p_order: ['string'],
   }).validateSync(req.allParams);
 
   if (err) {
