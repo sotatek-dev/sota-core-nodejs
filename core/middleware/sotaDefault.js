@@ -71,7 +71,7 @@ function _envelopResponse(data) {
         extraInfo: data.getExtraInfo(),
         serverTime: now,
       }
-    }
+    };
   }
 
   return {

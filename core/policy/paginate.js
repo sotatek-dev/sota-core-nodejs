@@ -38,12 +38,12 @@ module.exports = function(req, res, next) {
 
   if (type === 'cursor') {
     if (req.pagination.before && req.pagination.after) {
-      var msg = 'Both p_before and p_after cannot be defined at the same time';
+      let msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
     }
   } else if (type === 'cursor2') {
     if (req.pagination.before && req.pagination.after) {
-      var msg = 'Both p_before and p_after cannot be defined at the same time';
+      let msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
     }
     req.pagination.before = Utils.decrypt(req.pagination.before);

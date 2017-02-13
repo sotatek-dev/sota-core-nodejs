@@ -1,5 +1,3 @@
-var Class = require('sota-class').Class;
-
 class BaseError {
 
   getHttpStatus() {

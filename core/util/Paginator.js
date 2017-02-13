@@ -42,7 +42,7 @@ module.exports = {
     } else if (pagination.type === 'cursor2') {
 
       if (before !== undefined && before !== null) {
-        var comparator = '<';
+        let comparator = '<';
         if (options.isReverseOrder) {
           comparator = '>';
         }
@@ -63,7 +63,7 @@ module.exports = {
       }
 
       if (after !== undefined && after !== null) {
-        var comparator = '>';
+        let comparator = '>';
         if (options.isReverseOrder) {
           comparator = '<';
         }

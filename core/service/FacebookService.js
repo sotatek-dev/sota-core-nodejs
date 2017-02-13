@@ -37,6 +37,7 @@ module.exports = SocialNetworkService.extends({
       .accept('json')
       .end(function(err, res) {
         if (err) {
+          logger.error(err);
           return callback('FB authentication failed. err=' + util.inspect(err));
         }
 

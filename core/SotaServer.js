@@ -17,15 +17,15 @@ Interface               = require('sota-class').Interface;
 // TODO: remove global scope of logger
 log4js = require('log4js');
 var logConfig = {
-  "appenders": [
+  'appenders': [
     {
-      "type": "clustered",
-      "appenders": [
+      'type': 'clustered',
+      'appenders': [
         {
-          "type": "logLevelFilter",
-          "level": process.env.LOG_LEVEL || "WARN",
-          "appender": {
-            "type": "console"
+          'type': 'logLevelFilter',
+          'level': process.env.LOG_LEVEL || 'WARN',
+          'appender': {
+            'type': 'console'
           }
         }
       ]
@@ -56,7 +56,7 @@ SocketManager           = require('./socket/SocketManager');
 ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
 getText                 = require('./factory/LocalizationFactory').getText;
 
-var ErrorReporter       = require('./tools/mailer/ErrorReporter');
+var reportError         = require('./tools/mailer/ErrorReporter');
 
 /**
  * Hide real configuration object from rest of the world
@@ -410,7 +410,7 @@ var SotaServer = Class.extends({
       logger.error('############## process begin uncaught exception info ##############');
       logger.error(err);
       logger.error('############## process  end  uncaught exception info ##############');
-      ErrorReporter(err, revision);
+      reportError(err, revision);
     });
   },
 
