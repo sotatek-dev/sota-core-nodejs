@@ -1,6 +1,7 @@
 var google                = require('googleapis');
 var SocialNetworkService  = require('./SocialNetworkService');
-var plus                  = google.plus('v1');
+var GooglePlus            = google.plus('v1');
+var GooglePeople          = google.people('v1');
 var OAuth2                = google.auth.OAuth2;
 
 module.exports = SocialNetworkService.extends({
@@ -30,6 +31,8 @@ module.exports = SocialNetworkService.extends({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
+
+    var plus = this.getGooglePlus();
 
     plus.people.get({
       userId: 'me',
@@ -67,6 +70,29 @@ module.exports = SocialNetworkService.extends({
         return self.linkUserBySocialInfo(userId, info, next);
       }
     ], callback);
+  },
+
+  getOauth2Client: function(accessToken, refreshToken) {
+    var oauth2Client = new OAuth2(
+      process.env.GOOGLE_APP_ID,
+      process.env.GOOGLE_APP_SECRET,
+      process.env.APP_ENDPOINT
+    );
+
+    oauth2Client.setCredentials({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    return oauth2Client;
+  },
+
+  getGooglePlus: function() {
+    return GooglePlus;
+  },
+
+  getGooglePeople: function() {
+    return GooglePeople;
   },
 
 });
