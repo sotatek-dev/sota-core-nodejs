@@ -33,6 +33,8 @@ var BaseQueryBuilder = Class.extends({
     } else if (_.isArray(data) && data.length > 0) {
       tableName = data[0].tableName;
       isIdIncluded = data[0].isNewForced();
+      isInsertIgnore = data[0].isInsertIgnore();
+      onDuplicateKey = data[0].onDuplicateKey();
       entities = data;
     } else {
       logger.error(self.classname + '::insert invalid data=' +
