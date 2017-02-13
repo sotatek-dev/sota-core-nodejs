@@ -23,10 +23,12 @@ var BaseQueryBuilder = Class.extends({
   insert : function(data) {
     // logger.trace(this.classname + '::insert data=' + util.inspect(data));
     var self = this,
-        tableName, entities, isIdIncluded;
+        tableName, entities, isIdIncluded, isInsertIgnore, onDuplicateKey;
     if (data instanceof BaseEntity) {
       tableName = data.tableName;
       isIdIncluded = data.isNewForced();
+      isInsertIgnore = data.isInsertIgnore();
+      onDuplicateKey = data.onDuplicateKey();
       entities = [data];
     } else if (_.isArray(data) && data.length > 0) {
       tableName = data[0].tableName;
@@ -74,18 +76,24 @@ var BaseQueryBuilder = Class.extends({
       valueStrs.push(valueStr);
     });
 
-    return [self._buildInsertQuery(tableName, cols, valueStrs), params];
+    return [self._buildInsertQuery(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey), params];
   },
 
-  _buildInsertQuery : function(tableName, cols, valueStrs) {
+  _buildInsertQuery : function(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey) {
     var self = this;
-    var sql = 'INSERT INTO ';
+    var sql = 'INSERT ';
+    if (isInsertIgnore) {
+      sql += 'IGNORE ';
+    }
+    sql += 'INTO ';
     sql += tableName;
     sql += '(';
     sql += _.map(cols, self._escapeColumn).join(',');
     sql += ') VALUES ';
     sql += valueStrs.join(',');
-    // logger.trace(self.classname + '::_buildInsertQuery query=[' + sql + ']');
+    if (onDuplicateKey) {
+      sql += ' ON DUPLICATE KEY UPDATE ' + onDuplicateKey;
+    }
     return sql;
   },
 

@@ -297,7 +297,7 @@ var BaseModel = Class.extends({
    *  The criteria should be all in equal comparator
    * @param {Function} callback - typical callback
    */
-  findOrInsertOne: function(def, defaultValues, callback) {
+  findOrInsertOne: function(def, options, defaultValues, callback) {
     if (!def || def.id) {
       return callback('Invalid getOrInsertOne params: ' + util.inspect(def));
     }
@@ -340,7 +340,7 @@ var BaseModel = Class.extends({
           }
         }
 
-        self.add(def, next);
+        self.add(def, options, next);
       }],
     }, function(err, ret) {
       if (err) {

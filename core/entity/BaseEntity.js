@@ -6,19 +6,20 @@ module.exports = Class.extends({
 
   initialize : function(model, data) {
     // logger.trace(this.classname + '::initialize data=' + util.inspect(data));
-    this._model         = model;
-    this._data          = {};
-    this._dataOld       = {};
-    this._isNewForced   = false; // Flag to force update id column
+    this._model           = model;
+    this._data            = {};
+    this._dataOld         = {};
+    this._isNewForced     = false; // Flag to force update id column
+    this._isInsertIgnore  = false
 
-    this.classname      = model.classname.replace('Model', 'Entity');
-    this.tableName      = model.tableName;
-    this.primaryKeys    = model.primaryKeys;
-    this.columns        = model.columns;
-    this.predefinedCols = model.predefinedCols;
+    this.classname        = model.classname.replace('Model', 'Entity');
+    this.tableName        = model.tableName;
+    this.primaryKeys      = model.primaryKeys;
+    this.columns          = model.columns;
+    this.predefinedCols   = model.predefinedCols;
 
-    var excludedCols   = model.excludedCols || [];
-    this.excludedProps = _.map(excludedCols, function(columnName) {
+    var excludedCols      = model.excludedCols || [];
+    this.excludedProps    = _.map(excludedCols, function(columnName) {
       return Utils.convertToCamelCase(columnName);
     });
 
@@ -102,6 +103,14 @@ module.exports = Class.extends({
 
     if (options.isForceNew) {
       this._isNewForced = true;
+    }
+
+    if (options.isInsertIgnore) {
+      this._isInsertIgnore = true;
+    }
+
+    if (options.onDuplicateKey) {
+      this._onDuplicateKey = options.onDuplicateKey;
     }
 
     return this;
@@ -317,6 +326,14 @@ module.exports = Class.extends({
 
   isNewForced: function() {
     return this._isNewForced;
+  },
+
+  isInsertIgnore: function() {
+    return this._isInsertIgnore;
+  },
+
+  onDuplicateKey: function() {
+    return this._onDuplicateKey;
   },
 
   isChanged : function() {
