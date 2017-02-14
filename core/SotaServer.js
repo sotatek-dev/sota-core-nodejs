@@ -14,22 +14,33 @@ Checkit                 = require('cc-checkit');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;
 
+var logDir = '.logs';
+if (!fs.existsSync(logDir)){
+  fs.mkdirSync(logDir);
+}
+
 // TODO: remove global scope of logger
 log4js = require('log4js');
 var logConfig = {
-  'appenders': [
+  "replaceConsole": true,
+  "appenders": [
     {
-      'type': 'clustered',
-      'appenders': [
-        {
-          'type': 'logLevelFilter',
-          'level': process.env.LOG_LEVEL || 'WARN',
-          'appender': {
-            'type': 'console'
-          }
-        }
-      ]
-    }
+      "type": "logLevelFilter",
+      "level": process.env.LOG_LEVEL || 'WARN',
+      "appender": {
+        "type": "console"
+      }
+    },
+    {
+      "type": "logLevelFilter",
+      "level": 'ERROR',
+      "appender": {
+        type: 'dateFile',
+        filename: logDir + '/error.log',
+        pattern: '.yyyyMMdd',
+        alwaysIncludePattern: false
+      }
+    },
   ]
 };
 log4js.configure(logConfig);
