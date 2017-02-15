@@ -164,11 +164,19 @@ function extendRequest(req, res) {
       };
     }
 
-    return req.exSession.rollback(callback);
+    /**
+     * In case ending function is come first by timeout
+     * req.exSession is deleted and cannot be invoked anymore
+     */
+    if (req.exSession) {
+      return req.exSession.rollback(callback);
+    }
   };
 
   req.__endTimeout = setTimeout(function() {
-    res.sendError('Request timeout.');
+    req.rollback(function() {
+      res.sendError('Request timeout.');
+    });
   }, Const.DEFAULT_REQUEST_TIMEOUT);
 }
 
