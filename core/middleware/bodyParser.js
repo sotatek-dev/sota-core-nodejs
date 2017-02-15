@@ -1,7 +1,7 @@
 module.exports = function() {
   var bodyParser = require('body-parser'),
-      _json = bodyParser.json(),
-      _urlencoded = bodyParser.urlencoded({extended: true});
+      _json = bodyParser.json({limit: '5mb'}),
+      _urlencoded = bodyParser.urlencoded({limit: '5mb', extended: true});
 
   return function(req, res, callback) {
     async.auto({
