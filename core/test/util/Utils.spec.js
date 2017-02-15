@@ -17,10 +17,14 @@ describe('Utils', function() {
       var testStr2 = 'abc_xyz';
       var testStr3 = 'AbC_xYz';
       var testStr4 = 'ABC_XYZ';
+      var testStr5 = 'IsGoogleConnected';
+      var testStr6 = 'isGoogleConnected';
       assert.equal(Utils.convertToCamelCase(testStr1), 'abc');
       assert.equal(Utils.convertToCamelCase(testStr2), 'abcXyz');
       assert.equal(Utils.convertToCamelCase(testStr3), 'abcXyz');
       assert.equal(Utils.convertToCamelCase(testStr4), 'abcXyz');
+      assert.equal(Utils.convertToCamelCase(testStr5), 'isGoogleConnected');
+      assert.equal(Utils.convertToCamelCase(testStr6), 'isGoogleConnected');
     });
   });
 

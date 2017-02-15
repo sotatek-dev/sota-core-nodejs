@@ -67,6 +67,7 @@ module.exports = BaseService.extends({
     var UserSocialModel = self.getUserSocialModel();
     var UserModel = self.getModel('UserModel');
     var socialId = self.getSocialIdFromInfo(info);
+    var socialConnectedProperty = self.getSocialConnectedProperty();
     var result = null;
 
     async.waterfall([
@@ -74,14 +75,37 @@ module.exports = BaseService.extends({
         UserSocialModel.findOne({
           where: 'social_id=?',
           params: [socialId],
-        }, next);
-      },
-      function user(userSocial, next) {
-        if (userSocial) {
-          return next(ErrorFactory.conflict('Already linked to another account.'));
-        }
+        }, function(err, ret) {
+          if (err) {
+            return next(err);
+          }
 
+          if (ret) {
+            return next(ErrorFactory.conflict('The sns account is already linked to other user.'));
+          }
+
+          next();
+        });
+      },
+      function userAlreadyConnected(next) {
+        UserSocialModel.findById(userId, function(err, ret) {
+          if (err) {
+            return next(err);
+          }
+
+          if (ret) {
+            return next(ErrorFactory.conflict('User is already connected to other sns account'));
+          }
+
+          next();
+        });
+      },
+      function user(next) {
         UserModel.findCacheOne(userId, next);
+      },
+      function updateUser(user, next) {
+        user.setFieldValue(socialConnectedProperty, 1);
+        user.save(next);
       },
       function newUserSocial(user, next) {
         if (!user) {
@@ -96,27 +120,42 @@ module.exports = BaseService.extends({
         UserSocialModel.add({
           id: userId,
           social_id: socialId,
+          access_token: info.access_token,
+          refresh_token: info.refresh_token,
+          token: info.token,
+          token_secret: info.token_secret,
         }, options, next);
       },
     ], function(err, ret) {
       if (err) {
         return callback(err);
       }
-       return callback(null, result);
+
+      return callback(null, result);
     });
   },
 
   unlink: function(userId, callback) {
     var self = this;
     var UserSocialModel = self.getUserSocialModel();
+    var socialConnectedProperty = self.getSocialConnectedProperty();
+    var UserModel = self.getModel('UserModel');
 
     async.waterfall([
-      function count(next) {
-        self.countConnectedServices(userId, next);
+      function user(next) {
+        UserModel.findCacheOne(userId, next);
       },
-      function action(count, next) {
-        if (!count || count <= 1) {
-          return next(ErrorFactory.badRequest('Cannot unlink the only left connected service.'));
+      function updateUser(user, next) {
+        user.setFieldValue(socialConnectedProperty, 0);
+        user.save(next);
+      },
+      function action(user, next) {
+        var count = _.compact(_.values(_.pick(user.toJSON(),
+          ['isFacebookConnected', 'isGoogleConnected', 'isTwitterConnected']
+        ))).length;
+
+        if (!count || count < 1) {
+          return next(ErrorFactory.forbidden('Cannot unlink the only left connected service.'));
         }
 
         UserSocialModel.remove(userId, next);

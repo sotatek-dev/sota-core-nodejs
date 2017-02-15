@@ -8,6 +8,10 @@ module.exports = SocialNetworkService.extends({
     return this.getModel('UserFacebookModel');
   },
 
+  getSocialConnectedProperty: function() {
+    return 'isFacebookConnected';
+  },
+
   getUserDefFromInfo: function(fbInfo) {
     var age = fbInfo.age_range ? (fbInfo.age_range.max || fbInfo.age_range.min) : 0;
     var birthYear = new Date().getFullYear() - age;
@@ -18,6 +22,7 @@ module.exports = SocialNetworkService.extends({
       full_name: fbInfo.first_name + ' ' + fbInfo.last_name,
       avatar_url: fbInfo.picture.data.url,
       birthday: birthYear + '0101',
+      is_facebook_connected: 1,
     };
   },
 

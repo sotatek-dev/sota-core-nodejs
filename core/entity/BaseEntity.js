@@ -212,6 +212,13 @@ module.exports = Class.extends({
     return this;
   },
 
+  setFieldValue: function(field, value) {
+    var propertyName = Utils.convertToCamelCase(field);
+    var data = {};
+    data[propertyName] = value;
+    return this.setData(data);
+  },
+
   setExtra: function(data) {
     var self = this;
     var presetKeys = _.map(self._model.primaryKeys.concat(self._model.predefinedCols), function(c) {

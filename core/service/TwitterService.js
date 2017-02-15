@@ -8,6 +8,10 @@ module.exports = SocialNetworkService.extends({
     return this.getModel('UserTwitterModel');
   },
 
+  getSocialConnectedProperty: function() {
+    return 'isTwitterConnected';
+  },
+
   getUserDefFromInfo: function(twitterInfo) {
     var info = twitterInfo._json || twitterInfo;
     return {
@@ -15,6 +19,7 @@ module.exports = SocialNetworkService.extends({
       email: info.email || (info.screen_name + '@twitter.com'),
       full_name: info.name,
       avatar_url: info.profile_image_url,
+      is_twitter_connected: 1,
     };
   },
 

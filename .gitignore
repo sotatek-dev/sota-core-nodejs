@@ -3,3 +3,5 @@ config/Local.js
 node_modules
 core/coverage
 .env
+core/.logs
+.logs

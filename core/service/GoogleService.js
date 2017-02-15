@@ -11,16 +11,23 @@ module.exports = SocialNetworkService.extends({
     return this.getModel('UserGoogleModel');
   },
 
+  getSocialConnectedProperty: function() {
+    return 'isGoogleConnected';
+  },
+
   getUserDefFromInfo: function(info) {
     return {
       username: info.id,
       email: info.email || info.id,
       full_name: info.displayName,
       avatar_url: info.image ? info.image.url : null,
+      is_google_connected: 1,
     };
   },
 
   _getGoogleInfo: function(accessToken, refreshToken, callback) {
+    var self = this;
+
     var oauth2Client = new OAuth2(
       process.env.GOOGLE_APP_ID,
       process.env.GOOGLE_APP_SECRET,
@@ -32,17 +39,37 @@ module.exports = SocialNetworkService.extends({
       refresh_token: refreshToken,
     });
 
+    // return this._retryGetGoogleInfo(oauth2Client, callback);
+
     var plus = this.getGooglePlus();
 
     plus.people.get({
       userId: 'me',
       auth: oauth2Client
     }, function(err, info) {
+      // Invalid Credentials, try to refresh token once
+      if (err && err.code === 401) {
+        logger.error('Unauthorized from Google. Trying to refresh token and request agaim');
+        return self._retryGetGoogleInfo(oauth2Client, callback);
+      }
+
+      return callback(err, info);
+    });
+  },
+
+  _retryGetGoogleInfo: function(oauth2Client, callback) {
+    var self = this;
+    oauth2Client.refreshAccessToken(function(err, tokens) {
       if (err) {
         return callback(err);
       }
 
-      return callback(null, info);
+      var plus = self.getGooglePlus();
+
+      plus.people.get({
+        userId: 'me',
+        auth: oauth2Client
+      }, callback);
     });
   },
 

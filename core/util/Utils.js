@@ -4,7 +4,15 @@ Utils.capitalizeFirstLetter = function(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+Utils.normalizeFirstLetter = function(str) {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+};
+
 Utils.convertToCamelCase = function(key) {
+  if (key.indexOf('_') < 0) {
+    return Utils.normalizeFirstLetter(key);
+  }
+
   return key.toLowerCase().replace( /_./g, function(matched) {
     return matched.charAt(1).toUpperCase();
   });
