@@ -16,7 +16,7 @@ module.exports = SocialNetworkService.extends({
     var info = twitterInfo._json || twitterInfo;
     return {
       username: twitterInfo.screen_name,
-      email: info.email || (info.screen_name + '@twitter.com'),
+      email: info.email,
       full_name: info.name,
       avatar_url: info.profile_image_url,
       is_twitter_connected: 1,

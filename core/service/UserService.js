@@ -18,13 +18,12 @@ var UserService = BaseService.extends({
       }
     }
 
-    if (!params.length) {
-      callback(ErrorFactory.badRequest('No lookup information.'));
-      return;
-    }
-
     async.waterfall([
       function findUser(next) {
+        if (whereClauses.length ===  0) {
+          return next(null, null);
+        }
+
         UserModel.findOne({
           where   : whereClauses.join(' OR '),
           params  : params,

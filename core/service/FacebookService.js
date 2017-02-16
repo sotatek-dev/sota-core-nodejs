@@ -17,8 +17,7 @@ module.exports = SocialNetworkService.extends({
     var birthYear = new Date().getFullYear() - age;
 
     return {
-      username: fbInfo.id,
-      email: fbInfo.email || fbInfo.id,
+      email: fbInfo.email,
       full_name: fbInfo.first_name + ' ' + fbInfo.last_name,
       avatar_url: fbInfo.picture.data.url,
       birthday: birthYear + '0101',

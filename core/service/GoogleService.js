@@ -17,8 +17,7 @@ module.exports = SocialNetworkService.extends({
 
   getUserDefFromInfo: function(info) {
     return {
-      username: info.id,
-      email: info.email || info.id,
+      email: info.email,
       full_name: info.displayName,
       avatar_url: info.image ? info.image.url : null,
       is_google_connected: 1,
