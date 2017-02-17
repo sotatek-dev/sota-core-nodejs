@@ -99,6 +99,23 @@ module.exports = {
       result.push(self._convertOneObjectToCamelCase(e));
     });
 
+    // Some hack to make fan an subscription compatible with old client
+    // TODO: remove this later
+    if (self._model) {
+      if (self._model.tableName === 'fan') {
+        result = _.map(result, function(e) {
+          e.userId = e.idolId;
+          e.fanUid = e.fanId;
+          return e;
+        });
+      } else if (self._model.tableName === 'subscription') {
+        result = _.map(result, function(e) {
+          e.userId = e.fanId;
+          return e;
+        });
+      }
+    }
+
     return result;
   },
 
