@@ -6,6 +6,7 @@ var ForbiddenError          = require('./ForbiddenError');
 var InternalError           = require('./InternalError');
 var TooLargeError           = require('./PayloadTooLargeError');
 var UpgradeRequiredError    = require('./UpgradeRequiredError');
+var ServiceUnavailableError = require('./ServiceUnavailableError');
 
 module.exports = Class.singleton({
   classname: 'ErrorFactory',
@@ -40,6 +41,10 @@ module.exports = Class.singleton({
 
   upgradeRequired: function(msg, extraInfo) {
     return new UpgradeRequiredError(msg, extraInfo);
+  },
+
+  unavailable: function(msg, extraInfo) {
+    return new ServiceUnavailableError(msg, extraInfo);
   },
 
 });
