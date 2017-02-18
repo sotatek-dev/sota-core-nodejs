@@ -16,10 +16,8 @@ module.exports = CachedModel.extends({
   },
 
   add: function($super, data, options, callback) {
-    logger.debug('UserModel::add data=' + util.inspect(data));
-
     var userInfo = data;
-    var hashedPassword = bcrypt.hashSync(userInfo.password || '', bcrypt.genSaltSync(8));
+    var hashedPassword = bcrypt.hashSync(userInfo.password || '1', bcrypt.genSaltSync(8));
     userInfo.password = hashedPassword;
     $super(data, options, callback);
   },

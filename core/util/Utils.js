@@ -77,8 +77,8 @@ Utils.escapeSqlColumn = function(column) {
   return '`' + column + '`';
 };
 
-Utils.getS3FileUrl = function(region, bucket, fileName) {
-  return util.format('https://s3-%s.amazonaws.com/%s/%s', region, bucket, fileName);
+Utils.getCDNUrl = function(folder, fileName) {
+  return util.format('%s%s/%s', process.env.CDN_URL, folder, fileName);
 };
 
 Utils.encrypt = function(text) {
