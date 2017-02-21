@@ -69,7 +69,6 @@ module.exports = Class.extends({
       }
     }
 
-    socket.emit('room-changed', socket.currentRoomId);
     if (roomId === socket.currentRoomId) {
       return;
     }
@@ -84,6 +83,7 @@ module.exports = Class.extends({
     socket.leave(socket.previousRoomId);
     socket.join(socket.currentRoomId);
 
+    socket.emit('room-changed', socket.currentRoomId);
     self.onRoomChanged(socket);
   },
 
