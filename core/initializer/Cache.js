@@ -1,7 +1,7 @@
 var path        = require('path');
 var logger      = log4js.getLogger('Init.Cache');
 
-module.exports = function(app, CacheFactory, dirs) {
+module.exports = function(CacheFactory, dirs) {
   _.each(dirs, function(dir) {
     logger.trace('Initializer::Cache dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {

@@ -3,7 +3,7 @@ var logger        = log4js.getLogger('Init.Socket');
 var socketIO      = require('socket.io');
 var redisio       = require('socket.io-redis');
 
-module.exports = function(app, server, dirs) {
+module.exports = function(jwtSecret, server, dirs) {
   logger.trace('Start initializing SocketIO...');
   var io = socketIO(server);
   io.engine.ws = new (require('uws').Server)({
@@ -16,7 +16,6 @@ module.exports = function(app, server, dirs) {
     port: process.env.REDIS_SOCKET_HUB_PORT,
   }));
 
-  var jwtSecret = app.get('jwtSecret');
   _.each(dirs, function(dir) {
     logger.trace('Initializer::Soket dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {

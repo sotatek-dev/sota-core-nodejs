@@ -40,6 +40,11 @@ module.exports = function(app, ControllerFactory, config) {
     handlerDef = BaseController.createDefaultFind(model);
     app.get(route, handlerDef);
 
+    // Find/select random list
+    route = '/random/' + apiName;
+    handlerDef = BaseController.createDefaultFindRandom(model);
+    app.get(route, handlerDef);
+
     // Find/select one
     route = '/' + apiName + '/:id';
     handlerDef = BaseController.createDefaultFindOne(model);

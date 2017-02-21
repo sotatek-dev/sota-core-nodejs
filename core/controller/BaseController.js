@@ -79,6 +79,40 @@ var BaseController = Class.extends({
    * @param {Class} modeClass - The model class
    * @param {Object} acl - TODO
    */
+  $createDefaultFindRandom: function(modelClass) {
+
+    var baseHandler = function(req, res) {
+      var limit     = req.allParams['limit'] || 10;
+      var model     = req.getModel(modelClass.classname);
+      var tableName = model.tableName;
+      var randIdQuery = util.format('SELECT CEIL(RAND() * (SELECT MAX(id) FROM %s))', tableName);
+
+      async.auto({
+        find: function(next) {
+          var options = {
+            where: util.format('id >= (%s)', randIdQuery),
+            params: [],
+            limit: limit,
+          };
+          model.find(options, next);
+        }
+      }, function(err, ret) {
+        if (err) {
+          res.sendError(err);
+          return;
+        }
+
+        res.ok(ret.find);
+      });
+    };
+
+    return this.handleBy(baseHandler);
+  },
+
+  /**
+   * @param {Class} modeClass - The model class
+   * @param {Object} acl - TODO
+   */
   $createDefaultFindOne: function(modelClass) {
 
     var baseHandler = function(req, res) {

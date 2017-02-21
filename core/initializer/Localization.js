@@ -2,7 +2,7 @@ var path        = require('path');
 var setText     = require('../factory/LocalizationFactory').setText;
 var logger      = log4js.getLogger('Init.Localization');
 
-module.exports = function(app, dirs) {
+module.exports = function(dirs) {
   _.each(dirs, function(dir) {
     logger.trace('Initializer::Localization dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {

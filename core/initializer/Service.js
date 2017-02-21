@@ -1,6 +1,6 @@
 var logger = log4js.getLogger('Init.Service');
 
-module.exports = function(app, ServiceFactory, serviceDirs) {
+module.exports = function(ServiceFactory, serviceDirs) {
   _.each(serviceDirs, function(serviceDir) {
     logger.trace('Initializer::Service serviceDir=' + serviceDir);
     if (!FileUtils.isDirectorySync(serviceDir)) {

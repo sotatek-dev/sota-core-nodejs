@@ -1,6 +1,6 @@
 var logger = log4js.getLogger('Init.Model');
 
-module.exports = function(app, ModelFactory, adaptersConfig, modelSchema, modelDirs) {
+module.exports = function(ModelFactory, adaptersConfig, modelSchema, modelDirs) {
 
   // Store config of provided adapters/connections
   ModelFactory.setAdaptersConfig(adaptersConfig);

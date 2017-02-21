@@ -37,6 +37,10 @@ Utils.getRandomInRange = function(min, max) {
 };
 
 Utils.getRandomByProb = function(probs, propName) {
+  if (!propName) {
+    propName = 'prob';
+  }
+
   var result = null;
   var totalProb = 0;
   var i, prob;

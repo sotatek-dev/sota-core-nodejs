@@ -333,7 +333,7 @@ var SotaServer = Class.extends({
 
   _initLocalization: function(myApp) {
     var init = require('./initializer/Localization');
-    init(myApp, _realConfig.localizationDirs);
+    init(_realConfig.localizationDirs);
   },
 
   _initMiddlewares: function(myApp) {
@@ -345,7 +345,7 @@ var SotaServer = Class.extends({
     var init = require('./initializer/Socket'),
         socketDirs = _realConfig.socketDirs;
 
-    init(myApp, myServer, socketDirs);
+    init(myApp.get('jwtSecret'), myServer, socketDirs);
   },
 
   _initPolicies: function(myApp) {
@@ -362,24 +362,24 @@ var SotaServer = Class.extends({
     init(myApp, ControllerFactory, controllerDirs);
   },
 
-  _loadModels: function(myApp) {
+  _loadModels: function() {
     var init = require('./initializer/Model'),
         adapters = _realConfig.adapters,
         schema = _realConfig.modelSchema,
         modelDirs = _realConfig.modelDirs;
 
-    init(myApp, ModelFactory, adapters, schema, modelDirs);
+    init(ModelFactory, adapters, schema, modelDirs);
   },
 
-  _loadServices: function(myApp) {
+  _loadServices: function() {
     var init = require('./initializer/Service'),
         serviceDirs = _realConfig.serviceDirs;
-    init(myApp, ServiceFactory, serviceDirs);
+    init(ServiceFactory, serviceDirs);
   },
 
   _loadExternalServices: function(myApp) {
     var init = require('./initializer/ExternalService');
-    init(myApp, ExternalServiceAdapter, _realConfig.externalServiceDirs);
+    init(ExternalServiceAdapter, _realConfig.externalServiceDirs);
   },
 
   _setupLodash: function() {
@@ -401,7 +401,7 @@ var SotaServer = Class.extends({
   _setupCache: function(myApp) {
     var init = require('./initializer/Cache'),
         cacheDirs = _realConfig.cacheDirs;
-    init(myApp, CacheFactory, cacheDirs);
+    init(CacheFactory, cacheDirs);
   },
 
   _setupRoutes: function(myApp) {
