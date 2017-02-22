@@ -51,6 +51,10 @@ class SotaApp {
     this._setupProcess();
   }
 
+  start() {
+    // TODO
+  }
+
   getConfig() {
     return _appConfig;
   }
