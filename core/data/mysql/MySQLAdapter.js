@@ -51,7 +51,7 @@ module.exports = BaseAdapter.extends({
 
       // Should we throw error if the connection has to wait for a too long time?
       self._retryCount++;
-      if (self._retryCount > 50) {
+      if (self._retryCount > 500) {
         if (self._gotConnection && !self._connection) {
           logger.error('_exec waiting for getting connection but failed...');
         }

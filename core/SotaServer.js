@@ -317,8 +317,6 @@ var SotaServer = Class.extends({
     this._setupRoutes(myApp);
     this._initSocket(myApp, myServer);
 
-    this._setupProcess();
-
     process.nextTick(function() {
       myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
       myServer.on('error', this.onError.bind(this));
@@ -407,22 +405,6 @@ var SotaServer = Class.extends({
   _setupRoutes: function(myApp) {
     var init = require('./initializer/Routes');
     init(myApp, ControllerFactory, _realConfig);
-  },
-
-  _setupProcess: function() {
-    // TODO: Handle process-level events
-    if (_realConfig.errorHandler) {
-      process.on('uncaughtException', _realConfig.errorHandler);
-      return;
-    }
-
-    // Default error handler
-    process.on('uncaughtException', function (err) {
-      logger.error('############## process begin uncaught exception info ##############');
-      logger.error(err);
-      logger.error('############## process  end  uncaught exception info ##############');
-      reportError(err, revision);
-    });
   },
 
   onServerCreated: function() {
