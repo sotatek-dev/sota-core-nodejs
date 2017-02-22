@@ -93,6 +93,10 @@ var SotaServer = Class.extends({
     this._initExpress();
   },
 
+  start: function() {
+    // TODO
+  },
+
   _resolveConfig: function(config) {
     /**
      * rootDir is absolute path to the application's directory
