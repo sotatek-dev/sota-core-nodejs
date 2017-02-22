@@ -487,6 +487,15 @@ var BaseModel = Class.extends({
     }
   },
 
+  execRaw: function(sqlQuery, params, callback) {
+    if (typeof params === 'function') {
+      callback = params;
+      params = [];
+    }
+
+    this._masterAdapter.execRaw(sqlQuery, params, callback);
+  },
+
   as: function(alias) {
     var collection = new BaseCollection(this, alias);
     this._collections.push(collection);

@@ -397,6 +397,10 @@ module.exports = BaseAdapter.extends({
     });
   },
 
+  execRaw: function(sqlQuery, params, callback) {
+    this._exec(sqlQuery, params, callback);
+  },
+
   commit: function(callback) {
     this._finishConnections('commit', callback);
   },
