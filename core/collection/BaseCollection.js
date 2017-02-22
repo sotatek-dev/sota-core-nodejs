@@ -44,7 +44,7 @@ module.exports = Class.extends({
     return '`' + this._model.tableName + '` AS `' + this._alias + '`' +
           _.map(this._joints, function(j) {
             return j.type + '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions;
-          });
+          }).join(' ');
   },
 
   getAdapterForSelect: function() {
