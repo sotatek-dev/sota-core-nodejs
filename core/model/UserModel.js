@@ -10,7 +10,7 @@ module.exports = CachedModel.extends({
 
   $excludedCols: ['created_at', 'updated_at', 'created_by', 'updated_by', 'password'],
 
-  dsConfig: {
+  $dsConfig: {
     read   : 'mysql-slave',
     write  : 'mysql-master',
   },
