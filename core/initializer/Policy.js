@@ -1,7 +1,7 @@
 var path    = require('path');
 var logger  = log4js.getLogger('Init.Policy');
 
-module.exports = function(app, PolicyManager, dirs) {
+module.exports = function(PolicyManager, dirs) {
   _.each(dirs, function(dir) {
     logger.trace('Initializer::Policy dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {

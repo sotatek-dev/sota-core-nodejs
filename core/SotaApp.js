@@ -1,8 +1,10 @@
+// Global built-in depencencies
 fs                      = require('fs');
 path                    = require('path');
 util                    = require('util');
 crypto                  = require('crypto');
 
+// Global external libs
 _                       = require('lodash');
 co                      = require('co');
 bb                      = require('bluebird');
@@ -11,61 +13,95 @@ moment                  = require('moment');
 redis                   = require('redis');
 request                 = require('superagent');
 Checkit                 = require('cc-checkit');
-log4js                  = require('log4js');
 Class                   = require('sota-class').Class;
 Interface               = require('sota-class').Interface;
 
+// Log
+log4js                  = require('log4js');
 setupLog();
+logger                  = log4js.getLogger('SotaServer');
 
-CacheFactory            = require('./cache/foundation/CacheFactory');
-LocalCache              = require('./cache/foundation/LocalCache');
-RedisCache              = require('./cache/foundation/RedisCache');
-Const                   = require('./common/Const');
-FileUtils               = require('./util/FileUtils');
-Utils                   = require('./util/Utils');
-
-BaseEntity              = require('./entity/BaseEntity');
-BaseModel               = require('./model/BaseModel');
-BaseService             = require('./service/BaseService');
-ErrorFactory            = require('./error/ErrorFactory');
-ModelFactory            = require('./model/ModelFactory');
-ServiceFactory          = require('./service/ServiceFactory');
-AdapterFactory          = require('./data/AdapterFactory');
+// Singletons
 ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
 getText                 = require('./factory/LocalizationFactory').getText;
+CacheFactory            = require('./cache/foundation/CacheFactory');
+ControllerFactory       = require('./controller/ControllerFactory');
+LocalCache              = require('./cache/foundation/LocalCache');
+RedisCache              = require('./cache/foundation/RedisCache');
+ServiceFactory          = require('./service/ServiceFactory');
+SocketManager           = require('./socket/SocketManager');
+PolicyManager           = require('./policy/PolicyManager');
+AdapterFactory          = require('./data/AdapterFactory');
+ModelFactory            = require('./model/ModelFactory');
+ErrorFactory            = require('./error/ErrorFactory');
+FileUtils               = require('./util/FileUtils');
+Const                   = require('./common/Const');
+Utils                   = require('./util/Utils');
 
-/**
- * Private properties
- * Declare here to prevent accessing from outside
- */
-var _appConfig = {};
-getModelSchema = function() {
-  return _appConfig.modelSchema;
-};
+try {
+  var revision = require('child_process')
+  .execSync('git rev-parse HEAD')
+  .toString().trim();
+} catch (e) {
+  logger.warn('Cannot get curent git revision');
+  logger.warn(e);
+}
+
+let rootDir = path.join(path.resolve('.'));
 
 class SotaApp {
 
-  constructor(config) {
+  constructor(config, initCallback) {
+    this._initCallback = initCallback;
+    this._appConfig = {};
     this._resolveConfig(config);
-    this._setupInitializers();
-    this._setupProcess();
   }
 
   start() {
-    // TODO
+    this._initLocalization();
+    this._initPolicies();
+    this._loadControllers();
+    this._loadModels();
+    this._loadServices();
+    this._loadExternalServices();
+    this._setupLodash();
+    this._setupCheckit();
+    this._setupCache();
   }
 
   getConfig() {
-    return _appConfig;
+    return this._appConfig;
   }
 
   _resolveConfig(config) {
+    this._configRootDir(config);
+    this._configDBAdapters(config);
+    this._configLocalization(config);
+    this._configModel(config);
+    this._configService(config);
+    this._configValidator(config);
+    this._configCache(config);
+    this._configExternalService(config);
+    this._configConstants(config);
+
+    /**
+     * All settings can be overrided via the passed argument here
+     */
+    if (config) {
+      _.each(_.keys(config), function(p) {
+        this._appConfig[p] = config[p];
+      }.bind(this));
+    }
+  }
+
+  _configRootDir(config) {
     /**
      * rootDir is absolute path to the application's directory
      */
-    let rootDir = path.join(path.resolve('.'));
-    _appConfig.rootDir = rootDir;
+    this._appConfig.rootDir = rootDir;
+  }
 
+  _configDBAdapters() {
     /**
      * Local configuration
      */
@@ -78,18 +114,13 @@ class SotaApp {
      /**
       * Adapter settings
       */
-    _appConfig.adapters = _.merge(
+    this._appConfig.adapters = _.merge(
       require(path.resolve(rootDir, 'config', 'Adapters')),
       localConfig.adapters
     );
+  }
 
-    /**
-     * Port and secret phrase for encryption
-     * Normally are defined in .env file
-     */
-    _appConfig.port = process.env.PORT;
-    _appConfig.secret = process.env.SECRET;
-
+  _configLocalization() {
     /**
      * Localization
      */
@@ -99,8 +130,10 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appLocalizationDir)) {
       localizationDirs.push(appLocalizationDir);
     }
-    _appConfig.localizationDirs = localizationDirs;
+    this._appConfig.localizationDirs = localizationDirs;
+  }
 
+  _configModel() {
     /**
      * There're some models are predefined in core (like UserModel)
      * Others will be made or overrided for particular application's business
@@ -114,14 +147,16 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appModelDir)) {
       modelDirs.push(appModelDir);
     }
-    _appConfig.modelDirs = modelDirs;
+    this._appConfig.modelDirs = modelDirs;
 
     /**
      * ModelSchema is auto-generated file, reflects the database structure
      */
     var modelSchema = require(path.resolve(rootDir, 'config', 'ModelSchema'));
-    _appConfig.modelSchema = modelSchema;
+    this._appConfig.modelSchema = modelSchema;
+  }
 
+  _configService() {
     /**
      * Services are just similar to models
      * - core/service/
@@ -133,8 +168,10 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appServiceDir)) {
       serviceDirs.push(appServiceDir);
     }
-    _appConfig.serviceDirs = serviceDirs;
+    this._appConfig.serviceDirs = serviceDirs;
+  }
 
+  _configValidator() {
     /**
      * Rules to check and get parameters
      */
@@ -143,8 +180,10 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appCheckitDir)) {
       checkitDirs.push(appCheckitDir);
     }
-    _appConfig.checkitDirs = checkitDirs;
+    this._appConfig.checkitDirs = checkitDirs;
+  }
 
+  _configCache() {
     /**
      * Cache functions
      */
@@ -154,8 +193,10 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appCacheDir)) {
       cacheDirs.push(appCacheDir);
     }
-    _appConfig.cacheDirs = cacheDirs;
+    this._appConfig.cacheDirs = cacheDirs;
+  }
 
+  _configExternalService() {
     /**
      * External service handlers
      */
@@ -164,40 +205,22 @@ class SotaApp {
     if (FileUtils.isDirectorySync(appExternalServiceDir)) {
       externalServiceDirs.push(appExternalServiceDir);
     }
-    _appConfig.externalServiceDirs = externalServiceDirs;
+    this._appConfig.externalServiceDirs = externalServiceDirs;
+  }
 
-    /**
-     * Sockets:
-     * - app/sockets/
-     */
-    let socketDirs = [],
-        appSocketDir = path.resolve(rootDir, 'app', 'sockets');
-    if (FileUtils.isDirectorySync(appSocketDir)) {
-      socketDirs.push(appSocketDir);
-    }
-    _appConfig.socketDirs = socketDirs;
-
+  _configConstants() {
     /**
      * Application's defined constants
      */
     let constConfigFile = path.resolve(rootDir, 'app', 'common', 'Const.js');
     if (FileUtils.isFileSync(constConfigFile)) {
-      _appConfig.const = require(constConfigFile);
-    }
-
-    /**
-     * All settings can be overrided via the passed argument here
-     */
-    if (config) {
-      _.each(_.keys(config), function(p) {
-        _appConfig[p] = config[p];
-      });
+      this._appConfig.const = require(constConfigFile);
     }
 
     /**
      * Extend the core's constants by the app's ones
      */
-    Const = _.merge(Const, _appConfig.const || {});
+    Const = _.merge(Const, this._appConfig.const || {});
   }
 
   _setupInitializers() {
@@ -232,7 +255,7 @@ class SotaApp {
 
   _loadExternalServices() {
     var init = require('./initializer/ExternalService');
-    init(ExternalServiceAdapter, _appConfig.externalServiceDirs);
+    init(ExternalServiceAdapter, this._appConfig.externalServiceDirs);
   }
 
   _setupLodash() {
@@ -242,23 +265,84 @@ class SotaApp {
 
   _setupCheckit() {
     var init = require('./initializer/Checkit'),
-        checkitDirs = _appConfig.checkitDirs;
+        checkitDirs = this._appConfig.checkitDirs;
     init(Checkit, checkitDirs);
   }
 
   _setupCache() {
     var init = require('./initializer/Cache'),
-        cacheDirs = _appConfig.cacheDirs;
+        cacheDirs = this._appConfig.cacheDirs;
     init(CacheFactory, cacheDirs);
   }
 
-  _setupProcess() {
-    // Default error handler
-    process.on('uncaughtException', function (err) {
-      logger.error('############## process begin uncaught exception info ##############');
-      logger.error(err);
-      logger.error('############## process  end  uncaught exception info ##############');
-    });
+  _initLocalization() {
+    var init = require('./initializer/Localization');
+    init(this._appConfig.localizationDirs);
+  }
+
+  _initPolicies() {
+    var init = require('./initializer/Policy'),
+        policyDirs = this._appConfig.policyDirs;
+
+    init(PolicyManager, policyDirs);
+  }
+
+  _loadControllers() {
+    var init = require('./initializer/Controller'),
+        controllerDirs = this._appConfig.controllerDirs;
+
+    init(ControllerFactory, controllerDirs);
+  }
+
+  _loadModels() {
+    var init = require('./initializer/Model'),
+        adapters = this._appConfig.adapters,
+        schema = this._appConfig.modelSchema,
+        modelDirs = this._appConfig.modelDirs;
+
+    init(ModelFactory, adapters, schema, modelDirs);
+  }
+
+  _loadServices() {
+    var init = require('./initializer/Service'),
+        serviceDirs = this._appConfig.serviceDirs;
+    init(ServiceFactory, serviceDirs);
+  }
+
+  _loadExternalServices() {
+    var init = require('./initializer/ExternalService');
+    init(ExternalServiceAdapter, this._appConfig.externalServiceDirs);
+  }
+
+  _setupLodash() {
+    var init = require('./initializer/Lodash');
+    init(_);
+  }
+
+  _setupCheckit() {
+    var init = require('./initializer/Checkit'),
+        checkitDirs = this._appConfig.checkitDirs;
+    init(Checkit, checkitDirs);
+  }
+
+  _setupCache() {
+    var init = require('./initializer/Cache'),
+        cacheDirs = this._appConfig.cacheDirs;
+    init(CacheFactory, cacheDirs);
+  }
+
+  onServerCreated() {
+    logger.trace('Creating http server. Listening on port: ' + this._appConfig.port);
+  }
+
+  onListening() {
+    logger.trace('SotaServer is on listening');
+  }
+
+  onError(e) {
+    logger.error('############## SotaServer begin onError info ##############');
+    logger.error('onError: ' + util.inspect(e));
+    logger.error('############## SotaServer  end  onError info ##############');
   }
 
 }
@@ -271,19 +355,19 @@ function setupLog() {
 
   // TODO: remove global scope of logger
   var logConfig = {
-    "replaceConsole": true,
-    "appenders": [
+    replaceConsole: true,
+    appenders: [
       {
-        "type": "logLevelFilter",
-        "level": process.env.LOG_LEVEL || 'WARN',
-        "appender": {
-          "type": "console"
+        type: 'logLevelFilter',
+        level: process.env.LOG_LEVEL || 'WARN',
+        appender: {
+          type: 'console'
         }
       },
       {
-        "type": "logLevelFilter",
-        "level": 'ERROR',
-        "appender": {
+        type: 'logLevelFilter',
+        level: 'ERROR',
+        appender: {
           type: 'dateFile',
           filename: logDir + '/error.log',
           pattern: '.yyyyMMdd',
@@ -293,7 +377,6 @@ function setupLog() {
     ]
   };
   log4js.configure(logConfig);
-  logger = log4js.getLogger('SotaApp');
 }
 
 module.exports = SotaApp;

@@ -1,3 +1,4 @@
+var BaseService     = require('./BaseService');
 var jwt             = require('jsonwebtoken');
 
 module.exports = BaseService.extends({

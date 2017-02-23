@@ -1,7 +1,7 @@
-module.exports = function(app, config) {
+module.exports = function(app) {
   var session = require('express-session');
   return session({
-    secret: config.secret,
+    secret: process.env.SECRET,
     resave: true,
     saveUninitialized: true,
   });

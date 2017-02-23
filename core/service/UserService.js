@@ -1,3 +1,5 @@
+var BaseService     = require('./BaseService');
+
 var UserService = BaseService.extends({
   classname : 'UserService',
 

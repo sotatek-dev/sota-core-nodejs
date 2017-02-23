@@ -1,135 +1,39 @@
-fs                      = require('fs');
-path                    = require('path');
-util                    = require('util');
-crypto                  = require('crypto');
+var SotaApp = require('./SotaApp');
 
-_                       = require('lodash');
-co                      = require('co');
-bb                      = require('bluebird');
-async                   = require('async');
-moment                  = require('moment');
-redis                   = require('redis');
-request                 = require('superagent');
-Checkit                 = require('cc-checkit');
-Class                   = require('sota-class').Class;
-Interface               = require('sota-class').Interface;
+let rootDir = path.join(path.resolve('.'));
 
-var logDir = '.logs';
-if (!fs.existsSync(logDir)){
-  fs.mkdirSync(logDir);
-}
+class SotaServer extends SotaApp {
 
-// TODO: remove global scope of logger
-log4js = require('log4js');
-var logConfig = {
-  "replaceConsole": true,
-  "appenders": [
-    {
-      "type": "logLevelFilter",
-      "level": process.env.LOG_LEVEL || 'WARN',
-      "appender": {
-        "type": "console"
-      }
-    },
-    {
-      "type": "logLevelFilter",
-      "level": 'ERROR',
-      "appender": {
-        type: 'dateFile',
-        filename: logDir + '/error.log',
-        pattern: '.yyyyMMdd',
-        alwaysIncludePattern: false
-      }
-    },
-  ]
-};
-log4js.configure(logConfig);
-logger = log4js.getLogger('SotaServer');
-
-CacheFactory            = require('./cache/foundation/CacheFactory');
-LocalCache              = require('./cache/foundation/LocalCache');
-RedisCache              = require('./cache/foundation/RedisCache');
-Const                   = require('./common/Const');
-FileUtils               = require('./util/FileUtils');
-Utils                   = require('./util/Utils');
-
-BaseController          = require('./controller/BaseController');
-BaseEntity              = require('./entity/BaseEntity');
-BaseModel               = require('./model/BaseModel');
-BaseService             = require('./service/BaseService');
-ErrorFactory            = require('./error/ErrorFactory');
-ControllerFactory       = require('./controller/ControllerFactory');
-PolicyManager           = require('./policy/PolicyManager');
-ModelFactory            = require('./model/ModelFactory');
-ServiceFactory          = require('./service/ServiceFactory');
-AdapterFactory          = require('./data/AdapterFactory');
-SocketManager           = require('./socket/SocketManager');
-ExternalServiceAdapter  = require('./external_service/foundation/ExternalServiceAdapter');
-getText                 = require('./factory/LocalizationFactory').getText;
-
-var reportError         = require('./tools/mailer/ErrorReporter');
-
-/**
- * Hide real configuration object from rest of the world
- * No one should be able to touch it
- */
-var _realConfig = {};
-getModelSchema = function() {
-  return _realConfig.modelSchema;
-};
-
-var revision = require('child_process')
-  .execSync('git rev-parse HEAD')
-  .toString().trim();
-
-var SotaServer = Class.extends({
-  classname : 'SotaServer',
-
-  initialize: function(config, callback) {
-    // logger.trace('SotaServer::initialize config=' + util.inspect(config));
-
-    this._initCallback = callback;
-    this._resolveConfig(config);
+  start() {
+    super.start();
     this._initExpress();
-  },
+  }
 
-  start: function() {
-    // TODO
-  },
+  _resolveConfig(config) {
+    this._configDirectory();
+    this._configRoute();
+    this._configMiddleware();
+    this._configPolicy();
+    this._configController();
+    this._configSocket(config);
 
-  _resolveConfig: function(config) {
-    /**
-     * rootDir is absolute path to the application's directory
-     */
-    let rootDir = path.join(path.resolve('.'));
-    _realConfig.rootDir = rootDir;
+    super._resolveConfig(config);
+  }
 
-    /**
-     * Local configuration
-     */
-    let localConfig = {},
-        localConfigFile = path.join(rootDir, 'config', 'Local.js');
-    if (FileUtils.isFileSync(localConfigFile)) {
-      localConfig = require(localConfigFile);
-    }
-
+  _configDirectory() {
     /**
      * publicDir should be the folder contains static files
      */
-     _realConfig.publicDir = path.join(rootDir, 'public');
+     this._appConfig.publicDir = path.join(rootDir, 'public');
 
      /**
      * viewDir should be the folder contains view templates
      */
-     _realConfig.viewDir = path.join(rootDir, 'views');
+     this._appConfig.viewDir = path.join(rootDir, 'views');
+     this._appConfig.port = process.env.PORT;
+  }
 
-    /**
-     * Port and secret phrase for encryption
-     * Normally are defined in .env file
-     */
-    _realConfig.port = process.env.PORT;
-    _realConfig.secret = process.env.SECRET;
-
+  _configRoute() {
     /**
      * Routes
      */
@@ -137,16 +41,18 @@ var SotaServer = Class.extends({
     if (!FileUtils.isFileSync(routeConfigFile)) {
       throw new Error('Routes configuration file does not exist: ' + routeConfigFile);
     }
-    _realConfig.routes = require(routeConfigFile);
+    this._appConfig.routes = require(routeConfigFile);
+  }
 
+  _configMiddleware() {
     /**
      * Middlewares
      */
     let middlwareConfigFile = path.resolve(rootDir, 'config', 'Middlewares.js');
     if (FileUtils.isFileSync(middlwareConfigFile)) {
-      _realConfig.middlewares = require(middlwareConfigFile);
+      this._appConfig.middlewares = require(middlwareConfigFile);
     } else {
-      _realConfig.middlewares = {};
+      this._appConfig.middlewares = {};
     }
 
     let middlewareDirs = [],
@@ -155,19 +61,10 @@ var SotaServer = Class.extends({
     if (FileUtils.isDirectorySync(appMiddlewareDir)) {
       middlewareDirs.push(appMiddlewareDir);
     }
-    _realConfig.middlewareDirs = middlewareDirs;
+    this._appConfig.middlewareDirs = middlewareDirs;
+  }
 
-    /**
-     * Localization
-     */
-    let localizationDirs = [],
-        appLocalizationDir = path.resolve(rootDir, 'app', 'localizations');
-    localizationDirs.push(path.resolve(rootDir, 'core', 'localization'));
-    if (FileUtils.isDirectorySync(appLocalizationDir)) {
-      localizationDirs.push(appLocalizationDir);
-    }
-    _realConfig.localizationDirs = localizationDirs;
-
+  _configPolicy() {
     /**
      * Policies are stored in:
      * - core/policy/     (core-level)
@@ -179,7 +76,10 @@ var SotaServer = Class.extends({
     if (FileUtils.isDirectorySync(appPolicyDir)) {
       policyDirs.push(appPolicyDir);
     }
-    _realConfig.policyDirs = policyDirs;
+    this._appConfig.policyDirs = policyDirs;
+  }
+
+  _configController() {
 
     /**
      * There's no specific controller in core-level
@@ -192,73 +92,10 @@ var SotaServer = Class.extends({
     if (FileUtils.isDirectorySync(appControllerDir)) {
       controllerDirs.push(appControllerDir);
     }
-    _realConfig.controllerDirs = controllerDirs;
+    this._appConfig.controllerDirs = controllerDirs;
+  }
 
-    /**
-     * There're some models are predefined in core (like UserModel)
-     * Others will be made or overrided for particular application's business
-     * All model classes in those directory will be loaded:
-     * - core/model/
-     * - app/models/
-     */
-    let modelDirs = [],
-        appModelDir = path.resolve(rootDir, 'app', 'models');
-    modelDirs.push(path.resolve(rootDir, 'core', 'model'));
-    if (FileUtils.isDirectorySync(appModelDir)) {
-      modelDirs.push(appModelDir);
-    }
-    _realConfig.modelDirs = modelDirs;
-
-    /**
-     * ModelSchema is auto-generated file, reflects the database structure
-     */
-    modelSchema = require(path.resolve(rootDir, 'config', 'ModelSchema'));
-    _realConfig.modelSchema = modelSchema;
-
-    /**
-     * Services are just similar to models
-     * - core/service/
-     * - app/services/
-     */
-    let serviceDirs = [],
-        appServiceDir = path.resolve(rootDir, 'app', 'services');
-    serviceDirs.push(path.resolve(rootDir, 'core', 'service'));
-    if (FileUtils.isDirectorySync(appServiceDir)) {
-      serviceDirs.push(appServiceDir);
-    }
-    _realConfig.serviceDirs = serviceDirs;
-
-    /**
-     * Rules to check and get parameters
-     */
-    let checkitDirs = [],
-        appCheckitDir = path.resolve(rootDir, 'app', 'checkits');
-    if (FileUtils.isDirectorySync(appCheckitDir)) {
-      checkitDirs.push(appCheckitDir);
-    }
-    _realConfig.checkitDirs = checkitDirs;
-
-    /**
-     * Cache functions
-     */
-    let cacheDirs = [],
-        appCacheDir = path.resolve(rootDir, 'app', 'cache');
-    cacheDirs.push(path.resolve(rootDir, 'core', 'cache'));
-    if (FileUtils.isDirectorySync(appCacheDir)) {
-      cacheDirs.push(appCacheDir);
-    }
-    _realConfig.cacheDirs = cacheDirs;
-
-    /**
-     * External service handlers
-     */
-    let externalServiceDirs = [],
-        appExternalServiceDir = path.resolve(rootDir, 'app', 'external_services');
-    if (FileUtils.isDirectorySync(appExternalServiceDir)) {
-      externalServiceDirs.push(appExternalServiceDir);
-    }
-    _realConfig.externalServiceDirs = externalServiceDirs;
-
+  _configSocket() {
     /**
      * Sockets:
      * - app/sockets/
@@ -268,61 +105,24 @@ var SotaServer = Class.extends({
     if (FileUtils.isDirectorySync(appSocketDir)) {
       socketDirs.push(appSocketDir);
     }
-    _realConfig.socketDirs = socketDirs;
+    this._appConfig.socketDirs = socketDirs;
+  }
 
-    /**
-     * Application's defined constants
-     */
-    let constConfigFile = path.resolve(rootDir, 'app', 'common', 'Const.js');
-    if (FileUtils.isFileSync(constConfigFile)) {
-      _realConfig.const = require(constConfigFile);
-    }
+  getMyServer() {
+    return this._myServer;
+  }
 
-     /**
-      * Adapter settings
-      */
-    _realConfig.adapters = _.merge(
-      require(path.resolve(rootDir, 'config', 'Adapters')),
-      localConfig.adapters
-    );
-
-    /**
-     * All settings can be overrided via the passed argument here
-     */
-    if (config) {
-      _.each(_.keys(config), function(p) {
-        _realConfig[p] = config[p];
-      });
-    }
-
-    /**
-     * Extend the core's constants by the app's ones
-     */
-    Const = _.merge(Const, _realConfig.const || {});
-
-  },
-
-  _initExpress: function() {
+  _initExpress() {
     logger.trace('SotaServer::_initExpress initializing express application...');
-    var myApp = require('./initializer/Express')(_realConfig);
-    var myServer = require('http').createServer(myApp);
-
-    this._initLocalization(myApp);
-    this._initMiddlewares(myApp);
-    this._initPolicies(myApp);
-    this._loadControllers(myApp);
-    this._loadModels(myApp);
-    this._loadServices(myApp);
-    this._loadExternalServices(myApp);
-    this._setupLodash(myApp);
-    this._setupCheckit(myApp);
-    this._setupPassport(myApp);
-    this._setupCache(myApp);
-    this._setupRoutes(myApp);
-    this._initSocket(myApp, myServer);
+    var myExpressApp = require('./initializer/Express')(this._appConfig);
+    var myServer = require('http').createServer(myExpressApp);
 
     process.nextTick(function() {
-      myServer.listen(_realConfig.port, this.onServerCreated.bind(this));
+      var port = this._appConfig.port;
+      if (this._appConfig.isPortHiddenOnClusterMode) {
+        port = 0;
+      }
+      myServer.listen(port, this.onServerCreated.bind(this));
       myServer.on('error', this.onError.bind(this));
       myServer.on('listening', this.onListening.bind(this));
 
@@ -331,104 +131,37 @@ var SotaServer = Class.extends({
         delete this._initCallback;
       }
     }.bind(this));
-  },
 
-  _initLocalization: function(myApp) {
-    var init = require('./initializer/Localization');
-    init(_realConfig.localizationDirs);
-  },
+    this._initMiddlewares(myExpressApp);
+    this._setupPassport(myExpressApp);
+    this._setupRoutes(myExpressApp);
+    this._initSocket(myExpressApp, myServer);
 
-  _initMiddlewares: function(myApp) {
-    var init = require('./initializer/Middleware');
-    init(myApp, _realConfig);
-  },
+    this._myServer = myServer;
+  }
 
-  _initSocket: function(myApp, myServer) {
-    var init = require('./initializer/Socket'),
-        socketDirs = _realConfig.socketDirs;
-
-    init(myApp.get('jwtSecret'), myServer, socketDirs);
-  },
-
-  _initPolicies: function(myApp) {
-    var init = require('./initializer/Policy'),
-        policyDirs = _realConfig.policyDirs;
-
-    init(myApp, PolicyManager, policyDirs);
-  },
-
-  _loadControllers: function(myApp) {
-    var init = require('./initializer/Controller'),
-        controllerDirs = _realConfig.controllerDirs;
-
-    init(myApp, ControllerFactory, controllerDirs);
-  },
-
-  _loadModels: function() {
-    var init = require('./initializer/Model'),
-        adapters = _realConfig.adapters,
-        schema = _realConfig.modelSchema,
-        modelDirs = _realConfig.modelDirs;
-
-    init(ModelFactory, adapters, schema, modelDirs);
-  },
-
-  _loadServices: function() {
-    var init = require('./initializer/Service'),
-        serviceDirs = _realConfig.serviceDirs;
-    init(ServiceFactory, serviceDirs);
-  },
-
-  _loadExternalServices: function(myApp) {
-    var init = require('./initializer/ExternalService');
-    init(ExternalServiceAdapter, _realConfig.externalServiceDirs);
-  },
-
-  _setupLodash: function() {
-    var init = require('./initializer/Lodash');
-    init(_);
-  },
-
-  _setupCheckit: function() {
-    var init = require('./initializer/Checkit'),
-        checkitDirs = _realConfig.checkitDirs;
-    init(Checkit, checkitDirs);
-  },
-
-  _setupPassport: function(myApp) {
-    var init = require('./initializer/Passport');
-    init(myApp);
-  },
-
-  _setupCache: function(myApp) {
-    var init = require('./initializer/Cache'),
-        cacheDirs = _realConfig.cacheDirs;
-    init(CacheFactory, cacheDirs);
-  },
-
-  _setupRoutes: function(myApp) {
+  _setupRoutes(myExpressApp) {
     var init = require('./initializer/Routes');
-    init(myApp, ControllerFactory, _realConfig);
-  },
+    init(myExpressApp, ControllerFactory, this._appConfig);
+  }
 
-  onServerCreated: function() {
-    logger.trace('Creating http server. Listening on port: ' + _realConfig.port);
-  },
+  _initMiddlewares(myExpressApp) {
+    var init = require('./initializer/Middleware');
+    init(myExpressApp, this._appConfig);
+  }
 
-  onListening: function() {
-    logger.trace('SotaServer is on listening');
-  },
+  _setupPassport(myExpressApp) {
+    var init = require('./initializer/Passport');
+    init(myExpressApp);
+  }
 
-  onError: function(e) {
-    logger.error('############## SotaServer begin onError info ##############');
-    logger.error('onError: ' + util.inspect(e));
-    logger.error('############## SotaServer  end  onError info ##############');
-  },
+  _initSocket(myExpressApp, myServer) {
+    var init = require('./initializer/Socket'),
+        socketDirs = this._appConfig.socketDirs;
 
-});
+    init(myExpressApp.get('jwtSecret'), myServer, socketDirs);
+  }
+
+}
 
 module.exports = SotaServer;
-
-module.exports.createServer = function(config) {
-  return new SotaServer(config);
-};

@@ -184,7 +184,7 @@ module.exports = Class.extends({
       if (typeof data[columnName] === 'string' && data[columnName] === '_NULL') {
         self._data[property] = null;
       } else {
-        var modelSchema = getModelSchema();
+        var modelSchema = ModelFactory.getModelSchema();
         var isNumber = false;
         if (modelSchema && modelSchema[self._model.classname]) {
           var colDef = modelSchema[self._model.classname][columnName];

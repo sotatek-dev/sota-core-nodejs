@@ -1,6 +1,6 @@
 var logger = log4js.getLogger('Init.Controller');
 
-module.exports = function(app, ControllerFactory, controllerDirs) {
+module.exports = function(ControllerFactory, controllerDirs) {
   _.each(controllerDirs, function(controllerDir) {
     logger.trace('Load controllers dir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {

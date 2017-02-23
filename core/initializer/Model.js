@@ -1,4 +1,5 @@
-var logger = log4js.getLogger('Init.Model');
+var BaseModel   = require('../model/BaseModel');
+var logger      = log4js.getLogger('Init.Model');
 
 module.exports = function(ModelFactory, adaptersConfig, modelSchema, modelDirs) {
 

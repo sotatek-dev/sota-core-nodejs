@@ -1,4 +1,5 @@
 var logger              = log4js.getLogger('Init.Routes');
+var BaseController      = require('../controller/BaseController');
 var AuthController      = require('../controller/AuthController');
 
 module.exports = function(app, ControllerFactory, config) {

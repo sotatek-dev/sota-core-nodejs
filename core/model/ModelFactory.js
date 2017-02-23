@@ -20,6 +20,10 @@ module.exports = Class.singleton({
     _modelSchema = modelSchema;
   },
 
+  getModelSchema: function() {
+    return _modelSchema;
+  },
+
   getAdapterConfig: function(key) {
     var config = _adaptersConfig[key];
     if (!config) {

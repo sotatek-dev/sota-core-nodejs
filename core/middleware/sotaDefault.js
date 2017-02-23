@@ -2,6 +2,7 @@ var passport        = require('passport');
 var ExSession       = require('../common/ExSession');
 var BaseError       = require('../error/BaseError');
 var InternalError   = require('../error/InternalError');
+var BaseEntity      = require('../entity/BaseEntity');
 
 function _purifyEntity(data) {
 
