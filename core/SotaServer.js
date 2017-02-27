@@ -1,3 +1,6 @@
+// Expose global lib
+hbs         = require('hbs');
+
 var SotaApp = require('./SotaApp');
 
 let rootDir = path.join(path.resolve('.'));

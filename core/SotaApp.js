@@ -67,6 +67,7 @@ class SotaApp {
     this._setupLodash();
     this._setupCheckit();
     this._setupCache();
+    this._setupCustomizedInitializers();
   }
 
   getConfig() {
@@ -81,6 +82,7 @@ class SotaApp {
     this._configService(config);
     this._configValidator(config);
     this._configCache(config);
+    this._configInitializer(config);
     this._configExternalService(config);
     this._configConstants(config);
 
@@ -194,6 +196,18 @@ class SotaApp {
       cacheDirs.push(appCacheDir);
     }
     this._appConfig.cacheDirs = cacheDirs;
+  }
+
+  _configInitializer() {
+    /**
+     * Cache functions
+     */
+    let initializerDirs = [],
+        appInitializerDir = path.resolve(rootDir, 'app', 'initializers');
+    if (FileUtils.isDirectorySync(appInitializerDir)) {
+      initializerDirs.push(appInitializerDir);
+    }
+    this._appConfig.initializerDirs = initializerDirs;
   }
 
   _configExternalService() {
@@ -329,6 +343,30 @@ class SotaApp {
     var init = require('./initializer/Cache'),
         cacheDirs = this._appConfig.cacheDirs;
     init(CacheFactory, cacheDirs);
+  }
+
+  _setupCustomizedInitializers() {
+    var self = this;
+    _.forEach(self._appConfig.initializerDirs, function(dir) {
+      if (!FileUtils.isDirectorySync(dir)) {
+        throw new Error('Invalid initializer directory: ' + dir);
+      }
+
+      var files = FileUtils.listFiles(dir, /.js$/i);
+      if (!files.length) {
+        logger.warn('Initializer directory (' + dir + ') is empty');
+        return;
+      }
+
+      _.forEach(files, function(file) {
+        if (!FileUtils.isFileSync(file)) {
+          throw new Error('Invalid initializer file: ' + file);
+        }
+
+        var init = require(file);
+        init(self._appConfig);
+      });
+    });
   }
 
   onServerCreated() {
