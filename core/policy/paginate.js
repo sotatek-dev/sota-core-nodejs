@@ -48,6 +48,9 @@ module.exports = function(req, res, next) {
     }
     req.pagination.before = Utils.decrypt(req.pagination.before);
     req.pagination.after = Utils.decrypt(req.pagination.after);
+  } else if (type === 'auto') {
+    // Query from multi-tables, cannot predict the exact result
+    req.pagination.limit = -1;
   } else if (type === 'brute') {
     // No limit in brute-mode
     req.pagination.limit = -1;
