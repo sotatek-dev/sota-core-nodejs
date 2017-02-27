@@ -74,6 +74,10 @@ class RedisCache extends BaseCache {
     client.del(key);
   }
 
+  getClient() {
+    return client;
+  }
+
 }
 
 module.exports = new RedisCache();
