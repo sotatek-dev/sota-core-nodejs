@@ -1,7 +1,7 @@
 var path      = require('path');
 var fs        = require('fs');
 
-function processDir(dirPath,regex,result) {
+function processDir(dirPath, regex, isRecursive, result) {
 
   var files = fs.readdirSync(dirPath);
 
@@ -10,7 +10,9 @@ function processDir(dirPath,regex,result) {
     var stats = fs.statSync(currPath);
 
     if (stats.isDirectory()) {
-      processDir(currPath, regex, result);
+      if (isRecursive) {
+        processDir(currPath, regex, isRecursive, result);
+      }
     } else {
       if (currPath.match(regex)) {
         result.push(currPath);
@@ -29,7 +31,17 @@ module.exports = {
    * @return An array of relative paths to all files found at startPath
    * that match the provided regex.
    */
-  listFiles: function(startPath, regex) {
+  listFiles: function(startPath, options) {
+    var regex;
+    var isRecursive = true;
+    if (options) {
+      if (options instanceof RegExp) {
+        regex = options;
+      } else {
+        regex = options.regex;
+        isRecursive = !!options.isRecursive;
+      }
+    }
 
     var stats = fs.statSync(startPath);
 
@@ -38,7 +50,7 @@ module.exports = {
     }
 
     var result = [];
-    processDir(startPath, regex, result);
+    processDir(startPath, regex, isRecursive, result);
     return result;
   },
 

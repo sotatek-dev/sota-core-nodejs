@@ -78,7 +78,10 @@ var BaseQueryBuilder = Class.extends({
       valueStrs.push(valueStr);
     });
 
-    return [self._buildInsertQuery(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey), params];
+    return [
+      self._buildInsertQuery(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey),
+      params
+    ];
   },
 
   _buildInsertQuery : function(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey) {

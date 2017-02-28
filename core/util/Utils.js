@@ -135,6 +135,6 @@ Utils.removeSpecialCharacters = function(text) {
 
   var pattern = /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'| |\"|\&|\#|\[|\]|~|$|_/g;
   return text.replace(pattern, '');
-}
+};
 
 module.exports = Utils;

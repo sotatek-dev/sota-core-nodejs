@@ -10,7 +10,7 @@ module.exports = Class.extends({
     this._data            = {};
     this._dataOld         = {};
     this._isNewForced     = false; // Flag to force update id column
-    this._isInsertIgnore  = false
+    this._isInsertIgnore  = false;
 
     this.classname        = model.classname.replace('Model', 'Entity');
     this.tableName        = model.tableName;
