@@ -11,6 +11,7 @@ bb                      = require('bluebird');
 async                   = require('async');
 moment                  = require('moment');
 redis                   = require('redis');
+hbs                     = require('hbs');
 request                 = require('superagent');
 Checkit                 = require('cc-checkit');
 Class                   = require('sota-class').Class;
