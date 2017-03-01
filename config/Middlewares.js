@@ -13,6 +13,6 @@ module.exports = {
     'expressSession',
     'www',
     'passportInit',
-    'passportSession',
-  ],
-};
+    'passportSession'
+  ]
+}

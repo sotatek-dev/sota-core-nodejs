@@ -1,37 +1,37 @@
 module.exports = {
-  DATA_SOURCE_TYPE : {
-    MEMORY      : 'memory',
-    SQLITE      : 'sqlite',
-    MYSQL       : 'mysql',
-    POSTGRESQL  : 'postgresql',
-    MONGODB     : 'mongodb',
-    ORACLE      : 'oracle',
-    DISK        : 'disk',
+  DATA_SOURCE_TYPE: {
+    MEMORY: 'memory',
+    SQLITE: 'sqlite',
+    MYSQL: 'mysql',
+    POSTGRESQL: 'postgresql',
+    MONGODB: 'mongodb',
+    ORACLE: 'oracle',
+    DISK: 'disk'
   },
 
-  CONNECTION_TYPE : {
-    MASTER      : 'master',
-    SLAVE       : 'slave',
+  CONNECTION_TYPE: {
+    MASTER: 'master',
+    SLAVE: 'slave'
   },
 
-  COLUMN_DATA_TYPE : {
-    NUMBER      : 'number',
-    STRING      : 'string',
-    TIMESTAMP   : 'timestamp',
-    BINARY      : 'binary'
+  COLUMN_DATA_TYPE: {
+    NUMBER: 'number',
+    STRING: 'string',
+    TIMESTAMP: 'timestamp',
+    BINARY: 'binary'
   },
 
-  ERROR_TYPE    : {
-    UNKOWN    : {
-      STATUS  : 500,
-      CODE    : -1,
-      MSG     : 'Unkown error'
+  ERROR_TYPE: {
+    UNKOWN: {
+      STATUS: 500,
+      CODE: -1,
+      MSG: 'Unkown error'
     }
   },
 
   BOOLEAN: {
     TRUE: 1,
-    FALSE: 0,
+    FALSE: 0
   },
 
   SOCKET_HUB_EVENT_TYPE: {
@@ -45,10 +45,10 @@ module.exports = {
 
   PENDING_QUERY_TIMEOUT: 20,              // Milliseconds
 
-  MINUTE_IN_MILLISECONDS  : 1000 * 60,
-  HOUR_IN_MILLISECONDS    : 1000 * 60 * 60,
-  DAY_IN_MILLISECONDS     : 1000 * 60 * 60 * 24,
-  MONTH_IN_MILLISECONDS   : 1000 * 60 * 60 * 24 * 30,
-  YEAR_IN_MILLISECONDS    : 1000 * 60 * 60 * 24 * 365,
+  MINUTE_IN_MILLISECONDS: 1000 * 60,
+  HOUR_IN_MILLISECONDS: 1000 * 60 * 60,
+  DAY_IN_MILLISECONDS: 1000 * 60 * 60 * 24,
+  MONTH_IN_MILLISECONDS: 1000 * 60 * 60 * 24 * 30,
+  YEAR_IN_MILLISECONDS: 1000 * 60 * 60 * 24 * 365
 
-};
+}

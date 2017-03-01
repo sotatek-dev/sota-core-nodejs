@@ -1,4 +1,4 @@
-module.exports = function() {
-  var morgan = require('morgan');
-  return morgan('dev');
-};
+module.exports = function () {
+  var morgan = require('morgan')
+  return morgan('dev')
+}

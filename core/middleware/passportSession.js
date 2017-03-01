@@ -1,4 +1,4 @@
-module.exports = function() {
-  var passport = require('passport');
-  return passport.session();
-};
+module.exports = function () {
+  var passport = require('passport')
+  return passport.session()
+}

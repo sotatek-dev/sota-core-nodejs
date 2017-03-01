@@ -1,12 +1,12 @@
 module.exports = {
 
-  GET : {
-    '/'                 : ['MainController.mainPage'],
-    '/profile'          : ['MainController.profilePage', ['authenticate']],
+  GET: {
+    '/': ['MainController.mainPage'],
+    '/profile': ['MainController.profilePage', ['authenticate']]
   },
 
-  POST : {
-    '/register'         : ['MainController.register'],
+  POST: {
+    '/register': ['MainController.register']
   }
 
-};
+}

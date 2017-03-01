@@ -1,8 +1,8 @@
 
-module.exports = function(req, res, next) {
+module.exports = function (req, res, next) {
   if (!req.user) {
-    return res.unauthorized('Unauthorized.');
+    return res.unauthorized('Unauthorized.')
   }
 
-  next();
-};
+  next()
+}

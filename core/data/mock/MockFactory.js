@@ -1,26 +1,28 @@
-var Class       = require('sota-class').Class;
+/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
+var Class   = require('sota-class').Class
+var logger  = log4js.getLogger('MockFactory')
 
 var MockFactory = Class.singleton({
-  classname : 'MockFactory',
+  classname: 'MockFactory',
 
-  _registers : {},
+  _registers: {},
 
-  register : function(mockData) {
+  register: function (mockData) {
     if (mockData.tableName) {
-      this._registers[mockData.tableName] = mockData;
+      this._registers[mockData.tableName] = mockData
     }
   },
 
-  get : function(tableName) {
-    var mockData = this._registers[tableName];
+  get: function (tableName) {
+    var mockData = this._registers[tableName]
     if (!mockData) {
       logger.error('MockFactory::get mock of (' +
-                  tableName + ') is not registered yet...');
+                  tableName + ') is not registered yet...')
     }
 
-    return mockData;
-  },
+    return mockData
+  }
 
-});
+})
 
-module.exports = MockFactory;
+module.exports = MockFactory

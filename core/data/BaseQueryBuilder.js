@@ -1,144 +1,155 @@
-var Class             = require('sota-class').Class;
-var BaseEntity        = require('../entity/BaseEntity');
-var logger            = log4js.getLogger('BaseQueryBuilder');
+/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
+var _               = require('lodash')
+var util            = require('util')
+var Class           = require('sota-class').Class
+var Utils           = require('../util/Utils')
+var BaseEntity      = require('../entity/BaseEntity')
+var logger          = log4js.getLogger('BaseQueryBuilder')
 
 /**
  * Based on MySQL syntax.
  * Other db types should be customized with own query builder classes
  */
 var BaseQueryBuilder = Class.extends({
-  classname : 'QueryBuilder',
+  classname: 'QueryBuilder',
 
-  select : function(tableName, options) {
-    var self = this;
-    var sql = 'SELECT ';
-    sql += self._buildColumns(options);
-    sql += ' FROM ' + tableName;
-    sql += self._buildWhereClause(options);
+  select: function (tableName, options) {
+    var self = this
+    var sql = 'SELECT '
+    sql += self._buildColumns(options)
+    sql += ' FROM ' + tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::select query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::select query=[' + sql + ']')
+    return sql
   },
 
-  insert : function(data) {
-    // logger.trace(this.classname + '::insert data=' + util.inspect(data));
-    var self = this,
-        tableName, entities, isIdIncluded, isInsertIgnore, onDuplicateKey;
+  insert: function (data) {
+    // logger.trace(this.classname + '::insert data=' + util.inspect(data))
+    var self = this
+    var tableName
+    var entities
+    var isIdIncluded
+    var isInsertIgnore
+    var onDuplicateKey
+
     if (data instanceof BaseEntity) {
-      tableName = data.tableName;
-      isIdIncluded = data.isNewForced();
-      isInsertIgnore = data.isInsertIgnore();
-      onDuplicateKey = data.onDuplicateKey();
-      entities = [data];
+      tableName = data.tableName
+      isIdIncluded = data.isNewForced()
+      isInsertIgnore = data.isInsertIgnore()
+      onDuplicateKey = data.onDuplicateKey()
+      entities = [data]
     } else if (_.isArray(data) && data.length > 0) {
-      tableName = data[0].tableName;
-      isIdIncluded = data[0].isNewForced();
-      isInsertIgnore = data[0].isInsertIgnore();
-      onDuplicateKey = data[0].onDuplicateKey();
-      entities = data;
+      tableName = data[0].tableName
+      isIdIncluded = data[0].isNewForced()
+      isInsertIgnore = data[0].isInsertIgnore()
+      onDuplicateKey = data[0].onDuplicateKey()
+      entities = data
     } else {
       logger.error(self.classname + '::insert invalid data=' +
-                    util.inspect(data));
-      return null;
+                    util.inspect(data))
+      return null
     }
 
-    var cols = _.reject(_.keys(entities[0].columns), function(col) {
-      let isPK = _.indexOf(entities[0].primaryKeys, col) > -1,
-          prop = Utils.convertToCamelCase(col),
-          isNull = entities[0][prop] === null || entities[0][prop] === undefined;
-      return isPK || isNull;
-    }).concat(entities[0].predefinedCols);
+    var cols = _.reject(_.keys(entities[0].columns), function (col) {
+      let isPK = _.indexOf(entities[0].primaryKeys, col) > -1
+      var prop = Utils.convertToCamelCase(col)
+      var isNull = entities[0][prop] === null || entities[0][prop] === undefined
+
+      return isPK || isNull
+    }).concat(entities[0].predefinedCols)
 
     if (isIdIncluded) {
-      cols.unshift('id');
+      cols.unshift('id')
     }
 
-    var valueStrs = [],
-        params = [];
-    _.each(entities, function(entity) {
+    var valueStrs = []
+    var params = []
+
+    _.each(entities, function (entity) {
       if (tableName !== entity.tableName) {
         logger.error(self.classname + '::insert mismatch tableName (' +
-                      tableName + '#' + entity.tableName + '');
-        return null;
+                      tableName + '#' + entity.tableName + '')
+        return null
       }
 
-      var valueStr = '(';
-      valueStr += _.map(cols, function(col) {
-        var prop = Utils.convertToCamelCase(col);
+      var valueStr = '('
+      valueStr += _.map(cols, function (col) {
+        var prop = Utils.convertToCamelCase(col)
         if (entity[prop] === null || entity[prop] === undefined) {
-          params.push(null);
+          params.push(null)
         } else if (typeof entity[prop] === 'string') {
-          params.push(entity[prop]);
+          params.push(entity[prop])
         } else {
-          params.push(entity[prop]);
+          params.push(entity[prop])
         }
-        return '?';
-      }).join(',');
-      valueStr += ')';
-      valueStrs.push(valueStr);
-    });
+        return '?'
+      }).join(',')
+      valueStr += ')'
+      valueStrs.push(valueStr)
+    })
 
     return [
       self._buildInsertQuery(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey),
       params
-    ];
+    ]
   },
 
-  _buildInsertQuery : function(tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey) {
-    var self = this;
-    var sql = 'INSERT ';
+  _buildInsertQuery: function (tableName, cols, valueStrs, isInsertIgnore, onDuplicateKey) {
+    var self = this
+    var sql = 'INSERT '
     if (isInsertIgnore) {
-      sql += 'IGNORE ';
+      sql += 'IGNORE '
     }
-    sql += 'INTO ';
-    sql += tableName;
-    sql += '(';
-    sql += _.map(cols, self._escapeColumn).join(',');
-    sql += ') VALUES ';
-    sql += valueStrs.join(',');
+    sql += 'INTO '
+    sql += tableName
+    sql += '('
+    sql += _.map(cols, self._escapeColumn).join(',')
+    sql += ') VALUES '
+    sql += valueStrs.join(',')
     if (onDuplicateKey) {
-      sql += ' ON DUPLICATE KEY UPDATE ' + onDuplicateKey;
+      sql += ' ON DUPLICATE KEY UPDATE ' + onDuplicateKey
     }
-    return sql;
+    return sql
   },
 
-  updateOneById: function(tableName, id, data) {
-    var self = this;
-    var params = [];
-    var setClauses = [];
+  updateOneById: function (tableName, id, data) {
+    var self = this
+    var params = []
+    var setClauses = []
     for (let col in data) {
-      setClauses.push(self._escapeColumn(col) + '=?');
-      params.push(data[col]);
+      setClauses.push(self._escapeColumn(col) + '=?')
+      params.push(data[col])
     }
-    params.push(id);
-    var sql = util.format('UPDATE %s SET %s WHERE id=?', tableName, setClauses.join(','));
+    params.push(id)
+    var sql = util.format('UPDATE %s SET %s WHERE id=?', tableName, setClauses.join(','))
 
-    return [sql, params];
+    return [sql, params]
   },
 
-  updateOne : function(entity) {
-    var self = this,
-        tableName = entity.tableName,
-        changeCols = entity.getChangedColumns(),
-        params = [],
-        sql = 'UPDATE ';
+  updateOne: function (entity) {
+    var self = this
+    var tableName = entity.tableName
+    var changeCols = entity.getChangedColumns()
+    var params = []
+    var sql = 'UPDATE '
 
-    sql += tableName;
-    sql += ' SET ';
-    sql += _.map(changeCols, function(col) {
-      var prop = Utils.convertToCamelCase(col);
-      params.push(entity[prop]);
-      return self._escapeColumn(col) + '=?';
-    }).join(',');
-    sql += ' WHERE ';
-    sql += _.map(entity.primaryKeys, function(col) {
-      var prop = Utils.convertToCamelCase(col);
-      params.push(entity[prop]);
-      return self._escapeColumn(col) + '=?';
-    }).join(' AND ');
+    sql += tableName
+    sql += ' SET '
+    sql += _.map(changeCols, function (col) {
+      var prop = Utils.convertToCamelCase(col)
+      params.push(entity[prop])
+      return self._escapeColumn(col) + '=?'
+    }).join(',')
+    sql += ' WHERE '
+    sql += _.map(entity.primaryKeys, function (col) {
+      var prop = Utils.convertToCamelCase(col)
+      params.push(entity[prop])
+      return self._escapeColumn(col) + '=?'
+    }).join(' AND ')
 
-    // logger.trace(this.classname + '::updateOne query=[' + sql + ']');
-    return [sql, params];
+    // logger.trace(this.classname + '::updateOne query=[' + sql + ']')
+    return [sql, params]
   },
 
   /**
@@ -148,196 +159,196 @@ var BaseQueryBuilder = Class.extends({
    *   - {string} where   : where clause in statment
    *   - {array}  params  : parameters for preparing statement
    */
-  updateBatch : function(tableName, options) {
-    var self = this;
+  updateBatch: function (tableName, options) {
+    var self = this
 
-    var sql = 'UPDATE ';
-    sql += tableName;
-    sql += ' SET ';
-    sql += options.set;
-    sql += self._buildWhereClause(options);
+    var sql = 'UPDATE '
+    sql += tableName
+    sql += ' SET '
+    sql += options.set
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::updateBatch query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::updateBatch query=[' + sql + ']')
+    return sql
   },
 
-  deleteOne : function(entity) {
-    var self = this,
-        params = [];
+  deleteOne: function (entity) {
+    var self = this
+    var params = []
 
-    var sql = 'DELETE FROM ';
-    sql += entity.tableName;
-    sql += ' WHERE ';
-    sql += _.map(entity._model.primaryKeys, function(col) {
-      var prop = Utils.convertToCamelCase(col);
-      params.push(entity[prop]);
-      return self._escapeColumn(col) + '=?';
-    }).join(' AND ');
-    return [sql, params];
+    var sql = 'DELETE FROM '
+    sql += entity.tableName
+    sql += ' WHERE '
+    sql += _.map(entity._model.primaryKeys, function (col) {
+      var prop = Utils.convertToCamelCase(col)
+      params.push(entity[prop])
+      return self._escapeColumn(col) + '=?'
+    }).join(' AND ')
+    return [sql, params]
   },
 
-  deleteBatch : function(tableName, options) {
-    var self = this;
+  deleteBatch: function (tableName, options) {
+    var self = this
 
-    var sql = 'DELETE FROM ';
-    sql += tableName;
-    sql += self._buildWhereClause(options);
+    var sql = 'DELETE FROM '
+    sql += tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::deleteBatch query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::deleteBatch query=[' + sql + ']')
+    return sql
   },
 
-  count: function(tableName, options) {
-    var self = this;
+  count: function (tableName, options) {
+    var self = this
 
-    var sql = 'SELECT COUNT(1) AS `count` FROM ';
-    sql += tableName;
-    sql += self._buildWhereClause(options);
+    var sql = 'SELECT COUNT(1) AS `count` FROM '
+    sql += tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::count query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::count query=[' + sql + ']')
+    return sql
   },
 
-  countGroupBy: function(tableName, groupCols, options) {
-    var self = this;
-    options.groupBy = groupCols;
-    var sql =   'SELECT ' + _.map(groupCols, self._escapeColumn).join(',') +
-                ', COUNT(1) AS `count` FROM ';
-    sql += tableName;
-    sql += self._buildWhereClause(options);
+  countGroupBy: function (tableName, groupCols, options) {
+    var self = this
+    options.groupBy = groupCols
+    var sql = 'SELECT ' + _.map(groupCols, self._escapeColumn).join(',') +
+                ', COUNT(1) AS `count` FROM '
+    sql += tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::countGroupBy query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::countGroupBy query=[' + sql + ']')
+    return sql
   },
 
-  sum: function(tableName, column, options) {
-    var self = this,
-        // If the query is aggregation of an expression,
-        // column names should be escaped from outside
-        ignoreEscape = options.isExAggregation;
+  sum: function (tableName, column, options) {
+    var self = this
+    // If the query is aggregation of an expression,
+    // column names should be escaped from outside
+    var ignoreEscape = options.isExAggregation
 
-    var sql = 'SELECT SUM(' + self._escapeColumn(column, ignoreEscape) + ') AS `sum` FROM ';
-    sql += tableName;
-    sql += self._buildWhereClause(options);
+    var sql = 'SELECT SUM(' + self._escapeColumn(column, ignoreEscape) + ') AS `sum` FROM '
+    sql += tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::count query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::count query=[' + sql + ']')
+    return sql
   },
 
-  sumGroupBy: function(tableName, column, options) {
-    var self = this;
+  sumGroupBy: function (tableName, column, options) {
+    var self = this
 
-    var sql =   'SELECT ' + options.groupBy + ', sum(' + column + ') AS `sum` FROM ';
-    sql += tableName;
-    sql += self._buildWhereClause(options);
+    var sql = 'SELECT ' + options.groupBy + ', sum(' + column + ') AS `sum` FROM '
+    sql += tableName
+    sql += self._buildWhereClause(options)
 
-    // logger.trace(this.classname + '::sumGroupBy query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::sumGroupBy query=[' + sql + ']')
+    return sql
   },
 
-  existed: function(tableName, options) {
-    var self = this;
+  existed: function (tableName, options) {
+    var self = this
 
     var sql = util.format(
                 'SELECT if(exists(SELECT 1 FROM %s %s), 1, 0) AS `existed`',
                 tableName,
-                self._buildWhereClause(options));
+                self._buildWhereClause(options))
 
-    // logger.trace(this.classname + '::existed query=[' + sql + ']');
-    return sql;
+    // logger.trace(this.classname + '::existed query=[' + sql + ']')
+    return sql
   },
 
-  _escapeColumn : function(columnName, ignoreEscape) {
+  _escapeColumn: function (columnName, ignoreEscape) {
     if (ignoreEscape || columnName.indexOf('`') > -1) {
-      return columnName;
+      return columnName
     }
 
     if (columnName.indexOf('.') < 0) {
-      return '`' + columnName.toLowerCase() + '`';
+      return '`' + columnName.toLowerCase() + '`'
     }
 
-    return _.map(columnName.split('.'), function(e) {
-      return '`' + e.toLowerCase() + '`';
-    }).join('.');
+    return _.map(columnName.split('.'), function (e) {
+      return '`' + e.toLowerCase() + '`'
+    }).join('.')
   },
 
-  _buildColumns : function(options) {
-    var ret = '';
-    var columns = options.columns;
+  _buildColumns: function (options) {
+    var ret = ''
+    var columns = options.columns
     if (columns && columns.length) {
       if (typeof columns === 'string') {
-        return columns;
+        return columns
       }
 
       if (_.isArray(columns)) {
-        return columns.join(',');
+        return columns.join(',')
       }
     } else {
-      ret += '*';
+      ret += '*'
     }
 
-    return ret;
+    return ret
   },
 
-  _buildWhereClause : function(options) {
-    var self = this,
-        clause = '';
+  _buildWhereClause: function (options) {
+    var self = this
+    var clause = ''
 
     if (options.where) {
       if (typeof options.where === 'string') {
-        clause += (' WHERE ' + options.where);
+        clause += (' WHERE ' + options.where)
       } else if (_.isPlainObject(options.where)) {
-        clause += ' WHERE ';
-        clause += _.map(_.keys(options.where), function(col) {
-          return self._escapeColumn(col) + '=?';
-        }).join(' AND ');
+        clause += ' WHERE '
+        clause += _.map(_.keys(options.where), function (col) {
+          return self._escapeColumn(col) + '=?'
+        }).join(' AND ')
       }
     }
 
     if (options.groupBy) {
       if (typeof options.groupBy === 'string') {
-        clause += (' GROUP BY ' + options.groupBy);
+        clause += (' GROUP BY ' + options.groupBy)
       } else if (_.isArray(options.groupBy)) {
-        clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+        clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','))
       } else {
-        throw new Error('Invalid groupBy options: ' + options.groupBy);
+        throw new Error('Invalid groupBy options: ' + options.groupBy)
       }
     }
 
     if (options.having) {
       if (typeof options.having === 'string') {
-        clause += (' HAVING ' + options.having);
+        clause += (' HAVING ' + options.having)
       } else if (_.isArray(options.having)) {
         if (options.having.length > 0) {
-          clause += ' HAVING ';
-          clause += options.having.join(' AND ');
+          clause += ' HAVING '
+          clause += options.having.join(' AND ')
         }
       } else {
-        throw new Error('Invalid having options: ' + options.having);
+        throw new Error('Invalid having options: ' + options.having)
       }
     }
 
     if (options.orderBy) {
       if (typeof options.orderBy === 'string') {
-        clause += (' ORDER BY ' + options.orderBy);
+        clause += (' ORDER BY ' + options.orderBy)
       } else if (_.isArray(options.orderBy)) {
-        clause += (' ORDER BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+        clause += (' ORDER BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','))
       } else {
-        throw new Error('Invalid orderBy options: ' + options.orderBy);
+        throw new Error('Invalid orderBy options: ' + options.orderBy)
       }
     }
 
     if (options.limit) {
-      clause += (' LIMIT ' + ((options.limit < 0) ? Const.MAX_QUERY_RECORDS : options.limit));
+      clause += (' LIMIT ' + ((options.limit < 0) ? Const.MAX_QUERY_RECORDS : options.limit))
     }
 
     if (options.offset) {
-      clause += (' OFFSET ' + options.offset);
+      clause += (' OFFSET ' + options.offset)
     }
 
-    return clause;
-  },
+    return clause
+  }
 
-});
+})
 
-module.exports = BaseQueryBuilder;
+module.exports = BaseQueryBuilder

@@ -3,10 +3,10 @@
  */
 
 module.exports = {
-  ERROR_TYPE : {
-    APP_TEST : {
-      CODE : 1000,
-      MSG  : 'App test error'
+  ERROR_TYPE: {
+    APP_TEST: {
+      CODE: 1000,
+      MSG: 'App test error'
     }
   }
-};
+}

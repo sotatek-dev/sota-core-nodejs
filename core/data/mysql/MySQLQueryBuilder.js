@@ -1,9 +1,8 @@
-var BaseQueryBuilder = require('../BaseQueryBuilder');
+var BaseQueryBuilder = require('../BaseQueryBuilder')
 
 var MySQLQueryBuilder = BaseQueryBuilder.singleton({
-  classname : 'MySQLQueryBuilder',
+  classname: 'MySQLQueryBuilder'
 
+})
 
-});
-
-module.exports = MySQLQueryBuilder;
+module.exports = MySQLQueryBuilder

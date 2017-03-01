@@ -5,14 +5,14 @@
  * Run command `npm run schema` to re-generate this
  */
 
- module.exports = { ConfigModel: 
-   { key: { type: 'string', length: 300 },
-     value: { type: 'string', length: 180 },
-     type: { type: 'string', length: 30 } },
-  MasterModel: 
+ module.exports = { ConfigModel:
+ { key: { type: 'string', length: 300 },
+   value: { type: 'string', length: 180 },
+   type: { type: 'string', length: 30 } },
+   MasterModel:
    { key: { type: 'string', length: 765 },
      value: { type: 'string', length: 765 } },
-  UserModel: 
+   UserModel:
    { username: { type: 'string', length: 120 },
      avatar_url: { type: 'string', length: 768 },
      email: { type: 'string', length: 120 },

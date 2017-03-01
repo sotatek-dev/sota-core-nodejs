@@ -1,36 +1,38 @@
-var BaseModel = require('../../core/model/BaseModel');
+/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
+var _           = require('lodash')
+var BaseModel   = require('../../core/model/BaseModel')
 
 module.exports = BaseModel.extends({
-  classname : 'ConfigModel',
+  classname: 'ConfigModel',
 
   $tableName: 'config',
   $dsConfig: {
-    read   : 'mysql-slave',
-    write  : 'mysql-master',
+    read: 'mysql-slave',
+    write: 'mysql-master'
   },
 
-  getValue: function(key, callback) {
+  getValue: function (key, callback) {
     this.findOne({
       where: '`key`=?',
-      params: [key],
-    }, function(err, ret) {
+      params: [key]
+    }, function (err, ret) {
       if (err) {
-        return callback(err);
+        return callback(err)
       }
 
       if (_.isNil(ret)) {
-        return callback(null, null);
+        return callback(null, null)
       }
 
-      var value = ret.value;
+      var value = ret.value
       if (ret.type === 'integer') {
-        value = parseInt(value);
+        value = parseInt(value)
       } else if (ret.type === 'float') {
-        value = parseFloat(value);
+        value = parseFloat(value)
       }
 
-      callback(null, value);
-    });
+      callback(null, value)
+    })
   }
 
-});
+})
