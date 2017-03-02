@@ -9,7 +9,7 @@ var _localMeta = {}
 
 class LocalCache extends BaseCache {
 
-  set (key, value, meta, callback) {
+  setAsync (key, value, meta, callback) {
     if (typeof meta === 'function') {
       callback = meta
     }
@@ -18,7 +18,7 @@ class LocalCache extends BaseCache {
     return callback(null, value)
   }
 
-  get (key, callback) {
+  getAsync (key, callback) {
     return callback(null, this.getSync(key))
   }
 

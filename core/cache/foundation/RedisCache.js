@@ -17,7 +17,7 @@ client.on('error', function (err) {
 
 class RedisCache extends BaseCache {
 
-  set (key, value, meta, callback) {
+  setAsync (key, value, meta, callback) {
     if (typeof meta === 'function') {
       callback = meta
       meta = null
@@ -61,7 +61,7 @@ class RedisCache extends BaseCache {
     client.hgetall(key, callback)
   }
 
-  get (key, callback) {
+  getAsync (key, callback) {
     client.get(key, callback)
   }
 

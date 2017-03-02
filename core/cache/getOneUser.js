@@ -14,7 +14,7 @@ module.exports = function (userId, callback) {
 
   async.auto({
     cached: function (next) {
-      RedisCache.get(key, next)
+      RedisCache.getAsync(key, next)
     },
     user: ['cached', function (ret, next) {
       if (!_.isNil(ret.cached)) {
@@ -39,7 +39,7 @@ module.exports = function (userId, callback) {
         ttl: Const.MINUTE_IN_MILLISECONDS
       }
 
-      RedisCache.set(key, JSON.stringify(user), meta, next)
+      RedisCache.setAsync(key, JSON.stringify(user), meta, next)
     }]
   }, function (err, ret) {
     exSession.destroy()
