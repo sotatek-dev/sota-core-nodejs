@@ -51,7 +51,7 @@ class LocalCache extends BaseCache {
       return null
     }
 
-    return data
+    return data || null
   }
 
   removeSync (key) {
