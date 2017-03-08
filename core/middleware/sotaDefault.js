@@ -128,7 +128,10 @@ function _sendError (req, error, httpStatus) {
     error = new InternalError()
   }
 
-  if (req.headers['accept'] && req.headers['accept'].indexOf('application/json') === -1) {
+  if (req.headers['accept'] && (
+    req.headers['accept'].indexOf('text') > -1 ||
+    req.headers['accept'].indexOf('html') > -1 ||
+    req.headers['accept'].indexOf('xml') > -1)) {
     return this.render(error.getHttpStatus().toString(), error.toJSON())
   }
 

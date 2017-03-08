@@ -214,10 +214,10 @@ var BaseModel = Class.extends({
   _updateBatch: function (options, callback) {
     var now = Utils.now()
     var userId = this._exSession.getUserId()
-    if (_.includes(this.predefinedCols, 'updated_at')) {
+    if (_.includes(this.predefinedCols, 'updated_at') && options.set.toLowerCase().indexOf('updated_at') === -1) {
       options.set += ', updated_at=' + now
     }
-    if (_.includes(this.predefinedCols, 'updated_by')) {
+    if (_.includes(this.predefinedCols, 'updated_by') && options.set.toLowerCase().indexOf('updated_by') === -1) {
       options.set += ', updated_by=' + userId
     }
     this._masterAdapter.updateBatch(this.tableName, options, callback)
@@ -305,7 +305,7 @@ var BaseModel = Class.extends({
    * @param {Function} callback - typical callback
    */
   findOrInsertOne: function (def, options, defaultValues, callback) {
-    if (!def || def.id) {
+    if (_.isEmpty(def)) {
       return callback('Invalid getOrInsertOne params: ' + util.inspect(def))
     }
 
