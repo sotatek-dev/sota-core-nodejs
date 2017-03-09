@@ -22,6 +22,7 @@ module.exports = BaseAdapter.extends({
     this._gotConnection = false
     this._isFinished = false
     this._isDestroyed = false
+    this._isTransactionBegun = false
     this._retryCount = 0
     this.registryId = ++_nextId
   },
@@ -95,7 +96,8 @@ module.exports = BaseAdapter.extends({
       },
       function beginTransaction (connection, next) {
         self._connection = connection
-        if (self._mode === 'w') {
+        if (self._mode === 'w' && !self._isTransactionBegun) {
+          self._isTransactionBegun = true
           logger.trace(util.format('<%s> beginTransaction', self.registryId))
           self._connection.beginTransaction(function (err) {
             next(err, null)
@@ -511,6 +513,7 @@ module.exports = BaseAdapter.extends({
     this._retryCount = 0
     this._connection = null
     this._gotConnection = false
+    this._isTransactionBegun = false
 
     return callback(null, null)
   },
