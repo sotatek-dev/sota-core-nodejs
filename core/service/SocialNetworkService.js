@@ -151,21 +151,24 @@ module.exports = BaseService.extends({
       function user (next) {
         UserModel.findCacheOne(userId, next)
       },
-      function updateUser (user, next) {
-        user.setFieldValue(socialConnectedProperty, 0)
-        user.save(next)
-      },
       function action (user, next) {
         var count = _.compact(_.values(_.pick(user.toJSON(),
           ['isFacebookConnected', 'isGoogleConnected', 'isTwitterConnected']
         ))).length
 
-        if (!count || count < 1) {
+        if (!count || count < 2) {
           return next(ErrorFactory.forbidden('Cannot unlink the only left connected service.'))
         }
 
-        UserSocialModel.remove(userId, next)
-      }
+        UserSocialModel.remove(userId, function(err) {
+          if (err) return next(err)
+          return next(null, user)
+        })
+      },
+      function updateUser (user, next) {
+        user.setFieldValue(socialConnectedProperty, 0)
+        user.save(next)
+      },
     ], callback)
   },
 
