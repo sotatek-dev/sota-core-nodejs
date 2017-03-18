@@ -18,13 +18,13 @@ module.exports = SocialNetworkService.extends({
     return 'isGoogleConnected'
   },
 
-  getUserDefFromInfo: function (info) {
-    return {
+  getUserDefFromInfo: function (info, callback) {
+    return callback(null, {
       email: info.email,
       full_name: info.displayName,
       avatar_url: info.image ? info.image.url : null,
       is_google_connected: 1
-    }
+    })
   },
 
   _getGoogleInfo: function (accessToken, refreshToken, callback) {

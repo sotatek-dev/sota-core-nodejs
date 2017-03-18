@@ -291,6 +291,11 @@ function setupLog () {
     fs.mkdirSync(logDir)
   }
 
+  var tmpDir = '.tmp'
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir)
+  }
+
   // TODO: remove global scope of logger
   var logConfig = {
     replaceConsole: true,

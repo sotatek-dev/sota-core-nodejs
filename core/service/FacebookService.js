@@ -17,17 +17,17 @@ module.exports = SocialNetworkService.extends({
     return 'isFacebookConnected'
   },
 
-  getUserDefFromInfo: function (fbInfo) {
+  getUserDefFromInfo: function (fbInfo, callback) {
     var age = fbInfo.age_range ? (fbInfo.age_range.max || fbInfo.age_range.min) : 0
     var birthYear = new Date().getFullYear() - age
 
-    return {
+    return callback(null, {
       email: fbInfo.email,
       full_name: fbInfo.first_name + ' ' + fbInfo.last_name,
       avatar_url: fbInfo.picture.data.url,
       birthday: birthYear + '0101',
       is_facebook_connected: 1
-    }
+    })
   },
 
   _getFacebookInfo: function (fbAcessToken, callback) {

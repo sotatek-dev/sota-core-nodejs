@@ -24,7 +24,6 @@ module.exports = BaseService.extends({
     var UserSocialModel = self.getUserSocialModel()
     var UserModel = self.getModel('UserModel')
     var UserService = self.getService('UserService')
-    var userDef = self.getUserDefFromInfo(info)
     var socialId = self.getSocialIdFromInfo(info)
 
     async.auto({
@@ -34,12 +33,15 @@ module.exports = BaseService.extends({
           params: [socialId]
         }, next)
       },
-      user: ['userSocial', function (ret, next) {
+      userDef: function (next) {
+        self.getUserDefFromInfo(info, next)
+      },
+      user: ['userSocial', 'userDef', function (ret, next) {
         if (ret.userSocial) {
           return UserModel.findCacheOne(ret.userSocial.id, next)
         }
 
-        UserService.register(userDef, next)
+        UserService.register(ret.userDef, next)
       }],
       newUserSocial: ['user', function (ret, next) {
         if (ret.userSocial) {
@@ -160,7 +162,7 @@ module.exports = BaseService.extends({
           return next(ErrorFactory.forbidden('Cannot unlink the only left connected service.'))
         }
 
-        UserSocialModel.remove(userId, function(err) {
+        UserSocialModel.remove(userId, function (err) {
           if (err) return next(err)
           return next(null, user)
         })
@@ -168,7 +170,7 @@ module.exports = BaseService.extends({
       function updateUser (user, next) {
         user.setFieldValue(socialConnectedProperty, 0)
         user.save(next)
-      },
+      }
     ], callback)
   },
 

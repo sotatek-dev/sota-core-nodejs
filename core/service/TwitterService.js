@@ -14,15 +14,15 @@ module.exports = SocialNetworkService.extends({
     return 'isTwitterConnected'
   },
 
-  getUserDefFromInfo: function (twitterInfo) {
+  getUserDefFromInfo: function (twitterInfo, callback) {
     var info = twitterInfo._json || twitterInfo
-    return {
+    return callback(null, {
       username: twitterInfo.screen_name,
       email: info.email,
       full_name: info.name,
       avatar_url: info.profile_image_url,
       is_twitter_connected: 1
-    }
+    })
   },
 
   _getTwitterInfo: function (tokenKey, tokenSecret, callback) {
