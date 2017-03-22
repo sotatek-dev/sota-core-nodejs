@@ -44,10 +44,10 @@ function getModuleMap (dirs) {
 
 module.exports = function (app, config) {
   var moduleMap = getModuleMap(config.middlewareDirs)
-  var list = config.middlewares.list || defaultList
+  var beforeList = config.middlewares.before || config.middlewares.list || defaultList
+  var afterList = config.middlewares.after || []
 
-  // The required middleware
-  list.push('sotaDefault')
+  var list = beforeList.concat(['sotaDefault']).concat(afterList)
 
   for (let i = 0; i < list.length; i++) {
     let moduleName = list[i]

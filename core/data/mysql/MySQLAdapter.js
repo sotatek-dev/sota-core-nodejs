@@ -37,7 +37,7 @@ module.exports = BaseAdapter.extends({
      * Just return an error for this case
      */
     if (self._isDestroyed) {
-      logger.error(this.classname + '::_exec adapter is already destroyed id=' + self.registryId)
+      logger.error(this.classname + '::_exec adapter is already destroyed id=' + self.registryId + ', query=[' + sqlQuery + ']')
       return callback(new Error('DB connection has been terminated.'))
     }
 
