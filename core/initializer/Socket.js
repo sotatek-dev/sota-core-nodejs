@@ -9,10 +9,18 @@ var logger          = log4js.getLogger('Init.Socket')
 module.exports = function (jwtSecret, server, dirs) {
   logger.trace('Start initializing SocketIO...')
   var io = SocketIO(server)
-  io.engine.ws = new (require('uws').Server)({
-    noServer: true,
-    perMessageDeflate: false
-  })
+  try {
+    io.engine.ws = new (require('uws').Server)({
+      noServer: true,
+      perMessageDeflate: false
+    })
+  } catch (e) {
+    logger.warn('Cannot use uws, fallback to ws instead.')
+    io.engine.ws = new (require('ws').Server)({
+      noServer: true,
+      perMessageDeflate: false
+    })
+  }
 
   io.adapter(redisio({
     host: process.env.REDIS_SOCKET_HUB_ADDRESS,
