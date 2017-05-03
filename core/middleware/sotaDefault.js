@@ -107,7 +107,8 @@ function _sendResponse (req, data) {
   }
 
   var response = (typeof data === 'object') ? _envelopResponse(data) : data
-  logger.info(req.method + ' ' + req.url + ' Response:\n' + JSON.stringify(response))
+  var requestInfo = util.format('%s %s \n# Params: %j \n# Response: %j', req.method, req.url, req.allParams, response)
+  logger.info(requestInfo)
   this._originSend(response)
 }
 
