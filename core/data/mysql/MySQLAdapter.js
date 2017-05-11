@@ -117,7 +117,7 @@ module.exports = BaseAdapter.extends({
       }
     ], function (err, rows) {
       if (err) {
-        logger.error('Something went wrong when running query: [' + sqlQuery + ']')
+        logger.error('Something went wrong when running query: [' + sqlQuery + '] - params: ' + util.inspect(params))
         logger.error('<' + self.registryId + '>::exec err=' + util.inspect(err))
         callback(err)
         return
