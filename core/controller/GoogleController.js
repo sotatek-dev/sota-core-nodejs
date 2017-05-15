@@ -5,8 +5,9 @@ module.exports = BaseController.extends({
 
   login: function (req, res) {
     var [err, params] = new Checkit({
-      accessToken: ['required', 'string'],
-      refreshToken: ['required', 'string']
+      authCode: ['string'],
+      accessToken: ['string'],
+      refreshToken: ['string']
     }).validateSync(req.allParams)
 
     if (err) {
@@ -14,16 +15,14 @@ module.exports = BaseController.extends({
     }
 
     var AuthService = req.getService('AuthService')
-    AuthService.getUserGoogle(
-      params.accessToken, params.refreshToken,
-      this.ok.bind(this, req, res)
-    )
+    AuthService.getUserGoogle(params, this.ok.bind(this, req, res))
   },
 
   link: function (req, res) {
     var [err, params] = new Checkit({
-      accessToken: ['required', 'string'],
-      refreshToken: ['required', 'string']
+      authCode: ['string'],
+      accessToken: ['string'],
+      refreshToken: ['string']
     }).validateSync(req.allParams)
 
     if (err) {
@@ -31,10 +30,7 @@ module.exports = BaseController.extends({
     }
 
     var GoogleService = req.getService('GoogleService')
-    GoogleService.linkUserByToken(
-      req.user.id, params.accessToken, params.refreshToken,
-      this.created.bind(this, req, res)
-    )
+    GoogleService.linkUserByToken(req.user.id, params, this.created.bind(this, req, res))
   },
 
   unlink: function (req, res) {

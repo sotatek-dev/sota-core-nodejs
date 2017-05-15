@@ -57,13 +57,13 @@ module.exports = BaseService.extends({
     ], callback)
   },
 
-  getUserGoogle: function (accessToken, refreshToken, callback) {
+  getUserGoogle: function (params, callback) {
     var self = this
     var GoogleService = self.getService('GoogleService')
 
     async.waterfall([
       function user (next) {
-        GoogleService.getUserByToken(accessToken, refreshToken, next)
+        GoogleService.getUserByToken(params, next)
       },
       function addToken (user, next) {
         self._signTokenAndReturn(user, next)
