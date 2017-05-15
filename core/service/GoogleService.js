@@ -45,8 +45,8 @@ module.exports = SocialNetworkService.extends({
       }
     ], function(err, info) {
       // Invalid Credentials, try to refresh token once
-      if (err && err.code === 401) {
-        logger.error(err)
+      if (err && err.code === 401 && oauth2Client !== null) {
+        logger.error('Unauthorized from Google. Trying to refresh token and request again')
         return self._retryGetGoogleInfo(oauth2Client, callback)
       }
 
