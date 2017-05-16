@@ -10,7 +10,8 @@ module.exports = function (req, res, next) {
     p_offset: ['natural'],
     p_field: ['string'],
     p_before: ['string'],
-    p_after: ['string']
+    p_after: ['string'],
+    useRawId: ['natural']
   }).validateSync(req.allParams)
 
   if (err) {
@@ -49,8 +50,13 @@ module.exports = function (req, res, next) {
       let msg = 'Both p_before and p_after cannot be defined at the same time'
       return next(ErrorFactory.badRequest(msg))
     }
-    req.pagination.before = Utils.decrypt(req.pagination.before)
-    req.pagination.after = Utils.decrypt(req.pagination.after)
+
+    if (params.useRawId === 1) {
+      req.pagination.field = 'id'
+    } else {
+      req.pagination.before = Utils.decrypt(req.pagination.before)
+      req.pagination.after = Utils.decrypt(req.pagination.after)
+    }
   } else if (type === 'auto') {
     // Query from multi-tables, cannot predict the exact result
     req.pagination.limit = -1
