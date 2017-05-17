@@ -129,6 +129,10 @@ function _sendError (req, error, httpStatus) {
     error = new InternalError()
   }
 
+  if (req._sotaHooks && req._sotaHooks['sendError']) {
+    req._sotaHooks['sendError'].call(req, error)
+  }
+
   if (req.headers['accept'] && (
     req.headers['accept'].indexOf('text') > -1 ||
     req.headers['accept'].indexOf('html') > -1 ||
