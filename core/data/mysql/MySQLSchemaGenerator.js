@@ -1,12 +1,12 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var util            = require('util')
-var fs              = require('fs')
-var mysql           = require('mysql')
-var _               = require('lodash')
-var async           = require('async')
-var Types           = require('../../node_modules/mysql/lib/protocol/constants/types')
-var Class           = require('sota-class').Class
-var logger          = log4js.getLogger('MySQLSchemaGenerator')
+var util            = require('util');
+var fs              = require('fs');
+var mysql           = require('mysql');
+var _               = require('lodash');
+var async           = require('async');
+var Types           = require('../../node_modules/mysql/lib/protocol/constants/types');
+var Class           = require('sota-class').Class;
+var logger          = log4js.getLogger('MySQLSchemaGenerator');
 
 module.exports = Class.extends({
   classname: 'MySQLSchemaGenerator',
@@ -21,84 +21,87 @@ module.exports = Class.extends({
       user: config.dbUser,
       password: config.dbPwd,
       database: config.dbName
-    }
+    };
 
-    this._models = models
-    this._targetFile = targetFile
+    this._models = models;
+    this._targetFile = targetFile;
 
-    var lodashInitializer = require('../../initializer/Lodash')
-    lodashInitializer(_)
+    var lodashInitializer = require('../../initializer/Lodash');
+    lodashInitializer(_);
   },
 
   run: function () {
-    var self = this
-    self._schemaDef = {}
+    var self = this;
+    self._schemaDef = {};
 
     async.forEach(
       self._models,
       self._getOneTableSchema.bind(self),
       self._buildSchemaFile.bind(self)
-    )
+    );
   },
 
   _getOneTableSchema: function (model, callback) {
-    var tableName = model.tableName
-    var classname = model.classname
-    var self = this
-    var sqlQuery = util.format('SELECT * FROM %s LIMIT 1', tableName)
-    var connection = mysql.createConnection(this._config)
-    logger.trace('Processing table: ' + tableName)
+    var tableName = model.tableName;
+    var classname = model.classname;
+    var self = this;
+    var sqlQuery = util.format('SELECT * FROM %s LIMIT 1', tableName);
+    var connection = mysql.createConnection(this._config);
+    logger.trace('Processing table: ' + tableName);
 
-    connection.connect()
+    connection.connect();
     connection.query(sqlQuery, function (err, rows, fields) {
       if (err) {
-        throw err
+        throw err;
       }
 
-      var def = {}
+      var def = {};
       _.forEach(fields, function (field) {
         if (field.name === 'id' || _.includes(model.predefinedCols, field.name)) {
-          return
+          return;
         }
 
         def[field.name] = {
           type: self._getType(field.type),
           length: field.length
-          // default: field.default,
-        }
-      })
-      self._schemaDef[classname] = def
-      callback()
-    })
-    connection.end()
+        };
+      });
+
+      self._schemaDef[classname] = def;
+      callback();
+    });
+
+    connection.end();
   },
 
   _buildSchemaFile: function (err, ret) {
     if (err) {
-      logger.error(err)
-      return
+      logger.error(err);
+      return;
     }
 
-    logger.trace('Retrieved schema successfully. ')
-    this._schemaDef = _.sortKeysBy(this._schemaDef)
+    logger.trace('Retrieved schema successfully. ');
+    this._schemaDef = _.sortKeysBy(this._schemaDef);
 
-    var self = this
+    var self = this;
+
     // const content = 'module.exports = ' + JSON.stringify(this._schemaDef, null, 2)
     const content = '\n/**' +
                     '\n * This file is auto-generated' +
                     '\n * Please don\'t update it manually' +
                     '\n * Run command `npm run schema` to re-generate this' +
                     '\n */' +
-                    '\n\n module.exports = ' + util.inspect(this._schemaDef)
+                    '\n\n module.exports = ' + util.inspect(this._schemaDef);
 
     fs.writeFile(this._targetFile, content, function (err) {
       if (err) {
-        logger.error('Failed to write schema file : ' + err)
-        return
+        logger.error('Failed to write schema file : ' + err);
+        return;
       }
-      logger.trace('Schema file was saved: ' + self._targetFile)
-      process.exit(0)
-    })
+
+      logger.trace('Schema file was saved: ' + self._targetFile);
+      process.exit(0);
+    });
   },
 
   _getType: function (type) {
@@ -109,7 +112,7 @@ module.exports = Class.extends({
       case Types.DATETIME:
       case Types.DATETIME2:
       case Types.NEWDATE:
-        return 'date'
+        return 'date';
       case Types.TINY:
       case Types.SHORT:
       case Types.LONG:
@@ -119,16 +122,16 @@ module.exports = Class.extends({
       case Types.DOUBLE:
       case Types.NEWDECIMAL:
       case Types.LONGLONG:
-        return 'number'
+        return 'number';
       case Types.BIT:
       case Types.TINY_BLOB:
       case Types.MEDIUM_BLOB:
       case Types.LONG_BLOB:
       case Types.BLOB:
-        return 'buffer'
+        return 'buffer';
       default:
-        return 'string'
+        return 'string';
     }
   }
 
-})
+});

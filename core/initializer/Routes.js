@@ -1,57 +1,57 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _                   = require('lodash')
-var ControllerFactory   = require('../controller/ControllerFactory')
-var BaseController      = require('../controller/BaseController')
-var AuthController      = require('../controller/AuthController')
-var ModelFactory        = require('../model/foundation/ModelFactory')
-var logger              = log4js.getLogger('Init.Routes')
+var _                   = require('lodash');
+var ControllerFactory   = require('../controller/ControllerFactory');
+var BaseController      = require('../controller/BaseController');
+var AuthController      = require('../controller/AuthController');
+var ModelFactory        = require('../model/foundation/ModelFactory');
+var logger              = log4js.getLogger('Init.Routes');
 
 module.exports = function (app, config) {
   // Routes from config
-  var routes = config.routes
-  var hasCustomizedLogin = false
-  var hasCustomizedLogout = false
+  var routes = config.routes;
+  var hasCustomizedLogin = false;
+  var hasCustomizedLogout = false;
 
   for (let requestMethod in routes) {
-    let routesHash = routes[requestMethod]
+    let routesHash = routes[requestMethod];
     for (let route in routesHash) {
-      let handlerDef = routesHash[route]
-      let finalHandler = getHandler(handlerDef)
-      app[requestMethod.toLowerCase()](route, finalHandler)
+      let handlerDef = routesHash[route];
+      let finalHandler = getHandler(handlerDef);
+      app[requestMethod.toLowerCase()](route, finalHandler);
 
       if (requestMethod.toLowerCase() === 'post') {
         if (route === '/login') {
-          hasCustomizedLogin = true
+          hasCustomizedLogin = true;
         }
 
         if (route === '/logout') {
-          hasCustomizedLogin = true
+          hasCustomizedLogin = true;
         }
       }
     }
   }
 
   // Auto-generated routes from models
-  var models = ModelFactory.getAll()
+  var models = ModelFactory.getAll();
   for (var i in models) {
-    var classname = models[i]
-    var model = ModelFactory.get(classname)
-    var apiName = model.getPluralTableName()
+    var classname = models[i];
+    var model = ModelFactory.get(classname);
+    var apiName = model.getPluralTableName();
 
     // Find/select list
-    let route = '/' + apiName
-    let handlerDef = BaseController.createDefaultFind(model)
-    app.get(route, handlerDef)
+    let route = '/' + apiName;
+    let handlerDef = BaseController.createDefaultFind(model);
+    app.get(route, handlerDef);
 
     // Find/select random list
-    route = '/random/' + apiName
-    handlerDef = BaseController.createDefaultFindRandom(model)
-    app.get(route, handlerDef)
+    route = '/random/' + apiName;
+    handlerDef = BaseController.createDefaultFindRandom(model);
+    app.get(route, handlerDef);
 
     // Find/select one
-    route = '/' + apiName + '/:id'
-    handlerDef = BaseController.createDefaultFindOne(model)
-    app.get(route, handlerDef)
+    route = '/' + apiName + '/:id';
+    handlerDef = BaseController.createDefaultFindOne(model);
+    app.get(route, handlerDef);
 
     // Don't expose the create/update/delete APIs to the public
 
@@ -73,79 +73,79 @@ module.exports = function (app, config) {
 
   // If there's no user-defined login function, use built-int default login
   if (!hasCustomizedLogin) {
-    app.post('/login', AuthController.handleBy('login'))
+    app.post('/login', AuthController.handleBy('login'));
   }
 
   // If there's no user-defined logout function, use built-int default login
   if (!hasCustomizedLogout) {
-    app.post('/logout', AuthController.handleBy('logout'))
+    app.post('/logout', AuthController.handleBy('logout'));
   }
 
-  logger.trace('Routes: finished initializing.')
-}
+  logger.trace('Routes: finished initializing.');
+};
 
-function getHandler (handlerDef) {
+function getHandler(handlerDef) {
   if (!_.isArray(handlerDef)) {
     if (typeof handlerDef === 'string') {
-      handlerDef = [handlerDef]
+      handlerDef = [handlerDef];
     } else {
-      handlerDef = [handlerDef.controller, handlerDef.before, handlerDef.after]
+      handlerDef = [handlerDef.controller, handlerDef.before, handlerDef.after];
     }
   }
 
   if (!_.isArray(handlerDef)) {
-    throw new Error('Invalid routes config: ' + handlerDef)
+    throw new Error('Invalid routes config: ' + handlerDef);
   }
 
-  let controllerName = handlerDef[0]
+  let controllerName = handlerDef[0];
   if (!controllerName || typeof controllerName !== 'string') {
-    throw new Error('Invalid controller name for route config: ' + handlerDef)
+    throw new Error('Invalid controller name for route config: ' + handlerDef);
   }
 
-  let [classname, methodName] = controllerName.split('.')
+  let [classname, methodName] = controllerName.split('.');
   if (!classname || !methodName) {
-    throw new Error('Invalid controller name for route config: ' + handlerDef)
+    throw new Error('Invalid controller name for route config: ' + handlerDef);
   }
 
-  let ControllerClass = ControllerFactory.get(classname)
+  let ControllerClass = ControllerFactory.get(classname);
   if (!ControllerClass) {
-    throw new Error('Unregistered controller for route config: ' + handlerDef)
+    throw new Error('Unregistered controller for route config: ' + handlerDef);
   }
 
   if (!ControllerClass.prototype[methodName]) {
-    throw new Error('Invalid handler method for route config: ' + handlerDef)
+    throw new Error('Invalid handler method for route config: ' + handlerDef);
   }
 
-  let beforePolicies = handlerDef[1]
+  let beforePolicies = handlerDef[1];
 
   if (!beforePolicies) {
-    beforePolicies = []
+    beforePolicies = [];
   }
 
   if (typeof beforePolicies === 'string') {
-    beforePolicies = beforePolicies.split(',')
+    beforePolicies = beforePolicies.split(',');
   }
 
   if (!_.isArray(beforePolicies)) {
-    throw new Error('Invalid beforePolicies for route config: ' + handlerDef)
+    throw new Error('Invalid beforePolicies for route config: ' + handlerDef);
   }
 
-  let afterPolicies = handlerDef[2]
+  let afterPolicies = handlerDef[2];
 
   if (!afterPolicies) {
-    afterPolicies = []
+    afterPolicies = [];
   }
 
   if (typeof afterPolicies === 'string') {
-    afterPolicies = afterPolicies.split(',')
+    afterPolicies = afterPolicies.split(',');
   }
 
   if (!_.isArray(afterPolicies)) {
-    throw new Error('Invalid afterPolicies for route config: ' + handlerDef)
+    throw new Error('Invalid afterPolicies for route config: ' + handlerDef);
   }
 
   // logger.debug(util.format('Route controller=%s, beforePolicies=%s, afterPolicies=%s',
   //   controllerName, beforePolicies, afterPolicies))
 
-  return ControllerClass.handleBy(methodName, beforePolicies, afterPolicies)
+  return ControllerClass.handleBy(methodName, beforePolicies, afterPolicies);
 }

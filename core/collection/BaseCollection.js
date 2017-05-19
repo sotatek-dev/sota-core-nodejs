@@ -1,9 +1,9 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash')
-var util            = require('util')
-var Class           = require('sota-class').Class
-var IAdaptative     = require('../interface/IAdaptative')
-var logger          = log4js.getLogger('BaseCollection')
+var _               = require('lodash');
+var util            = require('util');
+var Class           = require('sota-class').Class;
+var IAdaptative     = require('../interface/IAdaptative');
+var logger          = log4js.getLogger('BaseCollection');
 
 module.exports = Class.extends({
   classname: 'BaseCollection',
@@ -12,24 +12,24 @@ module.exports = Class.extends({
     // logger.trace('created collection from model: ' + model.classname + ' as: ' + alias)
 
     if (!model || !model.tableName) {
-      throw new Error('initialize: invalid model')
+      throw new Error('initialize: invalid model');
     }
 
     if (typeof alias !== 'string') {
-      throw new Error('initialize: invalid alias')
+      throw new Error('initialize: invalid alias');
     }
 
-    this._model = model
-    this._alias = alias
-    this._joints = []
+    this._model = model;
+    this._alias = alias;
+    this._joints = [];
   },
 
   innerJoin: function (tableName, alias, conditions) {
-    return this._join(' inner join ', tableName, alias, conditions)
+    return this._join(' inner join ', tableName, alias, conditions);
   },
 
   leftJoin: function (tableName, alias, conditions) {
-    return this._join(' left join ', tableName, alias, conditions)
+    return this._join(' left join ', tableName, alias, conditions);
   },
 
   _join: function (type, tableName, alias, conditions) {
@@ -38,47 +38,47 @@ module.exports = Class.extends({
       tableName: tableName,
       alias: alias,
       conditions: this._resolveConditions(conditions)
-    })
+    });
 
-    return this
+    return this;
   },
 
   getFromClause: function () {
     return '`' + this._model.tableName + '` AS `' + this._alias + '`' +
           _.map(this._joints, function (j) {
-            return j.type + '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions
-          }).join(' ')
+            return j.type + '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions;
+          }).join(' ');
   },
 
   getAdapterForSelect: function () {
-    return this._model.getAdapterForSelect()
+    return this._model.getAdapterForSelect();
   },
 
   $_resolveConditions: function (conditions) {
     if (typeof conditions === 'string') {
-      return conditions
+      return conditions;
     }
 
-    var self = this
+    var self = this;
     if (_.isArray(conditions)) {
       return '(' + _.map(conditions, function (condition) {
-        return self._resolveConditions(condition)
-      }).join(' AND ') + ')'
+        return self._resolveConditions(condition);
+      }).join(' AND ') + ')';
     }
 
     if (_.isObject(conditions)) {
-      let _conditions = conditions['or']
+      let _conditions = conditions.or;
       if (!_.isArray(_conditions) || _conditions.length < 2) {
-        return ''
+        return '';
       }
 
       return '(' + _.map(_conditions, function (condition) {
-        return self._resolveConditions(condition)
-      }).join(' OR ') + ')'
+        return self._resolveConditions(condition);
+      }).join(' OR ') + ')';
     }
 
-    logger.error(util.format('Invalid conditions format: %j', conditions))
-    throw new Error('Invalid conditions format.')
+    logger.error(util.format('Invalid conditions format: %j', conditions));
+    throw new Error('Invalid conditions format.');
   }
 
-}).implements([IAdaptative])
+}).implements([IAdaptative]);

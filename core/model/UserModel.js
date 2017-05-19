@@ -1,6 +1,6 @@
-var bcrypt = require('bcryptjs')
-var UserEntity = require('../entity/UserEntity')
-var CachedModel = require('./CachedModel')
+var bcrypt = require('bcryptjs');
+var UserEntity = require('../entity/UserEntity');
+var CachedModel = require('./CachedModel');
 
 module.exports = CachedModel.extends({
   classname: 'UserModel',
@@ -16,10 +16,10 @@ module.exports = CachedModel.extends({
   },
 
   add: function ($super, data, options, callback) {
-    var userInfo = data
-    var hashedPassword = bcrypt.hashSync(userInfo.password || '1', bcrypt.genSaltSync(8))
-    userInfo.password = hashedPassword
-    $super(data, options, callback)
+    var userInfo = data;
+    var hashedPassword = bcrypt.hashSync(userInfo.password || '1', bcrypt.genSaltSync(8));
+    userInfo.password = hashedPassword;
+    $super(data, options, callback);
   }
 
-})
+});

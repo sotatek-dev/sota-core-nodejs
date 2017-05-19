@@ -1,24 +1,24 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var async           = require('async')
-var util            = require('util')
-var BaseEntity      = require('../entity/BaseEntity')
-var RedisCache      = require('../cache/foundation/RedisCache')
-var logger          = log4js.getLogger('Cache.setEntity')
+var async           = require('async');
+var util            = require('util');
+var BaseEntity      = require('../entity/BaseEntity');
+var RedisCache      = require('../cache/foundation/RedisCache');
+var logger          = log4js.getLogger('Cache.setEntity');
 
 module.exports = function (model, id, entity, callback) {
   async.waterfall([
-    function cached (next) {
-      var tableName = model.tableName
-      var key = util.format('entity-%s-%s', tableName, id)
-      var data = (entity instanceof BaseEntity) ? entity.toJSON() : entity
-      logger.trace(util.format('cache set: %s<%s>, data=%j', model.classname, id, data))
-      RedisCache.hmset(key, data, next)
+    function cached(next) {
+      var tableName = model.tableName;
+      var key = util.format('entity-%s-%s', tableName, id);
+      var data = (entity instanceof BaseEntity) ? entity.toJSON() : entity;
+      logger.trace(util.format('cache set: %s<%s>, data=%j', model.classname, id, data));
+      RedisCache.hmset(key, data, next);
     }
   ], function (err) {
     if (err) {
-      return callback(err)
+      return callback(err);
     }
 
-    callback(null, entity)
-  })
-}
+    callback(null, entity);
+  });
+};

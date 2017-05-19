@@ -1,4 +1,4 @@
 module.exports = function () {
-  var cookieParser = require('cookie-parser')
-  return cookieParser()
-}
+  var cookieParser = require('cookie-parser');
+  return cookieParser();
+};

@@ -1,126 +1,129 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _         = require('lodash')
-var crypto    = require('crypto')
-var util      = require('util')
+var _         = require('lodash');
+var crypto    = require('crypto');
+var util      = require('util');
 
-var Utils = {}
+var Utils = {};
 
 Utils.capitalizeFirstLetter = function (str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 Utils.normalizeFirstLetter = function (str) {
-  return str.charAt(0).toLowerCase() + str.slice(1)
-}
+  return str.charAt(0).toLowerCase() + str.slice(1);
+};
 
 Utils.convertToCamelCase = function (key) {
   if (key.indexOf('_') < 0) {
-    return Utils.normalizeFirstLetter(key)
+    return Utils.normalizeFirstLetter(key);
   }
 
   return key.toLowerCase().replace(/_./g, function (matched) {
-    return matched.charAt(1).toUpperCase()
-  })
-}
+    return matched.charAt(1).toUpperCase();
+  });
+};
 
 Utils.convertToSnakeCase = function (key) {
   return key.replace(/[a-z][A-Z]/g, function (matched) {
-    return matched.charAt(0) + '_' + matched.charAt(1).toLowerCase()
-  }).toLowerCase()
-}
+    return matched.charAt(0) + '_' + matched.charAt(1).toLowerCase();
+  }).toLowerCase();
+};
 
 Utils.emailUsername = function (emailAddress) {
-  var match = emailAddress.match(/^(.+)@/)
+  var match = emailAddress.match(/^(.+)@/);
   if (!match) {
-    return null
+    return null;
   }
-  return match[1]
-}
+
+  return match[1];
+};
 
 Utils.getRandomInRange = function (min, max) {
-  return (min + Math.floor(Math.random() * (max - min)))
-}
+  return (min + Math.floor(Math.random() * (max - min)));
+};
 
 Utils.getRandomByProb = function (probs, propName) {
   if (!propName) {
-    propName = 'prob'
+    propName = 'prob';
   }
 
-  var result = null
-  var totalProb = 0
-  var prob
+  var result = null;
+  var totalProb = 0;
+  var prob;
   for (let i = 0, len = probs.length; i < len; i++) {
-    prob = probs[i]
-    totalProb += prob[propName]
+    prob = probs[i];
+    totalProb += prob[propName];
   }
-  var prob1 = Utils.getRandomInRange(0, totalProb)
-  var prob2 = 0
+
+  var prob1 = Utils.getRandomInRange(0, totalProb);
+  var prob2 = 0;
   for (let i = 0, len = probs.length; i < len; i++) {
-    prob = probs[i]
-    prob2 += prob[propName]
+    prob = probs[i];
+    prob2 += prob[propName];
     if (prob1 < prob2) {
-      result = prob
-      break
+      result = prob;
+      break;
     }
   }
-  return result
-}
+
+  return result;
+};
 
 Utils.strToTimeInMillis = function (str) {
-  return (new Date(str)).getTime()
-}
+  return (new Date(str)).getTime();
+};
 
 Utils.nowInMilis = function () {
-  return Date.now()
-}
+  return Date.now();
+};
 
 Utils.now = function () {
-  return Utils.nowInMilis()
-}
+  return Utils.nowInMilis();
+};
 
 Utils.nowInSeconds = function () {
-  return Utils.nowInMilis() / 1000 | 0
-}
+  return Utils.nowInMilis() / 1000 | 0;
+};
 
 Utils.escapeSqlColumn = function (column) {
-  return '`' + column + '`'
-}
+  return '`' + column + '`';
+};
 
 Utils.getCDNUrl = function (folder, fileName) {
-  return util.format('%s%s/%s', process.env.CDN_URL, folder, fileName)
-}
+  return util.format('%s%s/%s', process.env.CDN_URL, folder, fileName);
+};
 
 Utils.encrypt = function (text) {
   if (!text) {
-    return null
+    return null;
   }
 
   if (_.isPlainObject(text)) {
-    text = JSON.stringify(text)
+    text = JSON.stringify(text);
   } else if (typeof text !== 'string') {
-    text = text.toString()
+    text = text.toString();
   }
 
-  var cipher = crypto.createCipher('aes-256-ctr', process.env.SECRET)
-  var crypted = cipher.update(text, 'utf8', 'hex')
-  crypted += cipher.final('hex')
-  return crypted
-}
+  var cipher = crypto.createCipher('aes-256-ctr', process.env.SECRET);
+  var crypted = cipher.update(text, 'utf8', 'hex');
+  crypted += cipher.final('hex');
+  return crypted;
+};
 
 Utils.decrypt = function (text) {
   if (!text) {
-    return null
+    return null;
   }
 
-  var decipher = crypto.createDecipher('aes-256-ctr', process.env.SECRET)
-  var dec = decipher.update(text, 'hex', 'utf8')
-  dec += decipher.final('utf8')
-  return dec
-}
+  var decipher = crypto.createDecipher('aes-256-ctr', process.env.SECRET);
+  var dec = decipher.update(text, 'hex', 'utf8');
+  dec += decipher.final('utf8');
+  return dec;
+};
 
 Utils.removeVneseSign = function (text) {
   if (!text || typeof text !== 'string') {
-    return ''
+    return '';
   }
 
   return text
@@ -130,16 +133,16 @@ Utils.removeVneseSign = function (text) {
           .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
           .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
           .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-          .replace(/đ/g, 'd')
-}
+          .replace(/đ/g, 'd');
+};
 
 Utils.removeSpecialCharacters = function (text) {
   if (!text || typeof text !== 'string') {
-    return ''
+    return '';
   }
 
-  var pattern = /!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|\/|,|\.|:|;|'| |"|&|#|\[|]|~|$|_/g
-  return text.replace(pattern, '')
-}
+  var pattern = /!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|\/|,|\.|:|;|'| |"|&|#|\[|]|~|$|_/g;
+  return text.replace(pattern, '');
+};
 
-module.exports = Utils
+module.exports = Utils;

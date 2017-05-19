@@ -1,24 +1,24 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _ = require('lodash')
+var _ = require('lodash');
 
 class BaseError {
 
   getHttpStatus () {
-    return this._httpStatus
+    return this._httpStatus;
   }
 
   getMsg () {
-    return this._msg
+    return this._msg;
   }
 
   getExtraInfo () {
-    return this._extraInfo
+    return this._extraInfo;
   }
 
   setExtraInfo (extraInfo) {
-    var originInfo = this._extraInfo || {}
-    this._extraInfo = _.assign(originInfo, extraInfo)
-    return this
+    var originInfo = this._extraInfo || {};
+    this._extraInfo = _.assign(originInfo, extraInfo);
+    return this;
   }
 
   toJSON () {
@@ -26,9 +26,9 @@ class BaseError {
       httpStatus: this._httpStatus,
       msg: this._msg,
       extraInfo: this._extraInfo || null
-    }
+    };
   }
 
 }
 
-module.exports = BaseError
+module.exports = BaseError;

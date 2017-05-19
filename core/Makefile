@@ -23,6 +23,9 @@ check-syntax-jshint:
 	--config="node-style-guide/.jshintrc" \
 	common/ controller/ data/ entity/ error/ model/ service/ util/
 
+check-style:
+	jscs .
+
 test:
 	node_modules/.bin/mocha test/*
 

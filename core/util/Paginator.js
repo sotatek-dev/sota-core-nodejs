@@ -1,101 +1,101 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash')
-var async           = require('async')
-var util            = require('util')
-var Utils           = require('../util/Utils')
-var ErrorFactory    = require('../error/ErrorFactory')
+var _               = require('lodash');
+var async           = require('async');
+var util            = require('util');
+var Utils           = require('../util/Utils');
+var ErrorFactory    = require('../error/ErrorFactory');
 
 module.exports = {
 
   _parsePaggingOption: function (model, options, pagination) {
     if (!pagination || !pagination.type) {
-      return null
+      return null;
     }
 
-    options = options || {}
+    options = options || {};
 
-    var having = options.having || []
-    var where = options.where || ''
-    var additionalWheres = []
-    var params = options.params || []
-    var limit = options.limit || pagination.limit
-    var offset = options.offset || pagination.offset
-    var field = pagination.field
-    var before = pagination.before
-    var after = pagination.after
+    var having = options.having || [];
+    var where = options.where || '';
+    var additionalWheres = [];
+    var params = options.params || [];
+    var limit = options.limit || pagination.limit;
+    var offset = options.offset || pagination.offset;
+    var field = pagination.field;
+    var before = pagination.before;
+    var after = pagination.after;
 
-    var orderBy = options.orderBy
+    var orderBy = options.orderBy;
     if (!options.ignorePaginationOrderBy) {
       orderBy = (options.orderBy ? (options.orderBy + ', ') : '') +
-                  model.getAlias() + '.' + pagination.field
+                  model.getAlias() + '.' + pagination.field;
     }
 
     if (pagination.type === 'cursor' ||
         pagination.type === 'brute') {
       if (before !== undefined && before !== null) {
-        additionalWheres.push(util.format('%s.`%s` > ?', model.getAlias(), field))
-        params.push(before)
+        additionalWheres.push(util.format('%s.`%s` > ?', model.getAlias(), field));
+        params.push(before);
       }
 
       if (after !== undefined && after !== null) {
-        additionalWheres.push(util.format('%s.`%s` < ?', model.getAlias(), field))
-        params.push(after)
+        additionalWheres.push(util.format('%s.`%s` < ?', model.getAlias(), field));
+        params.push(after);
         if (!options.ignorePaginationOrderBy) {
-          orderBy += ' DESC'
+          orderBy += ' DESC';
         }
       }
     } else if (pagination.type === 'cursor2') {
       if (before !== undefined && before !== null) {
-        let comparator = '<'
+        let comparator = '<';
         if (options.isReverseOrder) {
-          comparator = '>'
+          comparator = '>';
         }
 
         if (!options.isHavingCondition) {
-          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator))
+          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator));
         } else {
-          having.push(util.format('`%s` %s ?', field, comparator))
+          having.push(util.format('`%s` %s ?', field, comparator));
         }
 
-        params.push(before)
+        params.push(before);
 
         if (!options.ignorePaginationOrderBy) {
           if (!options.isReverseOrder) {
-            orderBy += ' DESC'
+            orderBy += ' DESC';
           }
         }
       }
 
       if (after !== undefined && after !== null) {
-        let comparator = '>'
+        let comparator = '>';
         if (options.isReverseOrder) {
-          comparator = '<'
+          comparator = '<';
         }
 
         if (!options.isHavingCondition) {
-          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator))
+          additionalWheres.push(util.format('%s.`%s` %s ?', model.getAlias(), field, comparator));
         } else {
-          having.push(util.format('`%s` %s ?', field, comparator))
+          having.push(util.format('`%s` %s ?', field, comparator));
         }
 
-        params.push(after)
+        params.push(after);
 
         if (!options.ignorePaginationOrderBy) {
           if (options.isReverseOrder) {
-            orderBy += ' DESC'
+            orderBy += ' DESC';
           }
         }
       }
     } else {
-      throw new Error('Unsupported pagination type: ' + pagination.type)
+      throw new Error('Unsupported pagination type: ' + pagination.type);
     }
 
     if (additionalWheres.length > 0) {
       if (where) {
-        where = '(' + where + ') AND '
+        where = '(' + where + ') AND ';
       }
 
-      where += '(' + additionalWheres.join(' AND ') + ')'
+      where += '(' + additionalWheres.join(' AND ') + ')';
     }
 
     return {
@@ -107,78 +107,80 @@ module.exports = {
       orderBy: orderBy,
       groupBy: options.groupBy,
       having: having
-    }
+    };
   },
 
   countGroupBy: function (model, groupFields, options, pagination, callback) {
     if (!pagination || !pagination.type) {
-      return model.countGroupBy(groupFields, options, callback)
+      return model.countGroupBy(groupFields, options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination)
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
 
-    model.countGroupBy(groupFields, mergedOptions, callback)
+    model.countGroupBy(groupFields, mergedOptions, callback);
   },
 
   sumGroupBy: function (model, columns, options, pagination, callback) {
     if (!pagination || !pagination.type) {
-      return model.sumGroupBy(columns, options, callback)
+      return model.sumGroupBy(columns, options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination)
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
 
-    model.sumGroupBy(columns, mergedOptions, callback)
+    model.sumGroupBy(columns, mergedOptions, callback);
   },
 
   find: function (model, options, pagination, callback) {
     if (!pagination || !pagination.type) {
-      return model.find(options, callback)
+      return model.find(options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination)
+    var mergedOptions = this._parsePaggingOption(model, options, pagination);
 
     async.waterfall([
-      function count (next) {
+      function count(next) {
         if (pagination.type === 'brute') {
-          model.count(_.pick(mergedOptions, ['where', 'params']), next)
+          model.count(_.pick(mergedOptions, ['where', 'params']), next);
         } else {
-          next(null, 0)
+          next(null, 0);
         }
       },
-      function list (count, next) {
+
+      function list(count, next) {
         if (count > Const.MAX_QUERY_RECORDS) {
-          return next(ErrorFactory.payloadTooLarge('Too many records'))
+          return next(ErrorFactory.payloadTooLarge('Too many records'));
         }
 
-        model.find(mergedOptions, next)
+        model.find(mergedOptions, next);
       }
-    ], callback)
+    ], callback);
   },
 
   getPagingInfo: function (result, inputPagination) {
     if (!result || !result.length) {
-      return null
+      return null;
     }
 
     if (!inputPagination.field || typeof inputPagination.field !== 'string') {
-      return null
+      return null;
     }
 
-    var prop = Utils.convertToCamelCase(inputPagination.field)
+    var prop = Utils.convertToCamelCase(inputPagination.field);
 
-    var head = _.head(result)
-    var before = Utils.encrypt(head[prop])
+    var head = _.head(result);
+    var before = Utils.encrypt(head[prop]);
 
-    var last = _.last(result)
-    var after = Utils.encrypt(last[prop])
+    var last = _.last(result);
+    var after = Utils.encrypt(last[prop]);
 
-    var previous, next
+    var previous;
+    var next;
 
-    var currentUrl = inputPagination.currentUrl
+    var currentUrl = inputPagination.currentUrl;
     if (currentUrl && typeof currentUrl === 'string') {
-      var linkingChar = currentUrl.indexOf('?') > -1 ? '&' : '?'
-      previous = currentUrl + util.format('%sp_before=%s', linkingChar, before)
-      next = currentUrl + util.format('%sp_after=%s', linkingChar, after)
+      var linkingChar = currentUrl.indexOf('?') > -1 ? '&' : '?';
+      previous = currentUrl + util.format('%sp_before=%s', linkingChar, before);
+      next = currentUrl + util.format('%sp_after=%s', linkingChar, after);
     }
 
     return {
@@ -186,7 +188,7 @@ module.exports = {
       after: after,
       previous: previous,
       next: next
-    }
+    };
   }
 
-}
+};

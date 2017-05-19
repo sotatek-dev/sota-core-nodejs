@@ -1,28 +1,28 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var async                 = require('async')
-var Twitter               = require('twitter')
-var SocialNetworkService  = require('./SocialNetworkService')
+var async                 = require('async');
+var Twitter               = require('twitter');
+var SocialNetworkService  = require('./SocialNetworkService');
 
 module.exports = SocialNetworkService.extends({
   classname: 'TwitterService',
 
   getUserSocialModel: function () {
-    return this.getModel('UserTwitterModel')
+    return this.getModel('UserTwitterModel');
   },
 
   getSocialConnectedProperty: function () {
-    return 'isTwitterConnected'
+    return 'isTwitterConnected';
   },
 
   getUserDefFromInfo: function (twitterInfo, callback) {
-    var info = twitterInfo._json || twitterInfo
+    var info = twitterInfo._json || twitterInfo;
     return callback(null, {
       username: twitterInfo.screen_name,
       email: info.email,
       full_name: info.name,
       avatar_url: info.profile_image_url,
       is_twitter_connected: 1
-    })
+    });
   },
 
   _getTwitterInfo: function (tokenKey, tokenSecret, callback) {
@@ -31,41 +31,43 @@ module.exports = SocialNetworkService.extends({
       consumer_secret: process.env.TWITTER_APP_SECRET,
       access_token_key: tokenKey,
       access_token_secret: tokenSecret
-    })
+    });
 
     client.get('account/verify_credentials', function (err, twitterProfile, response) {
       if (err) {
-        return callback(err)
+        return callback(err);
       }
 
-      return callback(null, twitterProfile)
-    })
+      return callback(null, twitterProfile);
+    });
   },
 
   getUserByToken: function (tokenKey, tokenSecret, callback) {
-    var self = this
+    var self = this;
     async.waterfall([
-      function twInfo (next) {
-        self._getTwitterInfo(tokenKey, tokenSecret, next)
+      function twInfo(next) {
+        self._getTwitterInfo(tokenKey, tokenSecret, next);
       },
-      function getUser (twInfo, next) {
-        twInfo.token = tokenKey
-        twInfo.token_secret = tokenSecret
-        return self.findOrCreateUserBySocialInfo(twInfo, next)
+
+      function getUser(twInfo, next) {
+        twInfo.token = tokenKey;
+        twInfo.token_secret = tokenSecret;
+        return self.findOrCreateUserBySocialInfo(twInfo, next);
       }
-    ], callback)
+    ], callback);
   },
 
   linkUserByToken: function (userId, tokenKey, tokenSecret, callback) {
-    var self = this
+    var self = this;
     async.waterfall([
-      function twInfo (next) {
-        self._getTwitterInfo(tokenKey, tokenSecret, next)
+      function twInfo(next) {
+        self._getTwitterInfo(tokenKey, tokenSecret, next);
       },
-      function getUser (twInfo, next) {
-        return self.linkUserBySocialInfo(userId, twInfo, next)
+
+      function getUser(twInfo, next) {
+        return self.linkUserBySocialInfo(userId, twInfo, next);
       }
-    ], callback)
+    ], callback);
   },
 
   getTwitterClient: function (tokenKey, tokenSecret) {
@@ -74,7 +76,7 @@ module.exports = SocialNetworkService.extends({
       consumer_secret: process.env.TWITTER_APP_SECRET,
       access_token_key: tokenKey,
       access_token_secret: tokenSecret
-    })
+    });
   }
 
-})
+});

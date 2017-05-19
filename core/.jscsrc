@@ -1,0 +1,10 @@
+{
+    "preset": "airbnb",
+    "maximumLineLength": {
+      "value": 120,
+      "allExcept": ["functionSignature", "comments", "urlComments"]
+    },
+    "requireTrailingComma": false,
+    "disallowArrayDestructuringReturn": false,
+    "safeContextKeyword": ["self"]
+}

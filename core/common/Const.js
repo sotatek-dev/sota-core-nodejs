@@ -51,4 +51,4 @@ module.exports = {
   MONTH_IN_MILLISECONDS: 1000 * 60 * 60 * 24 * 30,
   YEAR_IN_MILLISECONDS: 1000 * 60 * 60 * 24 * 365
 
-}
+};
