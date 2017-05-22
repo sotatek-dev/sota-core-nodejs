@@ -55,7 +55,11 @@ module.exports = BaseModel.extends({
         return callback(err);
       }
 
-      callback(null, ret.data);
+      var result = _.filter(ret.data, function (e) {
+        return _.isNil(e.isActive) || e.isActive > 0;
+      });
+
+      callback(null, result);
     });
   },
 
