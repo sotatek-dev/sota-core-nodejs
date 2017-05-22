@@ -51,13 +51,13 @@ var BaseQueryBuilder = Class.extends({
       return null;
     }
 
-    var cols = _.reject(_.keys(entities[0].columns), function (col) {
+    var cols = _.uniq(_.reject(_.keys(entities[0].columns), function (col) {
       let isPK = _.indexOf(entities[0].primaryKeys, col) > -1;
       var prop = Utils.convertToCamelCase(col);
       var isNull = entities[0][prop] === null || entities[0][prop] === undefined;
 
       return isPK || isNull;
-    }).concat(entities[0].predefinedCols);
+    }).concat(entities[0].predefinedCols));
 
     if (isIdIncluded) {
       cols.unshift('id');
