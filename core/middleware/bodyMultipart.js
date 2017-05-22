@@ -53,9 +53,9 @@ module.exports = function (app, config, options) {
 
       next();
     });
-
-    form.on('error', function (err) {
-      return next(err);
-    });
   };
+
+  form.on('error', function (err) {
+    return next(err);
+  });
 };
