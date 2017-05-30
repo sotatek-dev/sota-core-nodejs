@@ -76,9 +76,14 @@ module.exports = function (app) {
       passReqToCallback: true
     },
     function (req, email, password, done) {
-      var UserModel = req.getModel('UserModel');
+      let UserModel = req.getModel('UserModel');
+      let field = 'email';
+      if (email.indexOf('@') < 0) {
+        field = 'username';
+      }
+
       UserModel.findOne({
-        where: 'email=?',
+        where: `${field}=?`,
         params: [email.toLowerCase()]
       }, function (err, user) {
         if (err) {
@@ -86,12 +91,12 @@ module.exports = function (app) {
         }
 
         if (!user) {
-          logger.error('User not found email=' + email);
-          return done(ErrorFactory.notFound('User not found: email=' + email));
+          logger.error(`User not found ${field}=${email}`);
+          return done(ErrorFactory.notFound(`User not found: ${field}=${email}`));
         }
 
         if (!user.isValidPassword(password)) {
-          logger.error('Invalid password for email=' + email + ', password=' + password);
+          logger.error(`Invalid password for ${field}=${email}, password=${password}`);
           return done(ErrorFactory.badRequest('Wrong password.'));
         }
 
