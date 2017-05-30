@@ -169,7 +169,7 @@ module.exports = Class.extends({
     }
   },
 
-  getRedisHubClient: function () {
+  $getRedisHubClient: function () {
     return client;
   },
 
