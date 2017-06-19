@@ -59,6 +59,7 @@ module.exports = Class.singleton({
       user: config.dbUser,
       password: config.dbPwd,
       database: config.dbName,
+      port: config.dbPort || 3306,
       connectionLimit: config.connectionLimit || 10,
       waitForConnections: config.waitForConnections || true,
       queueLimit: config.queueLimit || 5,

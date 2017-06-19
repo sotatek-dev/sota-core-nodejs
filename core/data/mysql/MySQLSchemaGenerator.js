@@ -20,7 +20,8 @@ module.exports = Class.extends({
       host: config.dbHost,
       user: config.dbUser,
       password: config.dbPwd,
-      database: config.dbName
+      database: config.dbName,
+      port: config.dbPort || 3306,
     };
 
     this._models = models;

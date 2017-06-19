@@ -65,6 +65,7 @@ module.exports = {
       user: testAdapter.dbUser,
       database: testAdapter.dbName,
       password: testAdapter.dbPwd,
+      port: testAdapter.dbPort || 3306,
       charset: 'utf8'
     },
     migrations: {
@@ -82,6 +83,7 @@ module.exports = {
       user: adapter.dbUser,
       database: adapter.dbName,
       password: adapter.dbPwd,
+      port: adapter.dbPort || 3306,
       charset: 'utf8'
     },
     migrations: {
