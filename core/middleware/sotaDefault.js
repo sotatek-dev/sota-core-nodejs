@@ -69,25 +69,27 @@ function _envelopData(data) {
   return data;
 }
 
-function _envelopResponse(data) {
+function _envelopResponse(req, data) {
   var now = Utils.now();
   if (data instanceof BaseError) {
-    return {
-      meta: {
-        code: -1,
-        msg: data.getMsg(),
-        extraInfo: data.getExtraInfo(),
-        serverTime: now
-      }
-    };
+    let meta = _.assign({
+      code: -1,
+      msg: data.getMsg(),
+      extraInfo: data.getExtraInfo(),
+      serverTime: now
+    }, req._additionalMeta || {});
+
+    return { meta };
   }
 
+  let meta = _.assign({
+    code: 0,
+    serverTime: now,
+    masterdataVersion: LocalCache.getSync('data_version') || 1
+  }, req._additionalMeta || {});
+
   return {
-    meta: {
-      code: 0,
-      serverTime: now,
-      masterdataVersion: LocalCache.getSync('data_version') || 1
-    },
+    meta,
     data: data.data || null,
     pagination: data.pagination,
     global: data.global
@@ -106,7 +108,7 @@ function _sendResponse(req, data) {
     data = _envelopData(data);
   }
 
-  var response = (typeof data === 'object') ? _envelopResponse(data) : data;
+  var response = (typeof data === 'object') ? _envelopResponse(req, data) : data;
   var requestInfo = util.format('%s %s \n# Params: %j \n# Response: %j', req.method, req.url, req.allParams, response);
   logger.info(requestInfo);
   this._originSend(response);
