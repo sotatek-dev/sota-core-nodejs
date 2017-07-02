@@ -128,7 +128,7 @@ module.exports = SocialNetworkService.extends({
   getOauth2ClientSync: function (accessToken, refreshToken) {
     var oauth2Client = new OAuth2(
       process.env.GOOGLE_APP_ID,
-      process.env.GOOGLE_APP_SECRET,
+      process.env.GOOGLE_APP_SECRET
     );
 
     oauth2Client.setCredentials({
