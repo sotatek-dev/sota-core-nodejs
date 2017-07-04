@@ -108,8 +108,7 @@ module.exports = SocialNetworkService.extends({
 
     var oauth2Client = new OAuth2(
       process.env.GOOGLE_APP_ID,
-      process.env.GOOGLE_APP_SECRET,
-      process.env.APP_ENDPOINT
+      process.env.GOOGLE_APP_SECRET
     );
 
     oauth2Client.getToken(params.authCode, function (err, tokens) {
