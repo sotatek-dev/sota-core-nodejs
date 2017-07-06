@@ -109,7 +109,14 @@ function _sendResponse(req, data) {
   }
 
   var response = (typeof data === 'object') ? _envelopResponse(req, data) : data;
-  var requestInfo = util.format('%s %s \n# Params: %j \n# Response: %j', req.method, req.url, req.allParams, response);
+  var requestInfo = util.format(
+    '%s %s \n# User: %j \n# Params: %j \n# Response: %j',
+    req.method,
+    req.url,
+    req.user ? req.user.id : 0,
+    req.allParams,
+    response
+  );
   logger.info(requestInfo);
   this._originSend(response);
 }
