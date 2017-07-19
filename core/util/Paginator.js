@@ -187,8 +187,8 @@ module.exports = {
     var currentUrl = inputPagination.currentUrl;
     if (currentUrl && typeof currentUrl === 'string') {
       var linkingChar = currentUrl.indexOf('?') > -1 ? '&' : '?';
-      previous = currentUrl + util.format('%sp_before=%s', linkingChar, before);
-      next = currentUrl + util.format('%sp_after=%s', linkingChar, after);
+      next = currentUrl + util.format('%sp_before=%s', linkingChar, before);
+      previous = currentUrl + util.format('%sp_after=%s', linkingChar, after);
     }
 
     return {
