@@ -88,11 +88,11 @@ module.exports = {
         }
       }
 
-      if (!orderDirection) {
+      if (!orderDirection && !options.ignorePaginationOrderBy) {
         orderDirection = options.isReverseOrder ? ' DESC' : ' ASC';
       }
 
-      orderBy += orderDirection;
+      orderBy += orderDirection || '';
 
     } else {
       throw new Error('Unsupported pagination type: ' + pagination.type);
