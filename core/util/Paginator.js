@@ -25,6 +25,7 @@ module.exports = {
     var after = pagination.after;
 
     var orderBy = options.orderBy;
+    var orderDirection = null;
     if (!options.ignorePaginationOrderBy) {
       orderBy = (options.orderBy ? (options.orderBy + ', ') : '') +
                   model.getAlias() + '.' + pagination.field;
@@ -41,11 +42,11 @@ module.exports = {
         additionalWheres.push(util.format('%s.`%s` < ?', model.getAlias(), field));
         params.push(after);
         if (!options.ignorePaginationOrderBy) {
-          orderBy += ' DESC';
+          orderDirection = ' DESC';
         }
       }
     } else if (pagination.type === 'cursor2') {
-      if (before !== undefined && before !== null) {
+      if (after !== undefined && after !== null) {
         let comparator = '<';
         if (options.isReverseOrder) {
           comparator = '>';
@@ -57,16 +58,16 @@ module.exports = {
           having.push(util.format('`%s` %s ?', field, comparator));
         }
 
-        params.push(before);
+        params.push(after);
 
         if (!options.ignorePaginationOrderBy) {
           if (!options.isReverseOrder) {
-            orderBy += ' DESC';
+            orderDirection = ' DESC';
           }
         }
       }
 
-      if (after !== undefined && after !== null) {
+      if (before !== undefined && before !== null) {
         let comparator = '>';
         if (options.isReverseOrder) {
           comparator = '<';
@@ -78,14 +79,21 @@ module.exports = {
           having.push(util.format('`%s` %s ?', field, comparator));
         }
 
-        params.push(after);
+        params.push(before);
 
         if (!options.ignorePaginationOrderBy) {
           if (options.isReverseOrder) {
-            orderBy += ' DESC';
+            orderDirection = ' DESC';
           }
         }
       }
+
+      if (!orderDirection) {
+        orderDirection = options.isReverseOrder ? ' DESC' : ' ASC';
+      }
+
+      orderBy += orderDirection;
+
     } else {
       throw new Error('Unsupported pagination type: ' + pagination.type);
     }
