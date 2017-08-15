@@ -80,6 +80,8 @@ var BaseQueryBuilder = Class.extends({
           params.push(null);
         } else if (typeof entity[prop] === 'string') {
           params.push(entity[prop]);
+        } else if (typeof entity[prop] === 'boolean') {
+          params.push(entity[prop] ? 1 : 0);
         } else {
           params.push(entity[prop]);
         }
