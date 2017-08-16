@@ -114,8 +114,7 @@ module.exports = SocialNetworkService.extends({
 
     oauth2Client.getToken(params.authCode, function (err, tokens) {
       if (err) {
-        logger.warn(err);
-        return callback(err);
+        return callback(err.toString());
       }
 
       params.access_token = tokens.access_token;
