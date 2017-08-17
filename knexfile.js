@@ -23,11 +23,11 @@ var testAdapter = adapters['mysql-master-test']
 var addPredefinedColumns = function (seeds) {
   return _.map(seeds, function (def) {
     if (!def.created_at) {
-      def.created_at = now + _.random(0, 100000)
+      def.created_at = now + (def.id || 0)
     }
 
     if (!def.updated_at) {
-      def.updated_at = now + _.random(0, 100000)
+      def.updated_at = now + (def.id || 0)
     }
 
     if (!def.created_by) {

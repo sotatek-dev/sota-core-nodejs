@@ -205,6 +205,9 @@ module.exports = Class.extends({
         }
       }
 
+      // Id is always integer
+      self._data.id = ~~(self._data.id || 0);
+
       /* jshint loopfunc: true */
       self.__defineGetter__(property, function (property) {
         return self._data[property];
