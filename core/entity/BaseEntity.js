@@ -198,7 +198,7 @@ module.exports = Class.extends({
           isNumber = (colDef ? (colDef.type === 'number') : false) || columnName === 'id';
         }
 
-        if (!_.isNil(data[columnName]) && _.isNumber(data[columnName])) {
+        if (!_.isNil(data[columnName]) && !isNaN(data[columnName])) {
           self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
         } else {
           self._data[property] = data[columnName];
