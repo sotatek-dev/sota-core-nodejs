@@ -15,11 +15,27 @@ module.exports = CachedModel.extends({
     write: 'mysql-master'
   },
 
+  generateHashedPassword: function(rawPassword) {
+    return bcrypt.hashSync(rawPassword || '1', bcrypt.genSaltSync(8));
+  },
+
   add: function ($super, data, options, callback) {
     var userInfo = data;
-    var hashedPassword = bcrypt.hashSync(userInfo.password || '1', bcrypt.genSaltSync(8));
+    var hashedPassword = this.generateHashedPassword(userInfo.password);
     userInfo.password = hashedPassword;
     $super(data, options, callback);
+  },
+
+  updatePassword: function(userId, rawPassword, callback) {
+    const hashedPassword = this.generateHashedPassword(rawPassword);
+    this.update({
+      set: 'password=?',
+      where: 'id=?',
+      params: [hashedPassword, userId]
+    }, (err, ret) => {
+      if (err) return callback(err);
+      return callback(null, { success: 1 });
+    });
   }
 
 });
