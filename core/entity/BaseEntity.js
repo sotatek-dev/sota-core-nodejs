@@ -199,9 +199,11 @@ module.exports = Class.extends({
         }
 
         if (!_.isNil(data[columnName]) && !isNaN(data[columnName])) {
-          self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
-        } else if (isNumber && typeof data[columnName] === 'boolean') {
-          self._data[property] = data[columnName] ? 1 : 0;
+          if (typeof data[columnName] === 'boolean') {
+            self._data[property] = data[columnName] ? 1 : 0;
+          } else {
+            self._data[property] = isNumber ? parseFloat(data[columnName]) : data[columnName];
+          }
         } else {
           self._data[property] = data[columnName];
         }
