@@ -7,7 +7,7 @@ var ErrorFactory    = require('../error/ErrorFactory');
 
 module.exports = {
 
-  _parsePaggingOption: function (model, options, pagination) {
+  _parsePaggingOption: function (model, options, pagination, extraPagination) {
     if (!pagination || !pagination.type) {
       return null;
     }
@@ -118,32 +118,47 @@ module.exports = {
     };
   },
 
-  countGroupBy: function (model, groupFields, options, pagination, callback) {
+  countGroupBy: function (model, groupFields, options, pagination, extraPagination, callback) {
+    if (typeof extraPagination === 'function') {
+      callback = extraPagination;
+      extraPagination = null;
+    }
+
     if (!pagination || !pagination.type) {
       return model.countGroupBy(groupFields, options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+    var mergedOptions = this._parsePaggingOption(model, options, pagination, extraPagination);
 
     model.countGroupBy(groupFields, mergedOptions, callback);
   },
 
-  sumGroupBy: function (model, columns, options, pagination, callback) {
+  sumGroupBy: function (model, columns, options, pagination, extraPagination, callback) {
+    if (typeof extraPagination === 'function') {
+      callback = extraPagination;
+      extraPagination = null;
+    }
+
     if (!pagination || !pagination.type) {
       return model.sumGroupBy(columns, options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+    var mergedOptions = this._parsePaggingOption(model, options, pagination, extraPagination);
 
     model.sumGroupBy(columns, mergedOptions, callback);
   },
 
-  find: function (model, options, pagination, callback) {
+  find: function (model, options, pagination, extraPagination, callback) {
+    if (typeof extraPagination === 'function') {
+      callback = extraPagination;
+      extraPagination = null;
+    }
+
     if (!pagination || !pagination.type) {
       return model.find(options, callback);
     }
 
-    var mergedOptions = this._parsePaggingOption(model, options, pagination);
+    var mergedOptions = this._parsePaggingOption(model, options, pagination, extraPagination);
 
     async.waterfall([
       function count(next) {
@@ -176,19 +191,22 @@ module.exports = {
     var prop = Utils.convertToCamelCase(inputPagination.field);
 
     var head = _.head(result);
-    var before = Utils.encrypt(head[prop]);
+    var before = Utils.encode(head[prop]);
 
     var last = _.last(result);
-    var after = Utils.encrypt(last[prop]);
+    var after = Utils.encode(last[prop]);
 
     var previous;
     var next;
 
     var currentUrl = inputPagination.currentUrl;
+    if (inputPagination.currentUrl.indexOf('?') === -1) {
+      currentUrl = inputPagination.currentUrl + '?';
+    }
+
     if (currentUrl && typeof currentUrl === 'string') {
-      var linkingChar = currentUrl.indexOf('?') > -1 ? '&' : '?';
-      next = currentUrl + util.format('%sp_before=%s', linkingChar, before);
-      previous = currentUrl + util.format('%sp_after=%s', linkingChar, after);
+      next = `${currentUrl}&p_before=${before}`;
+      previous = `${currentUrl}&p_after=${after}`;
     }
 
     return {

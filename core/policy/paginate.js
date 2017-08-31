@@ -1,6 +1,7 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var Utils           = require('../util/Utils');
-var ErrorFactory    = require('../error/ErrorFactory');
+const Utils           = require('../util/Utils');
+const ErrorFactory    = require('../error/ErrorFactory');
+const logger          = log4js.getLogger('Policy.paginate');
 
 module.exports = function (req, res, next) {
   var [err, params] = new Checkit({
@@ -53,9 +54,37 @@ module.exports = function (req, res, next) {
     if (params.useRawId === 1) {
       req.pagination.field = 'id';
     } else {
-      req.pagination.before = Utils.decrypt(req.pagination.before);
-      req.pagination.after = Utils.decrypt(req.pagination.after);
+      if (req.pagination.before) {
+        req.pagination.before = Utils.decode(req.pagination.before);
+      }
+
+      if (req.pagination.after) {
+        req.pagination.after = Utils.decode(req.pagination.after);
+      }
     }
+
+    if (req.pagination.before) {
+      req.pagination.direction = Const.PAGINATION.DIRECTION.BEFORE;
+      req.pagination.pivotValue = req.pagination.before;
+    }
+
+    if (req.pagination.after) {
+      req.pagination.direction = Const.PAGINATION.DIRECTION.AFTER;
+      req.pagination.pivotValue = req.pagination.after;
+    }
+
+    // When the pivot contains 2 or more parameters
+    if (req.pagination.pivotValue && req.pagination.pivotValue.indexOf('{') > -1) {
+      try {
+        req.pagination.pivot = JSON.parse(req.pagination.pivotValue);
+      } catch (e) {
+        return next(ErrorFactory.badRequest(`Invalid pivotValue format: ${req.pagination.pivotValue}`));
+      }
+    } else {
+      req.pagination.pivot = {};
+      req.pagination.pivot[req.pagination.field] = req.pagination.pivotValue;
+    }
+
   } else if (type === 'auto') {
     // Query from multi-tables, cannot predict the exact result
     req.pagination.limit = -1;

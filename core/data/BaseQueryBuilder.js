@@ -265,6 +265,20 @@ var BaseQueryBuilder = Class.extends({
     return sql;
   },
 
+  _escapeOrderColumn: function (columnName, ignoreEscape) {
+    if (ignoreEscape || columnName.indexOf('`') > -1) {
+      return columnName;
+    }
+
+    if (columnName.indexOf('.') < 0) {
+      return '`' + columnName.toLowerCase() + '`';
+    }
+
+    return _.map(columnName.split('.'), function (e) {
+      return '`' + e.toLowerCase() + '`';
+    }).join('.');
+  },
+
   _escapeColumn: function (columnName, ignoreEscape) {
     if (ignoreEscape || columnName.indexOf('`') > -1) {
       return columnName;
@@ -339,7 +353,7 @@ var BaseQueryBuilder = Class.extends({
       if (typeof options.orderBy === 'string') {
         clause += (' ORDER BY ' + options.orderBy);
       } else if (_.isArray(options.orderBy)) {
-        clause += (' ORDER BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
+        clause += (' ORDER BY ' + _.map(options.orderBy, self._escapeColumn.bind(self)).join(','));
       } else {
         throw new Error('Invalid orderBy options: ' + options.orderBy);
       }

@@ -93,6 +93,14 @@ Utils.getCDNUrl = function (folder, fileName) {
   return util.format('%s%s/%s', process.env.CDN_URL, folder, fileName);
 };
 
+Utils.encode = function (text) {
+  return new Buffer(text).toString('base64');
+};
+
+Utils.decode = function (text) {
+  return new Buffer(text, 'base64').toString('ascii');
+};
+
 Utils.encrypt = function (text) {
   if (!text) {
     return null;

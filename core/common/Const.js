@@ -34,6 +34,17 @@ module.exports = {
     FALSE: 0
   },
 
+  PAGINATION: {
+    DIRECTION: {
+      BEFORE: 'before',
+      AFTER: 'after'
+    },
+    ORDER: {
+      ASC: 'asc',
+      DESC: 'desc',
+    }
+  },
+
   SOCKET_HUB_EVENT_TYPE: {
 
   },
