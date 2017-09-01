@@ -4,6 +4,7 @@ var async           = require('async');
 var util            = require('util');
 var Utils           = require('../util/Utils');
 var ErrorFactory    = require('../error/ErrorFactory');
+var Paginator       = require('./Paginator');
 var logger          = log4js.getLogger('Paginator2');
 
 function getPagingInfo (result, inputPagination) {
@@ -190,6 +191,10 @@ module.exports = {
   },
 
   find: function (model, options, pagination, callback) {
+    if (pagination && pagination.type !== 'cursor2') {
+      return Paginator.find(model, options, pagination, callback);
+    }
+
     const mergedOptions = this._parsePaggingOption(model, options, pagination);
     model.find(mergedOptions, (err, ret) => {
       if (err) return callback(err);
@@ -206,6 +211,10 @@ module.exports = {
   },
 
   countGroupBy: function (model, groupFields, options, pagination, callback) {
+    if (pagination && pagination.type !== 'cursor2') {
+      return Paginator.countGroupBy(model, groupFields, options, pagination, callback);
+    }
+
     options = _.assign(options, {
       isAggregate: true
     });
@@ -226,6 +235,10 @@ module.exports = {
   },
 
   sumGroupBy: function (model, columns, options, pagination, callback) {
+    if (pagination && pagination.type !== 'cursor2') {
+      return Paginator.sumGroupBy(model, columns, options, pagination, callback);
+    }
+
     options = _.assign(options, {
       isAggregate: true
     });
