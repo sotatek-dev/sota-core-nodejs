@@ -11,7 +11,7 @@ function getPagingInfo (result, inputPagination) {
     return null;
   }
 
-  const fieldNames = _.map(inputPagination.fields, 'name');
+  const fieldNames = _.flattenDeep(_.map(inputPagination.fields, 'name'));
   const rawBefore = _.pick(_.head(result), fieldNames);
   const before = Utils.encode(JSON.stringify(rawBefore));
   const rawAfter = _.pick(_.last(result), fieldNames);
@@ -99,7 +99,6 @@ module.exports = {
       options = {};
     }
 
-    let having = options.having || [];
     let where = options.where || '';
     let orderBy = options.orderBy || '';
     let limit = options.limit || pagination.limit;
@@ -107,25 +106,61 @@ module.exports = {
 
     let orderFields = [];
     let additionalWheres = [];
+    let having = options.having || [];
+    let havingParams = [];
 
     const pivot = pagination.pivot;
 
     _.forEach(pagination.fields, field => {
-
-      const fieldName = escapeFieldName(field.name);
-      const pivotValue = pivot[field.name];
       const fieldOrderDirection = getOrderDirection(field.defaultOrder, pagination.direction);
-      const comparisonOperator = getComparisonOperator(fieldOrderDirection, pagination.canBeEqual);
+      const comparisonOperator = getComparisonOperator(fieldOrderDirection, field.canBeEqual);
+      let fieldName;
+      let pivotValue;
 
-      // Build order clause
-      orderFields.push(`${fieldName} ${fieldOrderDirection}`);
+      // A group of fields
+      if (_.isArray(field.name)) {
+        const fieldNames = _.map(field.name, escapeFieldName);
+        const pivotValues = _.map(field.name, name => {
+          return pivot[name];
+        });
+        fieldName = '(' + fieldNames.join(',') + ')';
+        pivotValue = '(' + _.map(pivotValues, e => '?').join(',') + ')';
 
-      // Build where clause if pivot value is given
-      if (pivotValue || pivotValue === 0) {
-        additionalWheres.push(`${fieldName} ${comparisonOperator} ?`);
-        params.push(pivotValue);
+        // Build where clause if pivot value is given
+        if (_.every(pivotValues, val => !_.isNil(val))) {
+          const comparisonClause = `${fieldName} ${comparisonOperator} ${pivotValue}`;
+          if (options.isAggregate || field.isAggregateField) {
+            having.push(comparisonClause);
+            havingParams = havingParams.concat(pivotValues);
+          } else {
+            additionalWheres.push(comparisonClause);
+            params = params.concat(pivotValues);
+          }
+        }
+
+        // Build order clause
+        _.each(fieldNames, name => {
+          orderFields.push(`${name} ${fieldOrderDirection}`);
+        });
+      } else { // Single field
+        fieldName = escapeFieldName(field.name);
+        pivotValue = pivot[field.name];
+
+        // Build where clause if pivot value is given
+        if (pivotValue || pivotValue === 0) {
+          const comparisonClause = `${fieldName} ${comparisonOperator} ?`;
+          if (options.isAggregate || field.isAggregateField) {
+            having.push(comparisonClause);
+            havingParams.push(pivotValue);
+          } else {
+            additionalWheres.push(comparisonClause);
+            params.push(pivotValue);
+          }
+        }
+
+        // Build order clause
+        orderFields.push(`${fieldName} ${fieldOrderDirection}`);
       }
-
     });
 
     if (additionalWheres.length > 0) {
@@ -140,6 +175,8 @@ module.exports = {
     if (orderFields.length > 0) {
       orderBy = orderFields.join(',');
     }
+
+    params = params.concat(havingParams);
 
     return {
       columns: options.columns,
@@ -167,5 +204,45 @@ module.exports = {
       });
     });
   },
+
+  countGroupBy: function (model, groupFields, options, pagination, callback) {
+    options = _.assign(options, {
+      isAggregate: true
+    });
+
+    const mergedOptions = this._parsePaggingOption(model, options, pagination);
+    model.countGroupBy(groupFields, mergedOptions, (err, ret) => {
+      if (err) return callback(err);
+
+      if (pagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
+        _.reverse(ret);
+      }
+
+      return callback(null, {
+        data: ret,
+        pagination: getPagingInfo(ret, pagination)
+      });
+    });
+  },
+
+  sumGroupBy: function (model, columns, options, pagination, callback) {
+    options = _.assign(options, {
+      isAggregate: true
+    });
+
+    const mergedOptions = this._parsePaggingOption(model, options, pagination);
+    model.sumGroupBy(columns, mergedOptions, (err, ret) => {
+      if (err) return callback(err);
+
+      if (pagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
+        _.reverse(ret);
+      }
+
+      return callback(null, {
+        data: ret,
+        pagination: getPagingInfo(ret, pagination)
+      });
+    });
+  }
 
 };

@@ -332,7 +332,7 @@ var BaseQueryBuilder = Class.extends({
       } else if (_.isArray(options.groupBy)) {
         clause += (' GROUP BY ' + _.map(options.groupBy, self._escapeColumn.bind(self)).join(','));
       } else {
-        throw new Error('Invalid groupBy options: ' + options.groupBy);
+        throw new Error('Invalid groupBy options: ' + util.inspect(options.groupBy));
       }
     }
 
