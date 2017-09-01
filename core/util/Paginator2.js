@@ -4,39 +4,40 @@ var async           = require('async');
 var util            = require('util');
 var Utils           = require('../util/Utils');
 var ErrorFactory    = require('../error/ErrorFactory');
+var BaseEntity      = require('../entity/BaseEntity');
 var Paginator       = require('./Paginator');
 var logger          = log4js.getLogger('Paginator2');
 
-function getPagingInfo (result, inputPagination) {
-  if (!result || !result.length) {
-    return null;
+function getResultWithPagingInfo (inputPagination, callback, err, ret) {
+  if (err) return callback(err);
+
+  if (inputPagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
+    _.reverse(ret);
   }
 
   const fieldNames = _.flattenDeep(_.map(inputPagination.fields, 'name'));
-  const rawBefore = _.pick(_.head(result), fieldNames);
-  const before = Utils.encode(JSON.stringify(rawBefore));
-  const rawAfter = _.pick(_.last(result), fieldNames);
-  const after = Utils.encode(JSON.stringify(rawAfter));
 
-  let previous;
-  let next;
-  let currentUrl = inputPagination.currentUrl;
+  const data = _.map(ret, elem => {
+    const pivotInfo = _.pick(_.head(ret), fieldNames);
+    const __pivotValue = Utils.encode(JSON.stringify(pivotInfo));
+    if (elem instanceof BaseEntity) {
+      elem.setExtra({ __pivotValue });
+    } else {
+      elem = _.assign(elem, { __pivotValue });
+    }
 
-  if (inputPagination.currentUrl.indexOf('?') === -1) {
-    currentUrl = inputPagination.currentUrl + '?';
-  }
+    return elem;
+  });
 
-  if (currentUrl && typeof currentUrl === 'string') {
-    previous = `${currentUrl}&p_before=${before}`;
-    next = `${currentUrl}&p_after=${after}`;
-  }
-
-  return {
-    before,
-    after,
-    previous,
-    next,
+  const pagination = {
+    before: _.head(data).__pivotValue,
+    after: _.last(data).__pivotValue
   };
+
+  return callback(null, {
+    data,
+    pagination,
+  });
 }
 
 function getOrderDirection (defaultOrderDirection, paginationDirection) {
@@ -196,18 +197,7 @@ module.exports = {
     }
 
     const mergedOptions = this._parsePaggingOption(model, options, pagination);
-    model.find(mergedOptions, (err, ret) => {
-      if (err) return callback(err);
-
-      if (pagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
-        _.reverse(ret);
-      }
-
-      return callback(null, {
-        data: ret,
-        pagination: getPagingInfo(ret, pagination)
-      });
-    });
+    model.find(mergedOptions, getResultWithPagingInfo.bind(this, pagination, callback));
   },
 
   countGroupBy: function (model, groupFields, options, pagination, callback) {
@@ -220,18 +210,7 @@ module.exports = {
     });
 
     const mergedOptions = this._parsePaggingOption(model, options, pagination);
-    model.countGroupBy(groupFields, mergedOptions, (err, ret) => {
-      if (err) return callback(err);
-
-      if (pagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
-        _.reverse(ret);
-      }
-
-      return callback(null, {
-        data: ret,
-        pagination: getPagingInfo(ret, pagination)
-      });
-    });
+    model.countGroupBy(groupFields, mergedOptions, getResultWithPagingInfo.bind(this, pagination, callback));
   },
 
   sumGroupBy: function (model, columns, options, pagination, callback) {
@@ -244,18 +223,7 @@ module.exports = {
     });
 
     const mergedOptions = this._parsePaggingOption(model, options, pagination);
-    model.sumGroupBy(columns, mergedOptions, (err, ret) => {
-      if (err) return callback(err);
-
-      if (pagination.direction === Const.PAGINATION.DIRECTION.BEFORE) {
-        _.reverse(ret);
-      }
-
-      return callback(null, {
-        data: ret,
-        pagination: getPagingInfo(ret, pagination)
-      });
-    });
+    model.sumGroupBy(columns, mergedOptions, getResultWithPagingInfo.bind(this, pagination, callback));
   }
 
 };
