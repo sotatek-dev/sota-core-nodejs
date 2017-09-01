@@ -4,6 +4,7 @@ var async           = require('async');
 var util            = require('util');
 var Utils           = require('../util/Utils');
 var ErrorFactory    = require('../error/ErrorFactory');
+var logger          = log4js.getLogger('Paginator');
 
 module.exports = {
 
@@ -191,10 +192,10 @@ module.exports = {
     var prop = Utils.convertToCamelCase(inputPagination.field);
 
     var head = _.head(result);
-    var before = Utils.encode(head[prop]);
+    var before = Utils.encode(head[prop].toString());
 
     var last = _.last(result);
-    var after = Utils.encode(last[prop]);
+    var after = Utils.encode(last[prop].toString());
 
     var previous;
     var next;
