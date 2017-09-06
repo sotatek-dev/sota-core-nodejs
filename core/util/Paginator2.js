@@ -29,6 +29,13 @@ function getResultWithPagingInfo (inputPagination, callback, err, ret) {
     return elem;
   });
 
+  if (!data.length) {
+    return callback(null, {
+      data: data,
+      pagination: null
+    });
+  }
+
   const pagination = {
     before: _.head(data).__pivotValue,
     after: _.last(data).__pivotValue
