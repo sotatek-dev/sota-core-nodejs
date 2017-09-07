@@ -18,7 +18,7 @@ function getResultWithPagingInfo (inputPagination, callback, err, ret) {
   const fieldNames = _.flattenDeep(_.map(inputPagination.fields, 'name'));
 
   const data = _.map(ret, elem => {
-    const pivotInfo = _.pick(_.head(ret), fieldNames);
+    const pivotInfo = _.pick(elem, fieldNames);
     const __pivotValue = Utils.encode(JSON.stringify(pivotInfo));
     if (elem instanceof BaseEntity) {
       elem.setExtra({ __pivotValue });
