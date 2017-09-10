@@ -200,7 +200,8 @@ module.exports = {
 
   find: function (model, options, pagination, callback) {
     if (pagination && pagination.type !== 'cursor2') {
-      return Paginator.find(model, options, pagination, callback);
+      // return Paginator.find(model, options, pagination, callback);
+      return callback(ErrorFactory.badRequest(`Only support query with cursor2 pagination.`));
     }
 
     const mergedOptions = this._parsePaggingOption(model, options, pagination);
@@ -209,7 +210,8 @@ module.exports = {
 
   countGroupBy: function (model, groupFields, options, pagination, callback) {
     if (pagination && pagination.type !== 'cursor2') {
-      return Paginator.countGroupBy(model, groupFields, options, pagination, callback);
+      // return Paginator.countGroupBy(model, groupFields, options, pagination, callback);
+      return callback(ErrorFactory.badRequest(`Only support query with cursor2 pagination.`));
     }
 
     options = _.assign(options, {
@@ -222,7 +224,8 @@ module.exports = {
 
   sumGroupBy: function (model, columns, options, pagination, callback) {
     if (pagination && pagination.type !== 'cursor2') {
-      return Paginator.sumGroupBy(model, columns, options, pagination, callback);
+      // return Paginator.sumGroupBy(model, columns, options, pagination, callback);
+      return callback(ErrorFactory.badRequest(`Only support query with cursor2 pagination.`));
     }
 
     options = _.assign(options, {
