@@ -1,17 +1,20 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _                   = require('lodash');
-var FileUtils           = require('../util/FileUtils');
-var ControllerFactory   = require('../controller/ControllerFactory');
-var logger              = log4js.getLogger('Init.Controller');
+const _                   = require('lodash');
+const FileUtils           = require('../util/FileUtils');
+const ControllerFactory   = require('../controller/ControllerFactory');
+const logger              = log4js.getLogger('Init.Controller');
 
-module.exports = function (controllerDirs) {
-  _.each(controllerDirs, function (controllerDir) {
+module.exports = (defs) => {
+  _.each(defs, (def) => {
+    const controllerDir = def.path;
+    const isCoreModule = def.isCoreModule;
+
     logger.trace('Load controllers dir=' + controllerDir);
     if (!FileUtils.isDirectorySync(controllerDir)) {
       throw new Error('Invalid controller directory: ' + controllerDir);
     }
 
-    var files = FileUtils.listFiles(controllerDir, /Controller.js$/i);
+    const files = FileUtils.listFiles(controllerDir, /.js$/i);
     if (!files.length) {
       logger.warn('Controller directory (' + controllerDir + ') is empty');
       return;
@@ -22,8 +25,8 @@ module.exports = function (controllerDirs) {
         throw new Error('Invalid controller file ' + file);
       }
 
-      var module = require(file);
-      ControllerFactory.register(module);
+      const module = require(file);
+      ControllerFactory.register(module, isCoreModule);
     });
   });
 };

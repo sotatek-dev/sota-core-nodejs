@@ -1,38 +1,52 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _             = require('lodash');
-var async         = require('async');
-var Class         = require('sota-class').Class;
-var logger        = log4js.getLogger('ControllerFactory');
+const _             = require('lodash');
+const async         = require('async');
+const Class         = require('sota-class').Class;
+const logger        = log4js.getLogger('ControllerFactory');
 
 /**
  * Hide real private objects from rest of the world
  * No outsider should be able to touch it
  */
-var _registers = {};
+let _registers = {};
 
 module.exports = Class.singleton({
   classname: 'ControllerFactory',
 
-  register: function (c) {
-    if (c.classname) {
-      if (_registers[c.classname]) {
-        logger.warn('Controller is registered multiple times, will be overried: ' + c.classname);
-      }
-
-      _registers[c.classname] = c;
+  register: function (module, isCoreModule) {
+    if (!module.classname) {
+      logger.error(`Trying to register invalid controller: ${module}`);
+      return;
     }
 
-    logger.trace('registered: ' + c.classname);
+    const classname = module.classname;
+
+    const registeredModule = _registers[classname];
+    if (registeredModule && registeredModule.isCoreModule === isCoreModule) {
+      logger.warn('Controller is registered multiple times, will be overried: ' + classname);
+    }
+
+    _registers[classname] = { module, isCoreModule };
+
+    logger.trace('registered: ' + classname);
   },
 
   get: function (classname) {
-    return _registers[classname];
+    if (!_registers[classname]) {
+      throw new Error('Cannot get unregistered controller: ' + classname);
+    }
+
+    const ControllerClass = _registers[classname].module;
+    return ControllerClass;
   },
 
   create: function (classname) {
-    // logger.trace('get: ' + classname)
-    var c = new _registers[classname]();
-    return c;
+    if (!_registers[classname]) {
+      throw new Error('Cannot get unregistered controller: ' + classname);
+    }
+
+    const ControllerClass = _registers[classname].module;
+    return new ControllerClass();
   },
 
   /**

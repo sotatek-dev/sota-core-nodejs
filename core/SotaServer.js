@@ -93,10 +93,18 @@ class SotaServer extends SotaApp {
      * - app/controllers/
      */
     let controllerDirs = [];
+
+    controllerDirs.push({
+      path: path.resolve(rootDir, 'core', 'controller'),
+      isCoreModule: true,
+    });
+
     let appControllerDir = path.resolve(rootDir, 'app', 'controllers');
-    controllerDirs.push(path.resolve(rootDir, 'core', 'controller'));
     if (FileUtils.isDirectorySync(appControllerDir)) {
-      controllerDirs.push(appControllerDir);
+      controllerDirs.push({
+        path: appControllerDir,
+        isCoreModule: false,
+      });
     }
 
     this._appConfig.controllerDirs = controllerDirs;

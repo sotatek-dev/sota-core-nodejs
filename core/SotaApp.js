@@ -130,10 +130,18 @@ class SotaApp {
      * - app/services/
      */
     let serviceDirs = [];
+
+    serviceDirs.push({
+      path: path.resolve(rootDir, 'core', 'service'),
+      isCoreModule: true,
+    });
+
     let appServiceDir = path.resolve(rootDir, 'app', 'services');
-    serviceDirs.push(path.resolve(rootDir, 'core', 'service'));
     if (FileUtils.isDirectorySync(appServiceDir)) {
-      serviceDirs.push(appServiceDir);
+      serviceDirs.push({
+        path: appServiceDir,
+        isCoreModule: false,
+      });
     }
 
     this._appConfig.serviceDirs = serviceDirs;
@@ -157,10 +165,17 @@ class SotaApp {
      * Cache functions
      */
     let cacheDirs = [];
+    cacheDirs.push({
+      path: path.resolve(rootDir, 'core', 'cache'),
+      isCoreModule: true,
+    });
+
     let appCacheDir = path.resolve(rootDir, 'app', 'cache');
-    cacheDirs.push(path.resolve(rootDir, 'core', 'cache'));
     if (FileUtils.isDirectorySync(appCacheDir)) {
-      cacheDirs.push(appCacheDir);
+      cacheDirs.push({
+        path: appCacheDir,
+        isCoreModule: false,
+      });
     }
 
     this._appConfig.cacheDirs = cacheDirs;

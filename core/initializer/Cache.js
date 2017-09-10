@@ -1,21 +1,25 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash');
-var path            = require('path');
-var FileUtils       = require('../util/FileUtils');
-var CacheFactory    = require('../cache/foundation/CacheFactory');
-var logger          = log4js.getLogger('Init.Cache');
+const _               = require('lodash');
+const path            = require('path');
+const FileUtils       = require('../util/FileUtils');
+const CacheFactory    = require('../cache/foundation/CacheFactory');
+const logger          = log4js.getLogger('Init.Cache');
 
-module.exports = function (dirs) {
-  _.each(dirs, function (dir) {
+module.exports = (defs) => {
+  _.each(defs, (def) => {
+    const dir = def.path;
+    const isCoreModule = def.isCoreModule;
+
     logger.trace('Initializer::Cache dir=' + dir);
     if (!FileUtils.isDirectorySync(dir)) {
       throw new Error('Invalid cache directory: ' + dir);
     }
 
-    var files = FileUtils.listFiles(dir, {
+    const files = FileUtils.listFiles(dir, {
       regex: /.js$/i,
       isRecursive: false
     });
+
     if (!files.length) {
       logger.warn('Cache directory (' + dir + ') is empty');
       return;
@@ -26,8 +30,8 @@ module.exports = function (dirs) {
         throw new Error('Invalid cache file: ' + file);
       }
 
-      var module = require(file);
-      CacheFactory.register(path.basename(file, '.js'), module);
+      const module = require(file);
+      CacheFactory.register(path.basename(file, '.js'), module, isCoreModule);
     });
   });
 };
