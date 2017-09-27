@@ -314,7 +314,13 @@ module.exports = function () {
 
       extendRequest(req, res);
       extendResponse(req, res);
-      next();
+
+      if (req._sotaHooks && req._sotaHooks.afterExtendRequest) {
+        req._sotaHooks.afterExtendRequest.call(req, next);
+      } else {
+        return next();
+      }
+
     });
   };
 };
