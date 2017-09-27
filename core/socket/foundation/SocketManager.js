@@ -1,36 +1,42 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var uuid          = require('uuid');
-var util          = require('util');
-var redis         = require('redis');
-var Class         = require('sota-class').Class;
-var logger        = log4js.getLogger('SocketManager');
+const uuid          = require('uuid');
+const util          = require('util');
+const redis         = require('redis');
+const Class         = require('sota-class').Class;
+const logger        = log4js.getLogger('SocketManager');
 
-var _registers = {};
-var _socketServerId = uuid.v4();
+const _registers = {};
+const _socketServerId = uuid.v4();
 
-var sub = redis.createClient({
+const sub = redis.createClient({
   host: process.env.REDIS_SOCKET_HUB_ADDRESS,
   port: process.env.REDIS_SOCKET_HUB_PORT
 });
 
-var SocketManager = Class.singleton({
+const SocketManager = Class.singleton({
   classname: 'SocketManager',
 
   initialize: function () {
     logger.trace('SocketManager::initialize: ' + _socketServerId);
-    var channel = 'server:' + _socketServerId;
+    const channel = 'server:' + _socketServerId;
     sub.subscribe(channel);
-    sub.on('message', function (channel, data) {
+    sub.subscribe(Const.SOCKET_BROADCAST_CHANNEL);
+
+    sub.on('message', function (_channel, data) {
       if (!data) {
         return;
       }
 
       logger.debug(util.format(
-        'on received message from channel [%s], data=%s', channel, util.inspect(data)));
-      var params = data.split('|');
-      var handlerClassname = params[0];
-      var eventType = params[1];
-      var eventData = params[2];
+        'Socket [%s] on received message from channel [%s], data=%s',
+        _socketServerId,
+        _channel,
+        util.inspect(data)
+      ));
+      const params = data.split('|');
+      const handlerClassname = params[0];
+      const eventType = params[1];
+      const eventData = params[2];
       SocketManager.getInstance(handlerClassname).onReceivedMsgFromHub(eventType, eventData);
     });
   },
@@ -40,7 +46,7 @@ var SocketManager = Class.singleton({
   },
 
   create: function (SocketClass, server, jwtSecret) {
-    var classname = SocketClass.classname;
+    const classname = SocketClass.classname;
     if (!classname) {
       throw new Error('Invalid socket classname: ' + classname);
     }
@@ -50,7 +56,7 @@ var SocketManager = Class.singleton({
       return;
     }
 
-    var socket = new SocketClass(server, jwtSecret);
+    const socket = new SocketClass(server, jwtSecret);
     _registers[classname] = socket;
   },
 

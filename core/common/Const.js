@@ -49,6 +49,8 @@ module.exports = {
 
   },
 
+  SOCKET_BROADCAST_CHANNEL: 'server:all',
+
   MAX_QUERY_RECORDS: 1000,
   DEFAULT_PAGINATION_SIZE: 10,            // Records
   DEFAULT_CACHE_TTL: 300 * 1000,          // Milliseconds
