@@ -1,11 +1,11 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var Utils       = require('../../util/Utils');
-var BaseCache   = require('./BaseCache');
+const Utils       = require('../../util/Utils');
+const BaseCache   = require('./BaseCache');
 
 'use strict';
 
-var _localData = {};
-var _localMeta = {};
+const _localData = {};
+const _localMeta = {};
 
 class LocalCache extends BaseCache {
 
@@ -40,9 +40,9 @@ class LocalCache extends BaseCache {
   }
 
   getSync (key) {
-    var now = Utils.now();
-    var meta = _localMeta[key];
-    var data = _localData[key];
+    const now = Utils.now();
+    const meta = _localMeta[key];
+    const data = _localData[key];
 
     // If cache is expired
     if (meta && meta.expiredAt && meta.expiredAt < now) {
