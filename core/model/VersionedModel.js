@@ -1,8 +1,8 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash');
-var async           = require('async');
-var LocalCache      = require('../cache/foundation/LocalCache');
-var BaseModel       = require('./BaseModel');
+const _               = require('lodash');
+const async           = require('async');
+const LocalCache      = require('../cache/foundation/LocalCache');
+const BaseModel       = require('./BaseModel');
 
 /**
  * The masterdata's tables
@@ -11,55 +11,33 @@ var BaseModel       = require('./BaseModel');
 module.exports = BaseModel.extends({
   classname: 'VersionedModel',
 
-  getCacheKey: function (version) {
-    if (!version) {
-      version = 0;
-    }
-
-    return this.tableName + '-' + version + '-cached';
+  $getCacheKey: function () {
+    return `${this.tableName}-cached`;
   },
 
   getAll: function (callback) {
-    var self = this;
-    var key = this.getCacheKey();
+    const key = this.getCacheKey();
+    const cachedData = LocalCache.getSync(key);
 
-    async.auto({
-      cached: function (next) {
-        var cached = LocalCache.getSync(key);
-        if (cached) {
-          return next(null, cached);
-        }
+    // Cache hit. Just return
+    if (cachedData) {
+      return callback(null, cachedData);
+    }
 
-        next(null, null);
-      },
-
-      data: ['cached', function (ret, next) {
-        if (ret.cached) {
-          return next(null, ret.cached);
-        }
-
-        self._select({
-          limit: 9999
-        }, next);
-      }],
-
-      recache: ['data', function (ret, next) {
-        if (!ret.cached) {
-          LocalCache.setSync(key, ret.data, { ttl: Const.YEAR_IN_MILLISECONDS });
-        }
-
-        next();
-      }]
-    }, function (err, ret) {
+    // Query in DB
+    this._select({
+      limit: 9999
+    }, (err, ret) => {
       if (err) {
         return callback(err);
       }
 
-      var result = _.filter(ret.data, function (e) {
+      const data = _.filter(ret, function (e) {
         return _.isNil(e.isActive) || e.isActive > 0;
       });
 
-      callback(null, result);
+      LocalCache.setSync(key, data, { ttl: Const.YEAR_IN_MILLISECONDS });
+      return callback(null, data);
     });
   },
 
@@ -73,18 +51,21 @@ module.exports = BaseModel.extends({
   },
 
   findCacheOne: function (id, callback) {
-    var self = this;
-
     async.waterfall([
-      function getAll(next) {
-        self.getAll(next);
+      (next) => {
+        this.getAll(next);
       },
 
-      function getOne(entities, next) {
-        var result = _.find(entities, e => _.isEqual(id, e.id)) || null;
+      (entities, next) => {
+        const result = _.find(entities, e => _.isEqual(id, e.id)) || null;
         next(null, result);
       }
     ], callback);
-  }
+  },
+
+  $flushLocalData: function() {
+    const key = this.getCacheKey();
+    LocalCache.removeSync(key);
+  },
 
 });
