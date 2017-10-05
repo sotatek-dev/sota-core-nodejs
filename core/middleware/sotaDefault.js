@@ -144,10 +144,11 @@ function _sendError(req, error, httpStatus) {
   }
 
   let accept = req.headers.accept;
-  if (accept && (
-    accept.indexOf('text') > -1 ||
-    accept.indexOf('html') > -1 ||
-    accept.indexOf('xml') > -1)) {
+  if (accept &&
+    accept.indexOf('json') === -1 && (
+      accept.indexOf('text') > -1 ||
+      accept.indexOf('html') > -1 ||
+      accept.indexOf('xml') > -1)) {
     return this.render(error.getHttpStatus().toString(), error.toJSON());
   }
 
