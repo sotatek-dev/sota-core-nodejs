@@ -77,6 +77,10 @@ class RedisCache extends BaseCache {
     client.incr(key, callback);
   }
 
+  exists (key, callback) {
+    client.exists(key, callback);
+  }
+
   remove (key, callback) {
     client.del(key, callback);
   }
