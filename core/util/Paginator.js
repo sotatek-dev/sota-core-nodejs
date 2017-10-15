@@ -46,6 +46,8 @@ module.exports = {
           orderDirection = ' DESC';
         }
       }
+
+      orderBy += orderDirection || '';
     } else if (pagination.type === 'cursor2') {
       if (after !== undefined && after !== null) {
         let comparator = '<';
