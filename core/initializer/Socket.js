@@ -24,7 +24,8 @@ module.exports = function (jwtSecret, server, dirs) {
 
   io.adapter(redisio({
     host: process.env.REDIS_SOCKET_HUB_ADDRESS,
-    port: process.env.REDIS_SOCKET_HUB_PORT
+    port: process.env.REDIS_SOCKET_HUB_PORT,
+    password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
   }));
 
   _.each(dirs, function (dir) {

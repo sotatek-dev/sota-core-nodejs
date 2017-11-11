@@ -10,7 +10,8 @@ const _socketServerId = uuid.v4();
 
 const sub = redis.createClient({
   host: process.env.REDIS_SOCKET_HUB_ADDRESS,
-  port: process.env.REDIS_SOCKET_HUB_PORT
+  port: process.env.REDIS_SOCKET_HUB_PORT,
+  password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
 });
 
 const SocketManager = Class.singleton({

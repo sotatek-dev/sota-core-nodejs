@@ -8,7 +8,8 @@ var logger          = log4js.getLogger('RedisCache');
 
 var client = redis.createClient({
   host: process.env.REDIS_SERVER_ADDRESS,
-  port: process.env.REDIS_SERVER_PORT
+  port: process.env.REDIS_SERVER_PORT,
+  password: process.env.REDIS_SERVER_PASSWORD || undefined
 });
 
 client.on('error', function (err) {

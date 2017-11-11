@@ -12,7 +12,8 @@ var logger            = log4js.getLogger('BaseSocket');
 
 var client = redis.createClient({
   host: process.env.REDIS_SOCKET_HUB_ADDRESS,
-  port: process.env.REDIS_SOCKET_HUB_PORT
+  port: process.env.REDIS_SOCKET_HUB_PORT,
+  password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
 });
 
 module.exports = Class.extends({

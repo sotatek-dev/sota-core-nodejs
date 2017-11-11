@@ -6,7 +6,8 @@ var logger = log4js.getLogger('RedisFlusher');
 
 var client = redis.createClient({
   host: process.env.REDIS_SERVER_ADDRESS,
-  port: process.env.REDIS_SERVER_PORT
+  port: process.env.REDIS_SERVER_PORT,
+  password: process.env.REDIS_SERVER_PASSWORD
 });
 
 client.flushdb(function (err, succeeded) {
