@@ -130,6 +130,8 @@ module.exports = Class.extends({
       case Types.LONG_BLOB:
       case Types.BLOB:
         return 'buffer';
+      case Types.GEOMETRY:
+        return 'geometry';
       default:
         return 'string';
     }
