@@ -1,10 +1,11 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash');
-var util            = require('util');
-var Class           = require('sota-class').Class;
-var Utils           = require('../util/Utils');
-var BaseEntity      = require('../entity/BaseEntity');
-var logger          = log4js.getLogger('BaseQueryBuilder');
+const _               = require('lodash');
+const util            = require('util');
+const Class           = require('sota-class').Class;
+const Utils           = require('../util/Utils');
+const BaseEntity      = require('../entity/BaseEntity');
+const Point           = require('./types/Point');
+const logger          = log4js.getLogger('BaseQueryBuilder');
 
 /**
  * Based on MySQL syntax.
@@ -78,6 +79,9 @@ var BaseQueryBuilder = Class.extends({
         var prop = Utils.convertToCamelCase(col);
         if (entity[prop] === null || entity[prop] === undefined) {
           params.push(null);
+        } else if (entity[prop] instanceof Point) {
+          const point = entity[prop];
+          return `POINT(${point.x}, ${point.y})`;
         } else if (typeof entity[prop] === 'string') {
           params.push(entity[prop]);
         } else if (typeof entity[prop] === 'boolean') {
