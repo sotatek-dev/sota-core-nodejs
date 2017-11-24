@@ -1,3 +1,0 @@
-[submodule "core/node-style-guide"]
-	path = core/node-style-guide
-	url = git@github.com:felixge/node-style-guide.git
