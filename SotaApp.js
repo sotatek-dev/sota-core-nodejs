@@ -1,24 +1,19 @@
-/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-
-var _ = global._ = require('lodash');
-global.async = require('async');
-var util = global.util = require('util');
-global.Checkit = require('cc-checkit');
-global.hbs = require('hbs');
-
-var fs          = require('fs');
-var path        = require('path');
-setupLog();
-var logger      = log4js.getLogger('SotaApp');
-var rootDir     = path.join(path.resolve('.'));
-var FileUtils   = require('./util/FileUtils');
-getGitRevision();
+const _           = require('lodash');
+const async       = require('async');
+const util        = require('util');
+const fs          = require('fs');
+const path        = require('path');
+const logger      = require('./index').getLogger('SotaApp');
+const FileUtils   = require('./util/FileUtils');
+const Const       = require('./common/Const');
+const rootDir     = path.join(path.resolve('.'));
 
 class SotaApp {
 
   constructor (config, initCallback) {
     this._initCallback = initCallback;
     this._appConfig = {};
+    this._configRootDir(config);
     this._resolveConfig(config);
   }
 
@@ -38,7 +33,7 @@ class SotaApp {
   }
 
   _resolveConfig (config) {
-    this._configRootDir(config);
+    this._configConstants(config);
     this._configDBAdapters(config);
     this._configLocalization(config);
     this._configModel(config);
@@ -47,15 +42,12 @@ class SotaApp {
     this._configCache(config);
     this._configInitializer(config);
     this._configExternalService(config);
-    this._configConstants(config);
 
     /**
      * All settings can be overrided via the passed argument here
      */
     if (config) {
-      _.each(_.keys(config), function (p) {
-        this._appConfig[p] = config[p];
-      }.bind(this));
+      this._appConfig = _.merge(this._appConfig, config);
     }
   }
 
@@ -63,10 +55,37 @@ class SotaApp {
     /**
      * rootDir is absolute path to the application's directory
      */
+    let rootDir = path.join(path.resolve('.'));
     if (config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
       rootDir = config.rootDir;
     }
+
     this._appConfig.rootDir = rootDir;
+  }
+
+  _configConstants (config) {
+    let appConst = {};
+
+    /**
+     * Application's defined constants
+     */
+    let constConfigFile = path.resolve(rootDir, 'app', 'common', 'Const.js');
+    if (FileUtils.isFileSync(constConfigFile)) {
+      appConst = _.assign(appConst, require(constConfigFile) || {});
+    }
+
+    if (_.isPlainObject(config.const)) {
+      appConst = _.assign(appConst, config.const);
+    }
+
+    /**
+     * Extend the core's constants by the app's ones
+     */
+    if (appConst) {
+      for (let key in appConst) {
+        Const[key] = appConst[key];
+      }
+    }
   }
 
   _configDBAdapters () {
@@ -74,6 +93,7 @@ class SotaApp {
      * Local configuration
      */
     let localConfig = {};
+    let rootDir = this._appConfig.rootDir;
     let localConfigFile = path.join(rootDir, 'config', 'Local.js');
     if (FileUtils.isFileSync(localConfigFile)) {
       localConfig = require(localConfigFile);
@@ -93,6 +113,7 @@ class SotaApp {
      * Localization
      */
     let localizationDirs = [];
+    let rootDir = this._appConfig.rootDir;
     let appLocalizationDir = path.resolve(rootDir, 'app', 'localizations');
     localizationDirs.push(path.resolve(rootDir, 'core', 'localization'));
     if (FileUtils.isDirectorySync(appLocalizationDir)) {
@@ -111,6 +132,7 @@ class SotaApp {
      * - app/models/
      */
     let modelDirs = [];
+    let rootDir = this._appConfig.rootDir;
     let appModelDir = path.resolve(rootDir, 'app', 'models');
     modelDirs.push(path.resolve(rootDir, 'core', 'model'));
     if (FileUtils.isDirectorySync(appModelDir)) {
@@ -122,7 +144,7 @@ class SotaApp {
     /**
      * ModelSchema is auto-generated file, reflects the database structure
      */
-    var modelSchema = require(path.resolve(rootDir, 'config', 'ModelSchema'));
+    const modelSchema = require(path.resolve(rootDir, 'config', 'ModelSchema'));
     this._appConfig.modelSchema = modelSchema;
   }
 
@@ -133,6 +155,7 @@ class SotaApp {
      * - app/services/
      */
     let serviceDirs = [];
+    let rootDir = this._appConfig.rootDir;
 
     serviceDirs.push({
       path: path.resolve(rootDir, 'core', 'service'),
@@ -155,6 +178,7 @@ class SotaApp {
      * Rules to check and get parameters
      */
     let checkitDirs = [];
+    let rootDir = this._appConfig.rootDir;
     let appCheckitDir = path.resolve(rootDir, 'app', 'checkits');
     if (FileUtils.isDirectorySync(appCheckitDir)) {
       checkitDirs.push(appCheckitDir);
@@ -168,6 +192,7 @@ class SotaApp {
      * Cache functions
      */
     let cacheDirs = [];
+    let rootDir = this._appConfig.rootDir;
     cacheDirs.push({
       path: path.resolve(rootDir, 'core', 'cache'),
       isCoreModule: true,
@@ -189,6 +214,7 @@ class SotaApp {
      * Cache functions
      */
     let initializerDirs = [];
+    let rootDir = this._appConfig.rootDir;
     let appInitializerDir = path.resolve(rootDir, 'app', 'initializers');
     if (FileUtils.isDirectorySync(appInitializerDir)) {
       initializerDirs.push(appInitializerDir);
@@ -202,6 +228,7 @@ class SotaApp {
      * External service handlers
      */
     let externalServiceDirs = [];
+    let rootDir = this._appConfig.rootDir;
     let appExternalServiceDir = path.resolve(rootDir, 'app', 'external_services');
     if (FileUtils.isDirectorySync(appExternalServiceDir)) {
       externalServiceDirs.push(appExternalServiceDir);
@@ -210,85 +237,67 @@ class SotaApp {
     this._appConfig.externalServiceDirs = externalServiceDirs;
   }
 
-  _configConstants () {
-    /**
-     * Application's defined constants
-     */
-    let constConfigFile = path.resolve(rootDir, 'app', 'common', 'Const.js');
-    if (FileUtils.isFileSync(constConfigFile)) {
-      this._appConfig.const = require(constConfigFile);
-    }
-
-    var coreConst = require('./common/Const');
-
-    /**
-     * Extend the core's constants by the app's ones
-     */
-    global.Const = _.merge(coreConst, this._appConfig.const || {});
-  }
-
   _initLocalization () {
-    var init = require('./initializer/Localization');
+    const init = require('./initializer/Localization');
     init(this._appConfig.localizationDirs);
   }
 
   _loadModels () {
-    var init = require('./initializer/Model');
-    var adapters = this._appConfig.adapters;
-    var schema = this._appConfig.modelSchema;
-    var modelDirs = this._appConfig.modelDirs;
+    const init = require('./initializer/Model');
+    const adapters = this._appConfig.adapters;
+    const schema = this._appConfig.modelSchema;
+    const modelDirs = this._appConfig.modelDirs;
 
     init(adapters, schema, modelDirs);
   }
 
   _loadServices () {
-    var init = require('./initializer/Service');
-    var serviceDirs = this._appConfig.serviceDirs;
+    const init = require('./initializer/Service');
+    const serviceDirs = this._appConfig.serviceDirs;
     init(serviceDirs);
   }
 
   _loadExternalServices () {
-    var init = require('./initializer/ExternalService');
+    const init = require('./initializer/ExternalService');
     init(this._appConfig.externalServiceDirs);
   }
 
   _setupLodash () {
-    var init = require('./initializer/Lodash');
+    const init = require('./initializer/Lodash');
     init(_);
   }
 
   _setupCheckit () {
-    var init = require('./initializer/Checkit');
-    var checkitDirs = this._appConfig.checkitDirs;
+    const init = require('./initializer/Checkit');
+    const checkitDirs = this._appConfig.checkitDirs;
     init(checkitDirs);
   }
 
   _setupCache () {
-    var init = require('./initializer/Cache');
-    var cacheDirs = this._appConfig.cacheDirs;
+    const init = require('./initializer/Cache');
+    const cacheDirs = this._appConfig.cacheDirs;
     init(cacheDirs);
   }
 
   _setupCustomizedInitializers () {
-    var self = this;
-    _.forEach(self._appConfig.initializerDirs, function (dir) {
+    _.forEach(this._appConfig.initializerDirs, (dir) => {
       if (!FileUtils.isDirectorySync(dir)) {
         throw new Error('Invalid initializer directory: ' + dir);
       }
 
-      var files = FileUtils.listFiles(dir, /.js$/i);
+      const files = FileUtils.listFiles(dir, /.js$/i);
       if (!files.length) {
         logger.warn('Initializer directory (' + dir + ') is empty');
         return;
       }
 
-      _.forEach(files, function (file) {
+      _.forEach(files, (file) => {
         if (!FileUtils.isFileSync(file)) {
           throw new Error('Invalid initializer file: ' + file);
         }
 
-        var init = require(file);
-        init(self._appConfig);
+        const init = require(file);
+        init(this._appConfig);
       });
     });
   }
@@ -309,57 +318,4 @@ class SotaApp {
 
 }
 
-function setupLog() {
-  global.log4js = require('log4js');
-  var logDir = '.logs';
-  if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-  }
-
-  var tmpDir = '.tmp';
-  if (!fs.existsSync(tmpDir)) {
-    fs.mkdirSync(tmpDir);
-  }
-
-  // TODO: remove global scope of logger
-  var logConfig = {
-    replaceConsole: true,
-    appenders: [
-      {
-        type: 'logLevelFilter',
-        level: process.env.LOG_LEVEL || 'WARN',
-        appender: {
-          type: 'console'
-        }
-      },
-      {
-        type: 'logLevelFilter',
-        level: 'ERROR',
-        appender: {
-          type: 'dateFile',
-          filename: logDir + '/error.log',
-          pattern: '.yyyyMMdd',
-          alwaysIncludePattern: false
-        }
-      }
-    ]
-  };
-  log4js.configure(logConfig);
-}
-
-function getGitRevision() {
-  try {
-    var revision = require('child_process')
-                    .execSync('git rev-parse HEAD')
-                    .toString().trim();
-    logger.info('Current git revision: ' + revision);
-  } catch (e) {
-    logger.warn('Cannot get curent git revision');
-    logger.warn(e);
-  }
-}
-
 module.exports = SotaApp;
-module.exports.redis = require('redis');
-module.exports.Class = require('sota-class').Class;
-module.exports.Interface = require('sota-class').Interface;

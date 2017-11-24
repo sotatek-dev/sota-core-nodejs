@@ -1,6 +1,6 @@
 var WebSocket = require('ws');
 var Class = require('sota-class').Class;
-var ExSession = require('../common/ExSession');
+var ExSession = require('../../common/ExSession');
 var logger = log4js.getLogger('BaseClientWebSocket');
 
 module.exports = Class.extends({

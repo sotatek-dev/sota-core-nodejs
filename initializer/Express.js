@@ -1,3 +1,5 @@
+const hbs = require('hbs');
+
 module.exports = function (config) {
   var app = require('express')();
 

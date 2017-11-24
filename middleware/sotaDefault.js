@@ -1,16 +1,21 @@
-/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _                   = require('lodash');
-var bb                  = require('bluebird');
-var util                = require('util');
-var passport            = require('passport');
-var Utils               = require('../util/Utils');
-var ExSession           = require('../common/ExSession');
-var BaseError           = require('../error/BaseError');
-var InternalError       = require('../error/InternalError');
-var ErrorFactory        = require('../error/ErrorFactory');
-var BaseEntity          = require('../entity/BaseEntity');
-var LocalCache          = require('../cache/foundation/LocalCache');
-var logger              = log4js.getLogger('Core.sotaDefault');
+const _                   = require('lodash');
+const bb                  = require('bluebird');
+const util                = require('util');
+const passport            = require('passport');
+const Utils               = require('../util/Utils');
+const ExSession           = require('../common/ExSession');
+const BaseError           = require('../error/BaseError');
+const InternalError       = require('../error/InternalError');
+const ErrorFactory        = require('../error/ErrorFactory');
+const BaseEntity          = require('../entity/BaseEntity');
+const LocalCache          = require('../cache/foundation/LocalCache');
+const Const               = require('../common/Const');
+const logger              = log4js.getLogger('Core.sotaDefault');
+
+/**
+ * HERE'S COME VERY UGLY CODE...
+ * TODO: FIX ME PLEASE!!!!!!!
+ */
 
 function _purifyEntity(data) {
   if (data === undefined || data === null) {

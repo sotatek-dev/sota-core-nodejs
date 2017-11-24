@@ -1,10 +1,7 @@
-var path = require('path');
-
-var SotaApp = require('./SotaApp');
-var FileUtils = require('./util/FileUtils');
-var logger = log4js.getLogger('SotaServer');
-
-var rootDir = path.join(path.resolve('.'));
+const path        = require('path');
+const SotaApp     = require('./SotaApp');
+const FileUtils   = require('./util/FileUtils');
+const logger      = require('./index').getLogger('SotaServer');
 
 class SotaServer extends SotaApp {
 
@@ -14,11 +11,7 @@ class SotaServer extends SotaApp {
   }
 
   _resolveConfig (config) {
-    if (config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
-      rootDir = config.rootDir;
-    }
-
-    this._configDirectory();
+    this._configDirectory(config || {});
     this._configRoute();
     this._configMiddleware();
     this._configPolicy();
@@ -28,7 +21,9 @@ class SotaServer extends SotaApp {
     super._resolveConfig(config);
   }
 
-  _configDirectory () {
+  _configDirectory (config) {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * publicDir should be the folder contains static files
      */
@@ -38,10 +33,12 @@ class SotaServer extends SotaApp {
     * viewDir should be the folder contains view templates
     */
     this._appConfig.viewDir = path.join(rootDir, 'views');
-    this._appConfig.port = process.env.PORT;
+    this._appConfig.port = process.env.PORT || config.port;
   }
 
   _configRoute () {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * Routes
      */
@@ -54,6 +51,8 @@ class SotaServer extends SotaApp {
   }
 
   _configMiddleware () {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * Middlewares
      */
@@ -75,6 +74,8 @@ class SotaServer extends SotaApp {
   }
 
   _configPolicy () {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * Policies are stored in:
      * - core/policy/     (core-level)
@@ -91,6 +92,8 @@ class SotaServer extends SotaApp {
   }
 
   _configController () {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * There's no specific controller in core-level
      * The folder normally contains controllers is
@@ -115,6 +118,8 @@ class SotaServer extends SotaApp {
   }
 
   _configSocket () {
+    let rootDir = this._appConfig.rootDir;
+
     /**
      * Sockets:
      * - app/sockets/
@@ -134,11 +139,11 @@ class SotaServer extends SotaApp {
 
   _initExpress () {
     logger.trace('SotaServer::_initExpress initializing express application...');
-    var myExpressApp = require('./initializer/Express')(this._appConfig);
-    var myServer = require('http').createServer(myExpressApp);
+    const myExpressApp = require('./initializer/Express')(this._appConfig);
+    const myServer = require('http').createServer(myExpressApp);
 
     process.nextTick(function () {
-      var port = this._appConfig.port;
+      let port = this._appConfig.port;
       if (this._appConfig.isPortHiddenOnClusterMode) {
         port = 0;
       }
@@ -164,37 +169,37 @@ class SotaServer extends SotaApp {
   }
 
   _setupRoutes (myExpressApp) {
-    var init = require('./initializer/Routes');
+    const init = require('./initializer/Routes');
     init(myExpressApp, this._appConfig);
   }
 
   _initPolicies () {
-    var init = require('./initializer/Policy');
-    var policyDirs = this._appConfig.policyDirs;
+    const init = require('./initializer/Policy');
+    const policyDirs = this._appConfig.policyDirs;
 
     init(policyDirs);
   }
 
   _loadControllers () {
-    var init = require('./initializer/Controller');
-    var controllerDirs = this._appConfig.controllerDirs;
+    const init = require('./initializer/Controller');
+    const controllerDirs = this._appConfig.controllerDirs;
 
     init(controllerDirs);
   }
 
   _initMiddlewares (myExpressApp) {
-    var init = require('./initializer/Middleware');
+    const init = require('./initializer/Middleware');
     init(myExpressApp, this._appConfig);
   }
 
   _setupPassport (myExpressApp) {
-    var init = require('./initializer/Passport');
+    const init = require('./initializer/Passport');
     init(myExpressApp);
   }
 
   _initSocket (myExpressApp, myServer) {
-    var init = require('./initializer/Socket');
-    var socketDirs = this._appConfig.socketDirs;
+    const init = require('./initializer/Socket');
+    const socketDirs = this._appConfig.socketDirs;
 
     init(myExpressApp.get('jwtSecret'), myServer, socketDirs);
   }
