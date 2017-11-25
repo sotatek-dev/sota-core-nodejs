@@ -20,11 +20,11 @@ module.exports = function (app, config) {
       app[requestMethod.toLowerCase()](route, finalHandler);
 
       if (requestMethod.toLowerCase() === 'post') {
-        if (route === '/login') {
+        if (route === '/api/login') {
           hasCustomizedLogin = true;
         }
 
-        if (route === '/logout') {
+        if (route === '/api/logout') {
           hasCustomizedLogin = true;
         }
       }
@@ -39,17 +39,17 @@ module.exports = function (app, config) {
     var apiName = model.getPluralTableName();
 
     // Find/select list
-    let route = '/' + apiName;
+    let route = '/api/' + apiName;
     let handlerDef = BaseController.createDefaultFind(model);
     app.get(route, handlerDef);
 
     // Find/select random list
-    route = '/random/' + apiName;
+    route = '/api/random/' + apiName;
     handlerDef = BaseController.createDefaultFindRandom(model);
     app.get(route, handlerDef);
 
     // Find/select one
-    route = '/' + apiName + '/:id';
+    route = '/api/' + apiName + '/:id';
     handlerDef = BaseController.createDefaultFindOne(model);
     app.get(route, handlerDef);
 
@@ -73,12 +73,12 @@ module.exports = function (app, config) {
 
   // If there's no user-defined login function, use built-int default login
   if (!hasCustomizedLogin) {
-    app.post('/login', AuthController.handleBy('login'));
+    app.post('/api/login', AuthController.handleBy('login'));
   }
 
   // If there's no user-defined logout function, use built-int default login
   if (!hasCustomizedLogout) {
-    app.post('/logout', AuthController.handleBy('logout'));
+    app.post('/api/logout', AuthController.handleBy('logout'));
   }
 
   logger.trace('Routes: finished initializing.');
