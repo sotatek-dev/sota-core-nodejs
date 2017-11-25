@@ -3,7 +3,7 @@ var _             = require('lodash');
 var async         = require('async');
 var util          = require('util');
 var RedisCache    = require('./foundation/RedisCache');
-var ExSession     = require('../../core/common/ExSession');
+var ExSession     = require('../common/ExSession');
 var logger        = log4js.getLogger('Cache.getOneUser');
 
 module.exports = function (userId, callback) {

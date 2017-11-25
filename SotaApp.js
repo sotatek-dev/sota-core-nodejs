@@ -115,7 +115,7 @@ class SotaApp {
     let localizationDirs = [];
     let rootDir = this._appConfig.rootDir;
     let appLocalizationDir = path.resolve(rootDir, 'app', 'localizations');
-    localizationDirs.push(path.resolve(rootDir, 'core', 'localization'));
+    localizationDirs.push(path.resolve(__dirname, 'localization'));
     if (FileUtils.isDirectorySync(appLocalizationDir)) {
       localizationDirs.push(appLocalizationDir);
     }
@@ -134,7 +134,7 @@ class SotaApp {
     let modelDirs = [];
     let rootDir = this._appConfig.rootDir;
     let appModelDir = path.resolve(rootDir, 'app', 'models');
-    modelDirs.push(path.resolve(rootDir, 'core', 'model'));
+    modelDirs.push(path.resolve(__dirname, 'model'));
     if (FileUtils.isDirectorySync(appModelDir)) {
       modelDirs.push(appModelDir);
     }
@@ -158,7 +158,7 @@ class SotaApp {
     let rootDir = this._appConfig.rootDir;
 
     serviceDirs.push({
-      path: path.resolve(rootDir, 'core', 'service'),
+      path: path.resolve(__dirname, 'service'),
       isCoreModule: true,
     });
 
@@ -194,7 +194,7 @@ class SotaApp {
     let cacheDirs = [];
     let rootDir = this._appConfig.rootDir;
     cacheDirs.push({
-      path: path.resolve(rootDir, 'core', 'cache'),
+      path: path.resolve(__dirname, 'cache'),
       isCoreModule: true,
     });
 

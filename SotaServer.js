@@ -65,7 +65,7 @@ class SotaServer extends SotaApp {
 
     let middlewareDirs = [];
     let appMiddlewareDir = path.resolve(rootDir, 'app', 'middlewares');
-    middlewareDirs.push(path.resolve(rootDir, 'core', 'middleware'));
+    middlewareDirs.push(path.resolve(__dirname, 'middleware'));
     if (FileUtils.isDirectorySync(appMiddlewareDir)) {
       middlewareDirs.push(appMiddlewareDir);
     }
@@ -83,7 +83,7 @@ class SotaServer extends SotaApp {
      */
     let policyDirs = [];
     let appPolicyDir = path.resolve(rootDir, 'app', 'policies');
-    policyDirs.push(path.resolve(rootDir, 'core', 'policy'));
+    policyDirs.push(path.resolve(__dirname, 'policy'));
     if (FileUtils.isDirectorySync(appPolicyDir)) {
       policyDirs.push(appPolicyDir);
     }
@@ -102,7 +102,7 @@ class SotaServer extends SotaApp {
     let controllerDirs = [];
 
     controllerDirs.push({
-      path: path.resolve(rootDir, 'core', 'controller'),
+      path: path.resolve(__dirname, 'controller'),
       isCoreModule: true,
     });
 

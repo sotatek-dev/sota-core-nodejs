@@ -17,11 +17,11 @@ module.exports.getLogger = function (loggerName) {
 const modulesMap = require('./bootstrap/ModuleLoader')(__dirname);
 
 module.exports.load = function (moduleName) {
-  if (!modulesMap[relativePath]) {
+  if (!modulesMap[moduleName] && !modulesMap[moduleName + '.js']) {
     throw new Error(`Cannot get module: ${moduleName}`)
   }
 
-  return modulesMap[relativePath];
+  return modulesMap[moduleName] || modulesMap[moduleName + '.js'];
 }
 
 let instance = null;
