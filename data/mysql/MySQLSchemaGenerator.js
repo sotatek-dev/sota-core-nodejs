@@ -46,7 +46,7 @@ module.exports = Class.extends({
     var tableName = model.tableName;
     var classname = model.classname;
     var self = this;
-    var sqlQuery = util.format('SELECT * FROM %s LIMIT 1', tableName);
+    var sqlQuery = util.format('SELECT * FROM `%s` LIMIT 1', tableName);
     var connection = mysql.createConnection(this._config);
     logger.trace('Processing table: ' + tableName);
 
