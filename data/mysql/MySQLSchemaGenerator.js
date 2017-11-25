@@ -4,7 +4,7 @@ var fs              = require('fs');
 var mysql           = require('mysql');
 var _               = require('lodash');
 var async           = require('async');
-var Types           = require('../../node_modules/mysql/lib/protocol/constants/types');
+var Types           = require('./types');
 var Class           = require('sota-class').Class;
 var logger          = log4js.getLogger('MySQLSchemaGenerator');
 
