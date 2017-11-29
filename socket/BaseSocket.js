@@ -1,16 +1,15 @@
-/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _                 = require('lodash');
-var util              = require('util');
-var redis             = require('redis');
-var jwt               = require('jwt-simple');
-var Class             = require('sota-class').Class;
-var CacheFactory      = require('../cache/foundation/CacheFactory');
-var ErrorFactory      = require('../error/ErrorFactory');
-var ExSession         = require('../common/ExSession');
-var SocketIOWrapper   = require('./foundation/SocketIOWrapper');
-var logger            = log4js.getLogger('BaseSocket');
+const _                 = require('lodash');
+const util              = require('util');
+const redis             = require('redis');
+const jwt               = require('jwt-simple');
+const Class             = require('sota-class').Class;
+const CacheFactory      = require('../cache/foundation/CacheFactory');
+const ErrorFactory      = require('../error/ErrorFactory');
+const ExSession         = require('../common/ExSession');
+const SocketIOWrapper   = require('./foundation/SocketIOWrapper');
+const logger            = require('../index').getLogger('BaseSocket');
 
-var client = redis.createClient({
+const client = redis.createClient({
   host: process.env.REDIS_SOCKET_HUB_ADDRESS,
   port: process.env.REDIS_SOCKET_HUB_PORT,
   password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
@@ -24,14 +23,17 @@ module.exports = Class.extends({
 
   initialize: function (io, jwtSecret) {
     // logger.debug(this.classname + '::initialize jwtSecret=' + jwtSecret)
-    var self = this;
+    io.of(this._namespace)
+      .use(this._authenticate.bind(this))
+      .on('connection', this._onConnection.bind(this));
 
-    io.of(self._namespace)
-      .use(self._authenticate.bind(self))
-      .on('connection', self._onConnection.bind(self));
+    this._io = io;
+    this._jwtSecret = jwtSecret;
+  },
 
-    self._io = io;
-    self._jwtSecret = jwtSecret;
+  onConnect: function (socket) {
+    // Should be overrided in subclass
+    throw new Error('Must be implemented in derived class.')
   },
 
   onDisconnect: function (socket, callback) {
@@ -41,70 +43,60 @@ module.exports = Class.extends({
   },
 
   _onConnection: function (socket) {
-    var self = this;
     logger.trace(util.format('[%s]: user [%s](id:%d) connected! (socketId: %s)',
-                  self._namespace, socket.user.username, socket.user.id, socket.id));
+                  this._namespace, socket.user.username, socket.user.id, socket.id));
 
     // Default behavior
-    socket.on('join-room', self._onRoomChanged.bind(self, socket));
-    socket.on('disconnect', self._onDisconnect.bind(self, socket));
+    socket.on('join-room', this._onJoinRoom.bind(this, socket));
+    socket.on('leave-room', this._onLeaveRoom.bind(this, socket));
+    socket.on('disconnect', this._onDisconnect.bind(this, socket));
 
     // Customized behavior
-    if (self._events) {
-      for (let e in self._events) {
-        socket.on(e, function (data) {
+    if (this._events) {
+      for (let e in this._events) {
+        socket.on(e, (data) => {
           if (!data) {
             socket.emit('error', ErrorFactory.badRequest('Invalid data for event: ' + e));
             return;
           }
 
-          self[self._events[e]](socket, data);
+          this[this._events[e]](socket, data);
         });
       }
     }
+
+    this.onConnect(socket);
   },
 
-  _onRoomChanged: function (socket, roomId) {
-    var self = this;
-    if (isNaN(roomId)) {
-      try {
-        // TODO: Is client able to send object to server?
-        roomId = JSON.parse(roomId).roomId;
-      } catch (e) {
-        socket.emit('error', e.toString());
-        return;
-      }
+  _onJoinRoom: function (socket, roomId) {
+    socket.join(roomId);
+    socket.emit('room-joined', roomId);
+
+    if (typeof this.onRoomJoined === 'function') {
+      this.onRoomJoined(socket, roomId);
     }
+  },
 
-    if (roomId === socket.currentRoomId) {
-      return;
+  _onLeaveRoom: function (socket, roomId) {
+    socket.join(roomId);
+    socket.emit('room-left', roomId);
+
+    if (typeof this.onRoomLeft === 'function') {
+      this.onRoomLeft(socket, roomId);
     }
-
-    var user = socket.user;
-    socket.previousRoomId = socket.currentRoomId;
-    socket.currentRoomId = roomId;
-
-    logger.debug(util.format('[%s]: user [%s](id:%d) changed room from [%s] to [%s]',
-      self._namespace, user.username, user.id, socket.previousRoomId, socket.currentRoomId));
-
-    socket.leave(socket.previousRoomId);
-    socket.join(socket.currentRoomId);
-
-    socket.emit('room-changed', socket.currentRoomId);
-    self.onRoomChanged(socket);
   },
 
   _onDisconnect: function (socket) {
     logger.debug(util.format('[%s]: user [%s](id:%d) disconnected!',
                   this._namespace, socket.user.username, socket.user.id));
 
-    this.onDisconnect(socket, function (err) {
+    this.onDisconnect(socket, (err) => {
       if (err) {
         logger.error(err);
       }
 
       if (socket.exSession) {
-        socket.exSession.rollback(function () {
+        socket.exSession.rollback(() => {
           socket.exSession.destroy();
           delete socket.exSession;
         });
@@ -112,25 +104,24 @@ module.exports = Class.extends({
     });
   },
 
-  _authenticate: function (socket, next) {
-    var self = this;
-    var jwtSecret = this._jwtSecret;
+  _authenticate: function (socket, callback) {
+    const jwtSecret = this._jwtSecret;
 
     try {
-      var token = socket.request._query.auth_token;
+      const token = socket.request._query.auth_token;
       if (!token) {
         logger.warn(util.format('%s::_authenticate invalid token: %s',
-          self.classname, util.inspect(token)));
+          this.classname, util.inspect(token)));
         socket.emit('disconnect');
         return;
       }
 
-      var jwtPayload = jwt.decode(token, jwtSecret);
-      CacheFactory.getOneUser(jwtPayload.userId, function (err, user) {
+      const jwtPayload = jwt.decode(token, jwtSecret);
+      CacheFactory.getOneUser(jwtPayload.userId, (err, user) => {
         if (err) {
           logger.error(err);
           socket.emit('disconnect');
-          return next(err, false);
+          return callback(err, false);
         }
 
         logger.trace(util.format('BaseSocket::_authenticate token: %s', token));
@@ -141,33 +132,37 @@ module.exports = Class.extends({
           let e = ErrorFactory.unauthorized('User not found: ' + jwtPayload.userId);
           logger.error(e);
           socket.emit('disconnect');
-          return next(e);
+          return callback(e);
         }
 
-        var exSession = new ExSession({ user: user });
-        var bindMethods = ['getModel', 'getService', 'commit'];
-
-        _.forEach(bindMethods, function (method) {
-          socket[method] = exSession[method].bind(exSession);
-        });
-
-        socket.rollback = function (e) {
-          logger.warn(util.format('%s: something went wrong, err=%j', self.classname, e));
-          exSession.rollback();
-          if (e) {
-            self._io.of(self._namespace).to(socket.id).emit('socketError', e);
-          }
-        };
-
-        socket.user = user;
-        socket.exSession = exSession;
-
-        next(null, true);
+        this._onAuthenticated(socket, user, callback);
       });
     } catch (e) {
       logger.error(e);
-      return next(e, false);
+      return callback(e, false);
     }
+  },
+
+  _onAuthenticated: function(socket, user, callback) {
+    const exSession = new ExSession({ user: user });
+    const bindMethods = ['getModel', 'getService', 'commit'];
+
+    _.forEach(bindMethods, (method) => {
+      socket[method] = exSession[method].bind(exSession);
+    });
+
+    socket.rollback = (e) => {
+      logger.warn(util.format('%s: something went wrong, err=%j', this.classname, e));
+      exSession.rollback();
+      if (e) {
+        this._io.of(this._namespace).to(socket.id).emit('socketError', e);
+      }
+    };
+
+    socket.user = user;
+    socket.exSession = exSession;
+
+    callback(null, true);
   },
 
   $getRedisHubClient: function () {
@@ -183,7 +178,7 @@ module.exports = Class.extends({
       throw new Error('Invalid eventData to publish: ' + eventData);
     }
 
-    var message = [this.classname, eventType, eventData].join('|');
+    const message = [this.classname, eventType, eventData].join('|');
     client.publish(channel, message);
   },
 

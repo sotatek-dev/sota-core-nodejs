@@ -2,6 +2,7 @@ const _                   = require('lodash');
 const bb                  = require('bluebird');
 const util                = require('util');
 const passport            = require('passport');
+const Checkit             = require('cc-checkit');
 const Utils               = require('../util/Utils');
 const ExSession           = require('../common/ExSession');
 const BaseError           = require('../error/BaseError');
@@ -13,7 +14,7 @@ const Const               = require('../common/Const');
 const logger              = log4js.getLogger('Core.sotaDefault');
 
 /**
- * HERE'S COME VERY UGLY CODE...
+ * HERE COMES VERY UGLY CODE...
  * TODO: FIX ME PLEASE!!!!!!!
  */
 

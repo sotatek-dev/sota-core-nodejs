@@ -1,10 +1,11 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _             = require('lodash');
-var async         = require('async');
-var util          = require('util');
-var RedisCache    = require('./foundation/RedisCache');
-var ExSession     = require('../common/ExSession');
-var logger        = log4js.getLogger('Cache.getOneUser');
+const _             = require('lodash');
+const async         = require('async');
+const util          = require('util');
+const RedisCache    = require('./foundation/RedisCache');
+const ExSession     = require('../common/ExSession');
+const Const         = require('../common/Const');
+const logger        = require('../index').getLogger('Cache.getOneUser');
 
 module.exports = function (userId, callback) {
   var exSession = new ExSession();

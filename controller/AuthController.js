@@ -1,9 +1,10 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var util              = require('util');
-var BaseController    = require('./BaseController');
-var passport          = require('passport');
-var jwt               = require('jsonwebtoken');
-var logger            = log4js.getLogger('AuthController');
+const util              = require('util');
+const BaseController    = require('./BaseController');
+const passport          = require('passport');
+const jwt               = require('jsonwebtoken');
+const Const             = require('../common/Const');
+const logger            = require('../index').getLogger('AuthController');
 
 module.exports = BaseController.extends({
   classname: 'AuthController',

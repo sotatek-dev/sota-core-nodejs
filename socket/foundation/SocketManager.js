@@ -3,7 +3,8 @@ const uuid          = require('uuid');
 const util          = require('util');
 const redis         = require('redis');
 const Class         = require('sota-class').Class;
-const logger        = log4js.getLogger('SocketManager');
+const Const         = require('../../common/Const');
+const logger        = require('../../index').getLogger('SocketManager');
 
 const _registers = {};
 const _socketServerId = uuid.v4();

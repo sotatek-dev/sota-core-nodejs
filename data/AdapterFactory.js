@@ -1,8 +1,9 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var util            = require('util');
-var Class           = require('sota-class').Class;
-var MySQLAdapter    = require('./mysql/MySQLAdapter');
-var MySQL           = require('mysql');
+const util            = require('util');
+const Class           = require('sota-class').Class;
+const MySQLAdapter    = require('./mysql/MySQLAdapter');
+const Const           = require('../common/Const');
+const MySQL           = require('mysql');
 
 var _registry = {};
 var _pools = {};

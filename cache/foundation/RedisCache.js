@@ -1,8 +1,9 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash');
-var redis           = require('redis');
-var BaseCache       = require('./BaseCache');
-var logger          = log4js.getLogger('RedisCache');
+const _               = require('lodash');
+const redis           = require('redis');
+const BaseCache       = require('./BaseCache');
+const Const           = require('../../common/Const');
+const logger          = require('../../index').getLogger('RedisCache');
 
 'use strict';
 
