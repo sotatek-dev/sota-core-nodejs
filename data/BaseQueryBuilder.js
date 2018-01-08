@@ -3,6 +3,7 @@ const _               = require('lodash');
 const util            = require('util');
 const Class           = require('sota-class').Class;
 const Utils           = require('../util/Utils');
+const Const           = require('../common/Const');
 const BaseEntity      = require('../entity/BaseEntity');
 const Point           = require('./types/Point');
 const logger          = log4js.getLogger('BaseQueryBuilder');

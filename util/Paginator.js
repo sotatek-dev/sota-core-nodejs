@@ -4,6 +4,7 @@ var async           = require('async');
 var util            = require('util');
 var Utils           = require('../util/Utils');
 var ErrorFactory    = require('../error/ErrorFactory');
+const Const         = require('../common/Const');
 var logger          = log4js.getLogger('Paginator');
 
 module.exports = {

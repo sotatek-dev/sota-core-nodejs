@@ -2,6 +2,7 @@
 const _               = require('lodash');
 const async           = require('async');
 const LocalCache      = require('../cache/foundation/LocalCache');
+const Const           = require('../common/Const');
 const BaseModel       = require('./BaseModel');
 
 /**

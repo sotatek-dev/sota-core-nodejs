@@ -5,6 +5,7 @@ var util              = require('util');
 var BaseAdapter       = require('../BaseAdapter');
 var QueryBuilder      = require('./MySQLQueryBuilder');
 var ErrorFactory      = require('../../error/ErrorFactory');
+const Const           = require('../../common/Const');
 var logger            = log4js.getLogger('MySQLAdapter');
 
 var _nextId = 0;

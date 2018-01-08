@@ -5,6 +5,7 @@ var util            = require('util');
 var Utils           = require('../util/Utils');
 var ErrorFactory    = require('../error/ErrorFactory');
 var BaseEntity      = require('../entity/BaseEntity');
+const Const         = require('../common/Const');
 var Paginator       = require('./Paginator');
 var logger          = log4js.getLogger('Paginator2');
 

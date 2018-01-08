@@ -1,5 +1,6 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
 const Utils       = require('../../util/Utils');
+const Const       = require('../../common/Const');
 const BaseCache   = require('./BaseCache');
 
 'use strict';
