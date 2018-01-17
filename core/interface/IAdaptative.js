@@ -79,6 +79,24 @@ module.exports = {
     });
   },
 
+  countColumnGroupBy: function (groupCols, column, options, callback) {
+    if (typeof groupCols === 'string') {
+      groupCols = [groupCols];
+    }
+
+    var self = this;
+    var adapter = this.getAdapterForSelect();
+
+    adapter.countColumnGroupBy(this.getFromClause(), groupCols, column, options, function (err, ret) {
+      if (err) {
+        callback(err);
+        return;
+      }
+
+      callback(null, self.constructCollection(ret));
+    });
+  },
+
   sumGroupBy: function (column, options, callback) {
     var self = this;
     var adapter = this.getAdapterForSelect();

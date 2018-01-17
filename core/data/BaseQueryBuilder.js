@@ -231,6 +231,18 @@ var BaseQueryBuilder = Class.extends({
     return sql;
   },
 
+  countColumnGroupBy: function (tableName, groupCols, column, options) {
+    var self = this;
+    options.groupBy = groupCols;
+    var sql = 'SELECT ' + _.map(groupCols, self._escapeColumn).join(',') +
+                ', COUNT(' + column + ') AS `count` FROM ';
+    sql += tableName;
+    sql += self._buildWhereClause(options);
+
+    // logger.trace(this.classname + '::countGroupBy query=[' + sql + ']')
+    return sql;
+  },
+
   sum: function (tableName, column, options) {
     var self = this;
 

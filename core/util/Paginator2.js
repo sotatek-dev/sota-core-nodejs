@@ -222,6 +222,20 @@ module.exports = {
     model.countGroupBy(groupFields, mergedOptions, getResultWithPagingInfo.bind(this, pagination, callback));
   },
 
+  countColumnGroupBy: function (model, groupFields, column, options, pagination, callback) {
+    if (pagination && pagination.type !== 'cursor2') {
+      // return Paginator.countGroupBy(model, groupFields, options, pagination, callback);
+      return callback(ErrorFactory.badRequest(`Only support query with cursor2 pagination.`));
+    }
+
+    options = _.assign(options, {
+      isAggregate: true
+    });
+
+    const mergedOptions = this._parsePaggingOption(model, options, pagination);
+    model.countColumnGroupBy(groupFields, column, mergedOptions, getResultWithPagingInfo.bind(this, pagination, callback));
+  },
+
   sumGroupBy: function (model, columns, options, pagination, callback) {
     if (pagination && pagination.type !== 'cursor2') {
       // return Paginator.sumGroupBy(model, columns, options, pagination, callback);
