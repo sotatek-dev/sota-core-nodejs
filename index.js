@@ -11,6 +11,10 @@ module.exports.getLogger = function (loggerName) {
   return log4js.getLogger(loggerName);
 }
 
+module.exports.configureLogger = function (config) {
+  log4js.configure(config);
+}
+
 /**
  * Setup modules loader
  */
