@@ -1,6 +1,6 @@
 {
   "name": "sota-core",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Sotatek's server skeleton by NodeJS",
   "main": "core/index.js",
   "repository": {
@@ -49,6 +49,7 @@
     "sota-class": "^1.0.2",
     "superagent": "3.4.1",
     "twitter": "1.7.0",
+    "type-is": "1.6.15",
     "uuid": "3.0.1",
     "uws": "0.14.1",
     "ws": "^1.1.1"
