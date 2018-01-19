@@ -1,4 +1,5 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
+const Checkit         = require('cc-checkit');
 const Utils           = require('../util/Utils');
 const ErrorFactory    = require('../error/ErrorFactory');
 const logger          = log4js.getLogger('Policy.paginate');
