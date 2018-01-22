@@ -63,7 +63,7 @@ class SotaApp {
     /**
      * rootDir is absolute path to the application's directory
      */
-    if (config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
+    if (config && config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
       rootDir = config.rootDir;
     }
     this._appConfig.rootDir = rootDir;

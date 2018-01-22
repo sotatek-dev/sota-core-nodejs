@@ -14,7 +14,7 @@ class SotaServer extends SotaApp {
   }
 
   _resolveConfig (config) {
-    if (config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
+    if (config && config.rootDir && FileUtils.isDirectorySync(config.rootDir)) {
       rootDir = config.rootDir;
     }
 
