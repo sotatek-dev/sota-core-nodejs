@@ -1,8 +1,9 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _               = require('lodash');
-var path            = require('path');
-var FileUtils       = require('../util/FileUtils');
-var logger          = log4js.getLogger('Init.Checkit');
+const _               = require('lodash');
+const path            = require('path');
+const Checkit         = require('cc-checkit');
+const FileUtils       = require('../util/FileUtils');
+const logger          = log4js.getLogger('Init.Checkit');
 
 module.exports = function (dirs) {
   var subs = ['validator', 'transformer'];
