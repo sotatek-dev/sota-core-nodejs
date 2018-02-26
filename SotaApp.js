@@ -144,7 +144,8 @@ class SotaApp {
     /**
      * ModelSchema is auto-generated file, reflects the database structure
      */
-    const modelSchema = require(path.resolve(rootDir, 'config', 'ModelSchema'));
+    const modelSchemaFile = path.resolve(rootDir, 'config', 'ModelSchema');
+    const modelSchema = FileUtils.isFileSync(modelSchemaFile) ? require(modelSchemaFile) : {};
     this._appConfig.modelSchema = modelSchema;
   }
 
