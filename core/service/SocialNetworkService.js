@@ -34,20 +34,54 @@ module.exports = BaseService.extends({
         }, next);
       },
 
+      // Update user social
+      updateUserSocial: ['userSocial', function (ret, next) {
+        if (ret.userSocial) {
+          const userSocial = ret.userSocial;
+          if (info.access_token)
+            userSocial.access_token = info.access_token;
+          if (info.refresh_token)
+            userSocial.refresh_token = info.refresh_token;
+          if (info.token)
+            userSocial.token = info.token;
+          if (info.token_secret)
+            userSocial.token_secret = info.token_secret;
+          return UserSocialModel.update(userSocial, next);
+        }
+
+        next();
+      }],
+
       userDef: function (next) {
         self.getUserDefFromInfo(info, next);
       },
 
-      user: ['userSocial', 'userDef', function (ret, next) {
-        if (ret.userSocial) {
-          return UserModel.findCacheOne(ret.userSocial.id, next);
+      existentUser: ['updateUserSocial', function(ret, next) {
+        if (ret.updateUserSocial) {
+          return UserModel.findCacheOne(ret.updateUserSocial.id, next); 
+        }
+
+        next();
+      }],
+
+      user: ['existentUser', 'userDef', function (ret, next) {
+        if (ret.existentUser) {
+          const user = ret.existentUser;
+          const userDef = ret.userDef;
+          if (user.email !== userDef.email) {
+            user.email = userDef.email;
+
+            return UserModel.update(user, next);
+          }
+          
+          return next(null, user);
         }
 
         UserService.register(ret.userDef, next);
       }],
 
       newUserSocial: ['user', function (ret, next) {
-        if (ret.userSocial) {
+        if (ret.updateUserSocial) {
           return next(null, ret.userSocial);
         }
 
