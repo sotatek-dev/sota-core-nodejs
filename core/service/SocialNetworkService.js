@@ -39,13 +39,13 @@ module.exports = BaseService.extends({
         if (ret.userSocial) {
           const userSocial = ret.userSocial;
           if (info.access_token)
-            userSocial.access_token = info.access_token;
+            userSocial.accessToken = info.access_token;
           if (info.refresh_token)
-            userSocial.refresh_token = info.refresh_token;
+            userSocial.refreshToken = info.refresh_token;
           if (info.token)
             userSocial.token = info.token;
           if (info.token_secret)
-            userSocial.token_secret = info.token_secret;
+            userSocial.tokenSecret = info.token_secret;
           return UserSocialModel.update(userSocial, next);
         }
 
@@ -68,7 +68,7 @@ module.exports = BaseService.extends({
         if (ret.existentUser) {
           const user = ret.existentUser;
           const userDef = ret.userDef;
-          if (user.email !== userDef.email) {
+          if (userDef.email && user.email !== userDef.email) {
             user.email = userDef.email;
 
             return UserModel.update(user, next);
