@@ -48,7 +48,6 @@ module.exports = SocialNetworkService.extends({
         oauth2Client = ret;
         self.getGooglePlus().people.get({
           userId: 'me',
-          personFields: 'emailAddresses,names',
           auth: oauth2Client
         }, next);
       }
@@ -59,6 +58,7 @@ module.exports = SocialNetworkService.extends({
         return self._retryGetGoogleInfo(oauth2Client, callback);
       }
 
+      console.log(info);
       return callback(err, _.assign(info, params));
     });
   },
