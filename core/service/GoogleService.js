@@ -41,6 +41,7 @@ module.exports = SocialNetworkService.extends({
         oauth2Client = ret;
         self.getGooglePlus().people.get({
           userId: 'me',
+          personFields: 'emailAddresses,names',
           auth: oauth2Client
         }, next);
       }

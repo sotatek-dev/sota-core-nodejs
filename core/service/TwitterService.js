@@ -33,7 +33,11 @@ module.exports = SocialNetworkService.extends({
       access_token_secret: tokenSecret
     });
 
-    client.get('account/verify_credentials', function (err, twitterProfile, response) {
+    var params = {
+      include_email: true
+    }
+
+    client.get('account/verify_credentials', params, function (err, twitterProfile, response) {
       if (err) {
         return callback(err);
       }
