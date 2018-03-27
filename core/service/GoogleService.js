@@ -29,7 +29,10 @@ module.exports = SocialNetworkService.extends({
     }
 
     if (_.isEmpty(emails)) {
-      userDef.email = emails.value
+      let emailAddress = _.head(emails);
+      
+      if (emailAddress)
+        userDef.email = emailAddress.value;
     }
 
     return callback(null, userDef);
@@ -58,7 +61,6 @@ module.exports = SocialNetworkService.extends({
         return self._retryGetGoogleInfo(oauth2Client, callback);
       }
 
-      console.log(info);
       return callback(err, _.assign(info, params));
     });
   },
