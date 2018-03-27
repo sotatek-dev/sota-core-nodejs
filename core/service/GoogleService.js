@@ -28,7 +28,7 @@ module.exports = SocialNetworkService.extends({
       is_google_connected: 1
     }
 
-    if (_.isEmpty(emails)) {
+    if (!_.isEmpty(emails)) {
       let emailAddress = _.head(emails);
       
       if (emailAddress)
