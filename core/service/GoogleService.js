@@ -20,12 +20,19 @@ module.exports = SocialNetworkService.extends({
   },
 
   getUserDefFromInfo: function (info, callback) {
-    return callback(null, {
-      email: info.email,
+    const emails = _.filter(info.emails, ['type', 'account']);
+
+    var userDef = {
       full_name: info.displayName,
       avatar_url: info.image ? info.image.url : null,
       is_google_connected: 1
-    });
+    }
+
+    if (_.isEmpty(emails)) {
+      userDef.email = emails.value
+    }
+
+    return callback(null, userDef);
   },
 
   _getGoogleInfo: function (params, callback) {
