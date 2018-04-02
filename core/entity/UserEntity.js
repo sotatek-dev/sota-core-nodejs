@@ -6,6 +6,9 @@ module.exports = CachedEntity.extends({
 
   isValidPassword: function (password) {
     return bcrypt.compareSync(password, this.password || '');
-  }
+  },
 
+  isValidEmail: function() {
+    return !!this.email;
+  }
 });

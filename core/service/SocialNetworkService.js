@@ -68,7 +68,7 @@ module.exports = BaseService.extends({
         if (ret.existentUser) {
           const user = ret.existentUser;
           const userDef = ret.userDef;
-          if (userDef.email && !user.email) {
+          if (userDef.email && !user.isValidEmail()) {
             user.email = userDef.email;
 
             return UserModel.update(user, next);
