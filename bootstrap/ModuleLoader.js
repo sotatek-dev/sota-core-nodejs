@@ -32,12 +32,13 @@ module.exports = function (coreDir) {
 
   return _.reduce(listFiles, (result, filePath) => {
     let relativePath = filePath.replace(coreDir, '');
-    if (relativePath.startsWith('/')) {
+    if (relativePath.startsWith('/') || relativePath.startsWith('\\')) {
       relativePath = relativePath.slice(1);
     }
 
     logger.trace(`Module has been loaded: ${relativePath}`);
     result[relativePath] = require(filePath);
+    result[relativePath.replace(/\\/g, '/')] = require(filePath);
     return result;
   }, {});
 }
