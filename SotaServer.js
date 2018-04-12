@@ -198,6 +198,11 @@ class SotaServer extends SotaApp {
   }
 
   _initSocket (myExpressApp, myServer) {
+    if (this._appConfig.useSocket === false) {
+      logger.info(`Server doesn't use socket`);
+      return;
+    }
+
     const init = require('./initializer/Socket');
     const socketDirs = this._appConfig.socketDirs;
 

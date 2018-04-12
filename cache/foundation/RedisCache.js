@@ -7,15 +7,18 @@ const logger          = require('../../index').getLogger('RedisCache');
 
 'use strict';
 
-var client = redis.createClient({
-  host: process.env.REDIS_SERVER_ADDRESS,
-  port: process.env.REDIS_SERVER_PORT,
-  password: process.env.REDIS_SERVER_PASSWORD || undefined
-});
+let client;
+if (process.env.REDIS_SERVER_ADDRESS) {
+  client = redis.createClient({
+    host: process.env.REDIS_SERVER_ADDRESS,
+    port: process.env.REDIS_SERVER_PORT,
+    password: process.env.REDIS_SERVER_PASSWORD || undefined
+  });
 
-client.on('error', function (err) {
-  logger.error('On redis error: ' + err);
-});
+  client.on('error', function (err) {
+    logger.error('On redis error: ' + err);
+  });
+}
 
 class RedisCache extends BaseCache {
 

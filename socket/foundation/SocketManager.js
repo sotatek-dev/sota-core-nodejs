@@ -9,11 +9,14 @@ const logger        = require('../../index').getLogger('SocketManager');
 const _registers = {};
 const _socketServerId = uuid.v4();
 
-const sub = redis.createClient({
-  host: process.env.REDIS_SOCKET_HUB_ADDRESS,
-  port: process.env.REDIS_SOCKET_HUB_PORT,
-  password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
-});
+let sub;
+if (process.env.REDIS_SOCKET_HUB_ADDRESS) {
+  sub = redis.createClient({
+    host: process.env.REDIS_SOCKET_HUB_ADDRESS,
+    port: process.env.REDIS_SOCKET_HUB_PORT,
+    password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
+  });
+}
 
 const SocketManager = Class.singleton({
   classname: 'SocketManager',

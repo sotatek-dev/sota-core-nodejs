@@ -9,11 +9,14 @@ const ExSession         = require('../common/ExSession');
 const SocketIOWrapper   = require('./foundation/SocketIOWrapper');
 const logger            = require('../index').getLogger('BaseSocket');
 
-const client = redis.createClient({
-  host: process.env.REDIS_SOCKET_HUB_ADDRESS,
-  port: process.env.REDIS_SOCKET_HUB_PORT,
-  password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
-});
+let client;
+if (process.env.REDIS_SOCKET_HUB_ADDRESS) {
+  client = redis.createClient({
+    host: process.env.REDIS_SOCKET_HUB_ADDRESS,
+    port: process.env.REDIS_SOCKET_HUB_PORT,
+    password: process.env.REDIS_SOCKET_HUB_PASSWORD || undefined
+  });
+}
 
 module.exports = Class.extends({
   classname: 'BaseSocket',
