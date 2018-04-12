@@ -35,10 +35,35 @@ module.exports = function (app) {
   };
 
   opts.jwtFromRequest = function (req) {
+    // The standard request header to authenticate an user agent with the server
+    if (req.headers['authorization']) {
+      const credentials = req.headers['authorization'].split(' ');
+
+      // The whole content is jwt
+      if (credentials.length === 1) {
+        return credentials[0];
+      }
+
+      if (credentials.length === 2) {
+        const type = credentials[0];
+        const jwt = credentials[1];
+        if (type === 'Bearer') {
+          return jwt;
+        } else {
+          logger.warn(`Still don't support type ${type} yet. Request authorization: ${req.headers['authorization']}`);
+        }
+      } else {
+        logger.warn(`Unkown authorization format: ${req.headers['authorization']}`);
+      }
+    }
+
+    // Pre-defined field in old version of sota-core
+    // It's DEPRECATED. Try using authorization field instead
     if (req.headers['x-auth-token']) {
       return req.headers['x-auth-token'];
     }
 
+    // Customized header field for authentication
     if (req.body && req.body[jwtBodyField]) {
       return req.body[jwtBodyField];
     }
