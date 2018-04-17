@@ -91,6 +91,39 @@ class MongoAdapter {
     });
   }
 
+  update (model, conditions, doc, options, callback) {
+    const query = mongoose.model(model.tableName).update(conditions, doc, options);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, ret);
+    })
+  }
+
+  updateOne (model, conditions, doc, options, callback) {
+    const query = mongoose.model(model.tableName).updateOne(conditions, doc, options);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, ret);
+    })
+  }
+
+  updateMany (model, conditions, doc, options, callback) {
+    const query = mongoose.model(model.tableName).updateMany(conditions, doc, options);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, ret);
+    })
+  }
+
   commit (callback) {
     // TODO: implement me
     return callback(null, null);

@@ -81,4 +81,19 @@ module.exports = BaseModel.extends({
     this.getMasterAdapter().find(this, conditions, projection, options, callback);
   },
 
+  update: function (conditions, doc, _options, _callback) {
+    const { options, callback } = this._parseQueryParams(null, _options, _callback);
+    this.getMasterAdapter().update(this, conditions, doc, options, callback);
+  },
+
+  updateOne: function (conditions, doc, _options, _callback) {
+    const { options, callback } = this._parseQueryParams(null, _options, _callback);
+    this.getMasterAdapter().updateOne(this, conditions, doc, options, callback);
+  },
+
+  updateMany: function (conditions, doc, _options, _callback) {
+    const { options, callback } = this._parseQueryParams(null, _options, _callback);
+    this.getMasterAdapter().updateMany(this, conditions, doc, options, callback);
+  },
+
 });
