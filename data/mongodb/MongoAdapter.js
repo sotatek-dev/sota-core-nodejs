@@ -68,6 +68,25 @@ class MongoAdapter {
         return callback(err);
       }
 
+      if (!ret) {
+        return callback(null, null);
+      }
+
+      return callback(null, model.constructEntity(ret));
+    });
+  }
+
+  findById (model, id, projection, options, callback) {
+    const query = mongoose.model(model.tableName).findById(id, projection, options);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      if (!ret) {
+        return callback(null, null);
+      }
+
       return callback(null, model.constructEntity(ret));
     });
   }

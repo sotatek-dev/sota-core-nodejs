@@ -36,7 +36,7 @@ module.exports = BaseModel.extends({
     this.constructEntity(data, options).save(callback);
   },
 
-  find: function (conditions, projection = null, options = {}, callback) {
+  _parseQueryParams: function (projection, options, callback) {
     if (typeof projection === 'function') {
       callback = projection;
       projection = null;
@@ -52,26 +52,33 @@ module.exports = BaseModel.extends({
       projection = null;
     }
 
+    return { projection, options, callback };
+  },
+
+  find: function (conditions, _projection = null, _options = {}, _callback) {
+    const { projection, options, callback } = this._parseQueryParams(_projection, _options, _callback);
     this.getMasterAdapter().find(this, conditions, projection, options, callback);
   },
 
-  findOne: function (conditions, projection = null, options = {}, callback) {
-    if (typeof projection === 'function') {
-      callback = projection;
-      projection = null;
-    }
-
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-
-    // Select all fields/columns
-    if (projection === '*') {
-      projection = null;
-    }
-
+  findOne: function (conditions, _projection = null, _options = {}, _callback) {
+    const { projection, options, callback } = this._parseQueryParams(_projection, _options, _callback);
     this.getMasterAdapter().findOne(this, conditions, projection, options, callback);
+  },
+
+  findById: function (id, _projection = null, _options = {}, _callback) {
+    const { projection, options, callback } = this._parseQueryParams(_projection, _options, _callback);
+    this.getMasterAdapter().findById(this, id, projection, options, callback);
+  },
+
+  findByIds: function (ids, _projection = null, _options = {}, _callback) {
+    const { projection, options, callback } = this._parseQueryParams(_projection, _options, _callback);
+    const conditions = {
+      _id: {
+        $in: ids
+      }
+    };
+
+    this.getMasterAdapter().find(this, conditions, projection, options, callback);
   },
 
 });
