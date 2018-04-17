@@ -1,8 +1,9 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _             = require('lodash');
-var util          = require('util');
-var Class         = require('sota-class').Class;
-var logger        = log4js.getLogger('ModelFactory');
+const _             = require('lodash');
+const util          = require('util');
+const mongoose      = require('mongoose');
+const Class         = require('sota-class').Class;
+const logger        = log4js.getLogger('ModelFactory');
 
 /**
  * Hide real private objects from rest of the world
@@ -53,6 +54,12 @@ module.exports = Class.singleton({
     // Inject columns property from auto-generated object into model class
     var columns = _modelSchema[m.classname];
     m.prototype.columns = m.columns = columns;
+
+    // Register mongoose collection
+    if (m._mongooseSchema) {
+      const schema = new mongoose.Schema(m._mongooseSchema);
+      mongoose.model(m.tableName, schema);
+    }
 
     _registers[m.classname] = m;
   },
