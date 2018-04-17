@@ -99,7 +99,7 @@ class MongoAdapter {
       }
 
       return callback(null, ret);
-    })
+    });
   }
 
   updateOne (model, conditions, doc, options, callback) {
@@ -110,7 +110,7 @@ class MongoAdapter {
       }
 
       return callback(null, ret);
-    })
+    });
   }
 
   updateMany (model, conditions, doc, options, callback) {
@@ -121,7 +121,29 @@ class MongoAdapter {
       }
 
       return callback(null, ret);
-    })
+    });
+  }
+
+  removeOne (model, conditions, callback) {
+    const query = mongoose.model(model.tableName).deleteOne(conditions);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, ret);
+    });
+  }
+
+  removeMany (model, conditions, callback) {
+    const query = mongoose.model(model.tableName).deleteMany(conditions);
+    query.exec((err, ret) => {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, ret);
+    });
   }
 
   commit (callback) {

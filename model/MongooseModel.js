@@ -96,4 +96,12 @@ module.exports = BaseModel.extends({
     this.getMasterAdapter().updateMany(this, conditions, doc, options, callback);
   },
 
+  removeOne: function (conditions, callback) {
+    this.getMasterAdapter().removeOne(this, conditions, callback);
+  },
+
+  removeMany: function (conditions, callback) {
+    this.getMasterAdapter().removeMany(this, conditions, callback);
+  },
+
 });
