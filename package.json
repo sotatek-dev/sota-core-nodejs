@@ -35,6 +35,8 @@
     "log4js": "^1.0.1",
     "mime-types": "2.1.13",
     "moment": "2.20.1",
+    "mongodb": "3.0.6",
+    "mongoose": "5.0.14",
     "morgan": "^1.7.0",
     "multiparty": "4.1.2",
     "mysql": "^2.12.0",
