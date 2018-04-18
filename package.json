@@ -1,6 +1,6 @@
 {
   "name": "sota-core",
-  "version": "2.0.19",
+  "version": "2.1.1",
   "description": "Sotatek's server skeleton by NodeJS",
   "main": "core/index.js",
   "repository": {
