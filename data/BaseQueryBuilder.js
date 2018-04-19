@@ -113,7 +113,7 @@ var BaseQueryBuilder = Class.extends({
     sql += 'INTO ';
     sql += tableName;
     sql += '(';
-    sql += _.map(cols, self._escapeColumn).join(',');
+    sql += _.map(cols, (col) => self._escapeColumn(col)).join(',');
     sql += ') VALUES ';
     sql += valueStrs.join(',');
     if (onDuplicateKey) {
