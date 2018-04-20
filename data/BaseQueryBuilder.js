@@ -22,6 +22,10 @@ var BaseQueryBuilder = Class.extends({
     sql += ' FROM ' + tableName;
     sql += self._buildWhereClause(options);
 
+    if (options.lockMode && typeof options.lockMode === 'string') {
+      sql += ' ' + options.lockMode;
+    }
+
     // logger.trace(this.classname + '::select query=[' + sql + ']')
     return sql;
   },
