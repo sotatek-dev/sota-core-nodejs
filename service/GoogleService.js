@@ -1,6 +1,6 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
 var async                 = require('async');
-var google                = require('googleapis');
+var { google }            = require('googleapis');
 var SocialNetworkService  = require('./SocialNetworkService');
 var ErrorFactory          = require('../error/ErrorFactory');
 var GooglePlus            = google.plus('v1');

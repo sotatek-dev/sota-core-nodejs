@@ -15,29 +15,30 @@ module.exports = function () {
     fs.mkdirSync(tmpDir);
   }
 
-  const logConfig = {
-    replaceConsole: true,
-    appenders: [
-      {
-        type: 'logLevelFilter',
-        level: process.env.LOG_LEVEL || 'WARN',
-        appender: {
-          type: 'console'
-        }
+  log4js.configure({
+    appenders: {
+      out: {
+        type: 'console',
+        level: process.env.LOG_LEVEL || 'WARN'
       },
-      {
-        type: 'logLevelFilter',
-        level: 'ERROR',
-        appender: {
-          type: 'dateFile',
-          filename: logDir + '/error.log',
-          pattern: '.yyyyMMdd',
-          alwaysIncludePattern: false
-        }
+      err: {
+        type: 'dateFile',
+        filename: logDir + '/error.log',
+        pattern: '.yyyyMMdd',
+        alwaysIncludePattern: false,
       }
-    ]
-  };
-  log4js.configure(logConfig);
+    },
+    categories: {
+      default: {
+        appenders: ['out'],
+        level: process.env.LOG_LEVEL || 'WARN'
+      },
+      err: {
+        appenders: ['err'],
+        level: 'ERROR'
+      }
+    }
+  });
 
   return log4js;
 }
