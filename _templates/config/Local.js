@@ -1,35 +1,32 @@
-/**
- * Copy the _Local.js.template to Local.js then modify it
- * Here comes your own configuration for local environment
- * This will override all other settings
- * Local.js should be ignored on git repos
- */
-
 module.exports = {
   adapters: {
     'mysql-master' : {
-      dbName  : 'DB_NAME_HERE',
-      dbUser  : 'DB_USER_HERE',
-      dbPwd   : 'DB_PASS_HERE',
-      dbHost  : 'DB_HOST_HERE',
+      dbName  : process.env.MYSQL_DBNAME,
+      dbUser  : process.env.MYSQL_USERNAME,
+      dbPwd   : process.env.MYSQL_PASSWORD,
+      dbHost  : process.env.MYSQL_DB_HOST,
+      dbPort  : process.env.MYSQL_DB_PORT,
     },
     'mysql-slave' : {
-      dbName  : 'DB_NAME_HERE',
-      dbUser  : 'DB_USER_HERE',
-      dbPwd   : 'DB_PASS_HERE',
-      dbHost  : 'DB_HOST_HERE',
+      dbName  : process.env.MYSQL_DBNAME,
+      dbUser  : process.env.MYSQL_USERNAME,
+      dbPwd   : process.env.MYSQL_PASSWORD,
+      dbHost  : process.env.MYSQL_DB_HOST,
+      dbPort  : process.env.MYSQL_DB_PORT,
     },
     'mysql-master-test' : {
-      dbName  : 'DB_NAME_HERE',
-      dbUser  : 'DB_USER_HERE',
-      dbPwd   : 'DB_PASS_HERE',
-      dbHost  : 'DB_HOST_HERE',
+      dbName  : process.env.MYSQL_DBNAME_TEST,
+      dbUser  : process.env.MYSQL_USERNAME_TEST,
+      dbPwd   : process.env.MYSQL_PASSWORD_TEST,
+      dbHost  : process.env.MYSQL_DB_HOST_TEST,
+      dbPort  : process.env.MYSQL_DB_PORT_TEST,
     },
     'mysql-slave-test' : {
-      dbName  : 'DB_NAME_HERE',
-      dbUser  : 'DB_USER_HERE',
-      dbPwd   : 'DB_PASS_HERE',
-      dbHost  : 'DB_HOST_HERE',
+      dbName  : process.env.MYSQL_DBNAME_TEST,
+      dbUser  : process.env.MYSQL_USERNAME_TEST,
+      dbPwd   : process.env.MYSQL_PASSWORD_TEST,
+      dbHost  : process.env.MYSQL_DB_HOST_TEST,
+      dbPort  : process.env.MYSQL_DB_PORT_TEST,
     },
   }
 }

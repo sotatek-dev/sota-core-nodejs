@@ -28,7 +28,7 @@ function initEnvFile(targetDirPath) {
   const envFile = path.join(targetDirPath, '.env');
   if (!fs.existsSync(envFile)) {
     fs.copySync(path.join(templateDir, '.env'), envFile);
-    console.log(chalk.cyan(`✓ Env file: created.`));
+    console.log(chalk.green(`✓ Env file: created.`));
   } else {
     console.log(chalk.cyan(`✓ Env file: existed.`));
   }
@@ -39,7 +39,7 @@ function initConfigDir(targetDirPath) {
   const configDir = path.join(targetDirPath, 'config');
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir);
-    console.log(chalk.cyan(`✓ Config folder: created.`));
+    console.log(chalk.green(`✓ Config folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Config folder: existed.`));
   }
@@ -48,7 +48,7 @@ function initConfigDir(targetDirPath) {
   const routesDir = path.join(configDir, 'routes');
   if (!fs.existsSync(routesDir)) {
     fs.mkdirSync(routesDir);
-    console.log(chalk.cyan(`✓ Routes folder: created.`));
+    console.log(chalk.green(`✓ Routes folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Routes folder: existed.`));
   }
@@ -56,7 +56,7 @@ function initConfigDir(targetDirPath) {
   const apiRoutesFile = path.join(routesDir, 'api.js');
   if (!fs.existsSync(apiRoutesFile)) {
     fs.copySync(path.join(templateDir, 'config/routes/api.js'), apiRoutesFile);
-    console.log(chalk.cyan(`✓ API routes file: created.`));
+    console.log(chalk.green(`✓ API routes file: created.`));
   } else {
     console.log(chalk.cyan(`✓ API routes file: existed.`));
   }
@@ -64,7 +64,7 @@ function initConfigDir(targetDirPath) {
   const webRoutesFile = path.join(routesDir, 'web.js');
   if (!fs.existsSync(webRoutesFile)) {
     fs.copySync(path.join(templateDir, 'config/routes/web.js'), webRoutesFile);
-    console.log(chalk.cyan(`✓ WEB routes file: created.`));
+    console.log(chalk.green(`✓ WEB routes file: created.`));
   } else {
     console.log(chalk.cyan(`✓ WEB routes file: existed.`));
   }
@@ -72,7 +72,7 @@ function initConfigDir(targetDirPath) {
   const routesFile = path.join(configDir, 'Routes.js');
   if (!fs.existsSync(routesFile)) {
     fs.copySync(path.join(templateDir, 'config/Routes.js'), routesFile);
-    console.log(chalk.cyan(`✓ Routes config file: created.`));
+    console.log(chalk.green(`✓ Routes config file: created.`));
   } else {
     console.log(chalk.cyan(`✓ Routes config file: existed.`));
   }
@@ -80,7 +80,7 @@ function initConfigDir(targetDirPath) {
   const adaptersFile = path.join(configDir, 'Adapters.js');
   if (!fs.existsSync(adaptersFile)) {
     fs.copySync(path.join(templateDir, 'config/Adapters.js'), adaptersFile);
-    console.log(chalk.cyan(`✓ Adapters config file: created.`));
+    console.log(chalk.green(`✓ Adapters config file: created.`));
   } else {
     console.log(chalk.cyan(`✓ Adapters config file: existed.`));
   }
@@ -88,7 +88,7 @@ function initConfigDir(targetDirPath) {
   const localConfigFile = path.join(configDir, 'Local.js');
   if (!fs.existsSync(localConfigFile)) {
     fs.copySync(path.join(templateDir, 'config/Local.js'), localConfigFile);
-    console.log(chalk.cyan(`✓ Local config file: created.`));
+    console.log(chalk.green(`✓ Local config file: created.`));
   } else {
     console.log(chalk.cyan(`✓ Local config file: existed.`));
   }
@@ -98,7 +98,7 @@ function initAppDir(targetDirPath) {
   const appDir = path.join(targetDirPath, 'app');
   if (!fs.existsSync(appDir)) {
     fs.mkdirSync(appDir);
-    console.log(chalk.cyan(`✓ App folder: created.`));
+    console.log(chalk.green(`✓ App folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ App folder: existed.`));
   }
@@ -106,7 +106,7 @@ function initAppDir(targetDirPath) {
   const controllersDir = path.join(appDir, 'controllers');
   if (!fs.existsSync(controllersDir)) {
     fs.mkdirSync(controllersDir);
-    console.log(chalk.cyan(`✓ Controller folder: created.`));
+    console.log(chalk.green(`✓ Controller folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Controller folder: existed.`));
   }
@@ -114,7 +114,7 @@ function initAppDir(targetDirPath) {
   const modelsDir = path.join(appDir, 'models');
   if (!fs.existsSync(modelsDir)) {
     fs.mkdirSync(modelsDir);
-    console.log(chalk.cyan(`✓ Model folder: created.`));
+    console.log(chalk.green(`✓ Model folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Model folder: existed.`));
   }
@@ -122,7 +122,7 @@ function initAppDir(targetDirPath) {
   const servicesDir = path.join(appDir, 'services');
   if (!fs.existsSync(servicesDir)) {
     fs.mkdirSync(servicesDir);
-    console.log(chalk.cyan(`✓ Service folder: created.`));
+    console.log(chalk.green(`✓ Service folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Service folder: existed.`));
   }
@@ -130,7 +130,7 @@ function initAppDir(targetDirPath) {
   const entitiesDir = path.join(appDir, 'entities');
   if (!fs.existsSync(entitiesDir)) {
     fs.mkdirSync(entitiesDir);
-    console.log(chalk.cyan(`✓ Entity folder: created.`));
+    console.log(chalk.green(`✓ Entity folder: created.`));
   } else {
     console.log(chalk.cyan(`✓ Entity folder: existed.`));
   }
@@ -138,7 +138,7 @@ function initAppDir(targetDirPath) {
   const appControllerFile = path.join(controllersDir, 'AppController.js');
   if (!fs.existsSync(appControllerFile)) {
     fs.copySync(path.join(templateDir, 'app/controllers/AppController.js'), appControllerFile);
-    console.log(chalk.cyan(`✓ AppController file: created.`));
+    console.log(chalk.green(`✓ AppController file: created.`));
   } else {
     console.log(chalk.cyan(`✓ AppController file: existed.`));
   }
