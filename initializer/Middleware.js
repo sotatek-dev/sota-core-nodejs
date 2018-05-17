@@ -9,7 +9,6 @@ var defaultList = [
   'cookieParser',
   'bodyParser',
   'bodyMultipart',
-  'expressSession',
   'www',
   'passportInit',
   'passportSession'
