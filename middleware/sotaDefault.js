@@ -1,5 +1,4 @@
 const _                   = require('lodash');
-const bb                  = require('bluebird');
 const util                = require('util');
 const passport            = require('passport');
 const Checkit             = require('cc-checkit');
@@ -11,7 +10,7 @@ const ErrorFactory        = require('../error/ErrorFactory');
 const BaseEntity          = require('../entity/BaseEntity');
 const LocalCache          = require('../cache/foundation/LocalCache');
 const Const               = require('../common/Const');
-const logger              = log4js.getLogger('Core.sotaDefault');
+const logger              = require('../index').getLogger('Core.sotaDefault');
 
 /**
  * HERE COMES VERY UGLY CODE...
@@ -44,7 +43,7 @@ function _purifyEntity(data) {
     });
   }
 
-  var ret = {};
+  const ret = {};
   for (let p in data) {
     if (data.hasOwnProperty(p)) {
       ret[p] = _purifyEntity(data[p]);
@@ -54,86 +53,36 @@ function _purifyEntity(data) {
   return ret;
 }
 
-function _envelopData(data) {
-  data = data || {};
-
-  if (data.hasOwnProperty('data')) {
-    return data;
+function _sendResponse(req, res, data) {
+  if (res._isSending) {
+    return res._originalSend(data);
   }
 
-  // Wrap data to envelop if it wasn't done yet
-  if (data instanceof BaseEntity) {
-    data = {
-      data: data.getData()
-    };
-  } else if (typeof data === 'object') {
-    data = {
-      data: data
-    };
-  }
-
-  return data;
-}
-
-function _envelopResponse(req, data) {
-  var now = Utils.now();
-  if (data instanceof BaseError) {
-    let meta = _.assign({
-      code: -1,
-      msg: data.getMsg(),
-      extraInfo: data.getExtraInfo(),
-      serverTime: now
-    }, req._additionalMeta || {});
-
-    return { meta };
-  }
-
-  let meta = _.assign({
-    code: 0,
-    serverTime: now,
-    masterdataVersion: LocalCache.getSync('data_version') || 1
-  }, req._additionalMeta || {});
-
-  return {
-    meta,
-    data: data.data || null,
-    pagination: data.pagination,
-    global: data.global
-  };
-}
-
-function _sendResponse(req, data) {
-  if (this._isSending) {
-    return this._originSend(data);
-  }
-
-  this._isSending = true;
+  res._isSending = true;
 
   if (!(data instanceof BaseError)) {
     data = _purifyEntity(data);
-    data = _envelopData(data);
   }
 
-  var response = (typeof data === 'object') ? _envelopResponse(req, data) : data;
-  var requestInfo = util.format(
-    '%s %s \n# User: %j \n# Params: %j \n# Response: %j',
-    req.method,
-    req.url,
-    req.user ? req.user.id : 0,
-    req.allParams,
-    response
-  );
-  logger.info(requestInfo);
-  this._originSend(response);
+  const userId = req.user ? req.user.id : 0;
+  logger.info(`${req.method} ${req.url} | Params: ${JSON.stringify(req.allParams)} | User: ${userId} | Response: ${JSON.stringify(data)}`);
+
+  // Prevent original send method recognizes data as http status
+  // In the case data is a number
+  if (typeof data === 'number') {
+    data = data.toString();
+  }
+
+  res._originalSend(data);
 }
 
-function _sendError(req, error, httpStatus) {
+function _sendError(req, res, error, httpStatus) {
   if (!error) {
     error = new InternalError();
   } else if (typeof error === 'string') {
     error = new InternalError(error);
   } else if (error instanceof Checkit.Error) {
-    this.badRequest(error.toString());
+    res.badRequest(error.toString());
   } else if (error instanceof BaseError) {
     // Don't need to do any extra thing...
     logger.trace('_sendError error: ' + util.inspect(error));
@@ -145,32 +94,29 @@ function _sendError(req, error, httpStatus) {
     error = new InternalError();
   }
 
-  if (req._sotaHooks && req._sotaHooks.sendError) {
-    req._sotaHooks.sendError.call(req, error);
-  }
-
   let accept = req.headers.accept;
   if (accept &&
     accept.indexOf('json') === -1 && (
       accept.indexOf('text') > -1 ||
       accept.indexOf('html') > -1 ||
       accept.indexOf('xml') > -1)) {
-    return this.render(error.getHttpStatus().toString(), error.toJSON());
+    return res.render(error.getHttpStatus().toString(), error.toJSON());
   }
 
-  this.status(httpStatus || error.getHttpStatus())
+  res.status(httpStatus || error.getHttpStatus())
       .send(error);
 }
 
 function extendRequest(req, res) {
-  res._originSend = res.send;
-  res.send = _sendResponse.bind(res, req);
-  res.sendError = _sendError.bind(res, req);
+  res._originalSend = res.send;
+  res.send = _sendResponse.bind(null, req, res);
+  res.sendError = _sendError.bind(null, req, res);
 
   req.exSession = new ExSession({
     user: req.user,
     useLocalCache: true
   });
+
   req.getService = function (name) {
     return req.exSession.getService(name);
   };
@@ -187,18 +133,15 @@ function extendRequest(req, res) {
     return req.exSession.commit(callback);
   };
 
-  req.commit_promisified = bb.promisify(req.commit);
-
   req.rollback = function (err, callback) {
-    var error = err;
     if (typeof err === 'function') {
       callback = err;
-      error = ErrorFactory.internal();
+      err = ErrorFactory.internal();
     }
 
     if (!callback) {
       callback = function () {
-        res.sendError(error);
+        res.sendError(err);
       };
     }
 
@@ -211,8 +154,8 @@ function extendRequest(req, res) {
     }
   };
 
-  req.__endTimeout = setTimeout(function () {
-    req.rollback(function () {
+  req.__endTimeout = setTimeout(() => {
+    req.rollback(() => {
       res.sendError('Request timeout.');
     });
   }, Const.DEFAULT_REQUEST_TIMEOUT);
@@ -233,14 +176,11 @@ function extendResponse(req, res) {
   };
 
   res.noContent = function (body) {
-    res.status(204).send(body || {});
+    res.sendStatus(204);
   };
 
   res.deleted = function () {
-    // TODO: 200 or 204 status?
-    res.ok({ deleted: true });
-
-    // res.noContent()
+    res.noContent()
   };
 
   // Error response
@@ -264,12 +204,12 @@ function extendResponse(req, res) {
     }
   };
 
-  var end = res.end;
-  res.end = function (data, encoding) {
+  const originalEnd = res.end;
+  res.end = (data, encoding) => {
     clearTimeout(req.__endTimeout);
-    res.end = end;
+    res.end = originalEnd;
 
-    // var finishMethod = 'rollback'
+    // let finishMethod = 'rollback'
     // if (req._needCommit) {
     //   finishMethod = 'commit'
     // }
@@ -277,7 +217,7 @@ function extendResponse(req, res) {
     /**
      * We just try to commit in all requests
      */
-    var finishMethod = 'commit';
+    let finishMethod = 'commit';
 
     req.exSession[finishMethod](function () {
       req.exSession.destroy();
@@ -321,13 +261,7 @@ module.exports = function () {
 
       extendRequest(req, res);
       extendResponse(req, res);
-
-      if (req._sotaHooks && req._sotaHooks.afterExtendRequest) {
-        req._sotaHooks.afterExtendRequest.call(req, next);
-      } else {
-        return next();
-      }
-
+      next(null, null);
     });
   };
 };
