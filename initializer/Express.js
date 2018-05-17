@@ -1,7 +1,9 @@
 const hbs = require('hbs');
 
 module.exports = function (config) {
-  var app = require('express')();
+  const app = require('express')();
+
+  app.disable('x-powered-by');
 
   // Customized config
   app.set('jwtSecret', config.secret || process.env.SECRET);
