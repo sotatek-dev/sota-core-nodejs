@@ -153,7 +153,11 @@ module.exports = Class.extends({
       if (data[columnName] === undefined) {
         if (data[property] === undefined) {
           if (_.includes(self._model.predefinedCols, columnName)) {
-            if (columnName === 'created_at' || columnName === 'updated_at') {
+            if (columnName === 'created_at') {
+              if (!self._data[property]) {
+                data[columnName] = now;
+              }
+            } else if (columnName === 'updated_at') {
               data[columnName] = now;
             } else if (columnName === 'created_by' || columnName === 'updated_by') {
               data[columnName] = userId;
