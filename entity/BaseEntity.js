@@ -156,6 +156,8 @@ module.exports = Class.extends({
             if (columnName === 'created_at') {
               if (!self._data[property]) {
                 data[columnName] = now;
+              } else {
+                data[columnName] = self._data[property];
               }
             } else if (columnName === 'updated_at') {
               data[columnName] = now;
