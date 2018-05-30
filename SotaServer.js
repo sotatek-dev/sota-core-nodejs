@@ -193,6 +193,11 @@ class SotaServer extends SotaApp {
   }
 
   _setupPassport (myExpressApp) {
+    if (this._appConfig.usePassport === false) {
+      logger.info(`Server doesn't use passport`);
+      return;
+    }
+
     const init = require('./initializer/Passport');
     init(myExpressApp);
   }
