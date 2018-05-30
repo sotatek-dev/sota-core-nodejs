@@ -230,7 +230,7 @@ function extendResponse(req, res) {
   };
 }
 
-function tryAuthenticate(req, res, next) {
+function tryAuthenticate(config, req, res, next) {
   if (config.usePassport === false) {
     return next(null, null);
   }
@@ -252,7 +252,7 @@ function tryAuthenticate(req, res, next) {
 
 module.exports = function (app, config) {
   return function (req, res, next) {
-    tryAuthenticate(req, res, function (err) {
+    tryAuthenticate(config, req, res, function (err) {
       if (err) {
         if (err instanceof BaseError) {
           res.status(err.getHttpStatus())
