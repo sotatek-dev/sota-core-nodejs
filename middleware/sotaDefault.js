@@ -231,6 +231,10 @@ function extendResponse(req, res) {
 }
 
 function tryAuthenticate(req, res, next) {
+  if (config.usePassport === false) {
+    return next(null, null);
+  }
+
   passport.authenticate('jwt', {
     session: false
   }, function (err, user, info) {
@@ -248,10 +252,6 @@ function tryAuthenticate(req, res, next) {
 
 module.exports = function (app, config) {
   return function (req, res, next) {
-    if (config.usePassport === false) {
-      return next(null, null);
-    }
-
     tryAuthenticate(req, res, function (err) {
       if (err) {
         if (err instanceof BaseError) {
