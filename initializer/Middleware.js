@@ -55,6 +55,8 @@ module.exports = function (app, config) {
     }
 
     let middleware = require(moduleMap[moduleName])(app, config);
-    app.use(middleware);
+    if (middleware) {
+      app.use(middleware);
+    }
   }
 };

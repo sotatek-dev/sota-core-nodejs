@@ -246,8 +246,12 @@ function tryAuthenticate(req, res, next) {
   })(req, res, next);
 }
 
-module.exports = function () {
+module.exports = function (app, config) {
   return function (req, res, next) {
+    if (config.usePassport === false) {
+      return next(null, null);
+    }
+
     tryAuthenticate(req, res, function (err) {
       if (err) {
         if (err instanceof BaseError) {
