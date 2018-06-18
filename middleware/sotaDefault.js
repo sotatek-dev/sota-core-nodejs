@@ -164,11 +164,11 @@ function extendRequest(req, res) {
 function extendResponse(req, res) {
   // OK response
   res.ok = function (body) {
-    res.status(200).send(body || {});
+    res.status(200).send(body);
   };
 
   res.created = function (body) {
-    res.status(201).send(body || {});
+    res.status(201).send(body);
   };
 
   res.accepted = function (body) {
