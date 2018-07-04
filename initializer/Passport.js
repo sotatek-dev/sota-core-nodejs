@@ -117,12 +117,12 @@ module.exports = function (app) {
 
         if (!user) {
           logger.error(`User not found ${field}=${email}`);
-          return done(ErrorFactory.notFound(`User not found: ${field}=${email}`));
+          return done(ErrorFactory.unauthorized(`User not found: ${field}=${email}`));
         }
 
         if (!user.isValidPassword(password)) {
           logger.error(`Invalid password for ${field}=${email}, password=${password}`);
-          return done(ErrorFactory.badRequest('Wrong password.'));
+          return done(ErrorFactory.unauthorized('Wrong password.'));
         }
 
         return done(null, user);
