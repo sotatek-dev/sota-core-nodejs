@@ -34,7 +34,7 @@ module.exports = function (req, res, next) {
   // Result will be sorted by this field as well
   // The default field is `id`
   req.pagination = {
-    type: params.p_type,
+    type: params.p_type || 'ordinary',
     limit: params.p_limit || Const.DEFAULT_PAGINATION_SIZE,
     offset: params.p_offset || 0,
     field: params.p_field || 'id',
