@@ -1,6 +1,6 @@
 {
   "name": "sota-core",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "description": "Sotatek's server skeleton by NodeJS",
   "main": "core/index.js",
   "repository": {
@@ -16,7 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "async": "2.6.0",
-    "aws-sdk": "2.241.1",
     "bcryptjs": "2.4.3",
     "bluebird": "3.5.1",
     "body-parser": "1.18.3",
@@ -44,7 +43,6 @@
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
     "passport-twitter": "1.0.4",
-    "pg": "7.4.3",
     "randomstring": "1.1.5",
     "redis": "2.8.0",
     "socket.io": "2.1.0",
