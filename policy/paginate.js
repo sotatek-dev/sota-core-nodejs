@@ -42,7 +42,11 @@ module.exports = function (req, res, next) {
     after: params.p_after
   };
 
-  if (type === 'cursor') {
+  if (type === 'ordinary') {
+    // Just use limit and offset
+    // No extra handling
+    return next();
+  } else if (type === 'cursor') {
     if (req.pagination.before && req.pagination.after) {
       let msg = 'Both p_before and p_after cannot be defined at the same time';
       return next(ErrorFactory.badRequest(msg));
