@@ -185,20 +185,20 @@ function extendResponse(req, res) {
 
   // Error response
   res.badRequest = function (body) {
-    res.sendError(body, 400);
+    res.sendError(ErrorFactory.badRequest(body.toString()));
   };
 
   res.unauthorized = function (body) {
-    res.sendError(body, 401);
+    res.sendError(ErrorFactory.unauthorized(body.toString()));
   };
 
   res.forbidden = function (body) {
-    res.sendError(body, 403);
+    res.sendError(ErrorFactory.forbidden(body.toString()));
   };
 
   res.notFound = function (body) {
     if (req.headers.accept && req.headers.accept.match(/application\/json/)) {
-      res.sendError(body, 404);
+      res.sendError(ErrorFactory.notFound(body.toString()));
     } else {
       res.status(404).render('404');
     }
