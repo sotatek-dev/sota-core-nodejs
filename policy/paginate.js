@@ -6,7 +6,7 @@ const ErrorFactory    = require('../error/ErrorFactory');
 const logger          = log4js.getLogger('Policy.paginate');
 
 module.exports = function (req, res, next) {
-  var [err, params] = new Checkit({
+  const [err, params] = new Checkit({
     p_type: ['string'],
     p_limit: ['natural'],
     p_offset: ['natural'],
@@ -18,15 +18,6 @@ module.exports = function (req, res, next) {
 
   if (err) {
     return next(err.toString());
-  }
-
-  req.pagination = {};
-
-  // If there's no particular paging
-  // just use default values and keep living on
-  var type = params.p_type;
-  if (!type) {
-    return next();
   }
 
   // Init value
@@ -41,6 +32,8 @@ module.exports = function (req, res, next) {
     before: params.p_before,
     after: params.p_after
   };
+
+  const type = params.type;
 
   if (type === 'ordinary') {
     // Just use limit and offset
