@@ -33,7 +33,7 @@ module.exports = function (req, res, next) {
     after: params.p_after
   };
 
-  const type = params.type;
+  const type = req.pagination.type;
 
   if (type === 'ordinary') {
     // Just use limit and offset
