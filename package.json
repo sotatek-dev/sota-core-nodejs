@@ -30,7 +30,7 @@
     "jsonwebtoken": "8.2.1",
     "jwt-simple": "0.5.1",
     "lodash": "4.17.10",
-    "log4js": "2.6.1",
+    "log4js": "2.10.0",
     "mime-types": "2.1.18",
     "moment": "2.22.1",
     "mongodb": "3.1.0-beta4",
