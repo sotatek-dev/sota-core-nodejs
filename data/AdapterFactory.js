@@ -83,7 +83,9 @@ module.exports = Class.singleton({
         connectionLimit: config.connectionLimit || 10,
         waitForConnections: config.waitForConnections || true,
         queueLimit: config.queueLimit || 5,
-        charset: 'utf8mb4_general_ci'
+        charset: 'utf8mb4_general_ci',
+        supportBigNumbers: config.supportBigNumbers,
+        bigNumberStrings: config.bigNumberStrings,
       });
     } else if (type === Const.DATA_SOURCE_TYPE.MONGODB) {
       pool = {};
