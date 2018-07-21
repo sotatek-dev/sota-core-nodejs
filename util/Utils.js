@@ -85,6 +85,15 @@ Utils.nowInSeconds = function () {
   return Utils.nowInMilis() / 1000 | 0;
 };
 
+Utils.nowInNanos = function () {
+  const t = process.hrtime();
+  return t[0] * 1e9 + t[1];
+};
+
+Utils.nowInMicros = function () {
+  return Utils.nowInNanos() / 1000 | 0;
+};
+
 Utils.escapeSqlColumn = function (column) {
   return '`' + column + '`';
 };
