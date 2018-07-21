@@ -1,9 +1,10 @@
 /* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var _         = require('lodash');
-var crypto    = require('crypto');
-var util      = require('util');
+const _               = require('lodash');
+const crypto          = require('crypto');
+const util            = require('util');
+const performanceNow  = require('performance-now');
 
-var Utils = {};
+const Utils = {};
 
 Utils.capitalizeFirstLetter = function (str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -86,12 +87,13 @@ Utils.nowInSeconds = function () {
 };
 
 Utils.nowInNanos = function () {
-  const t = process.hrtime();
-  return t[0] * 1e9 + t[1];
+  const nowInMilis = Utils.nowInMilis();
+  return (nowInMilis + performanceNow()) * 1e6;
 };
 
 Utils.nowInMicros = function () {
-  return Utils.nowInNanos() / 1000 | 0;
+  const nowInMilis = Utils.nowInMilis();
+  return (nowInMilis + performanceNow()) * 1e3;
 };
 
 Utils.escapeSqlColumn = function (column) {
