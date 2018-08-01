@@ -24,19 +24,20 @@ module.exports = Class.extends({
     this._joints = [];
   },
 
-  innerJoin: function (tableName, alias, conditions) {
-    return this._join(' inner join ', tableName, alias, conditions);
+  innerJoin: function (tableName, alias, conditions, fields) {
+    return this._join(' inner join ', tableName, alias, conditions, fields);
   },
 
-  leftJoin: function (tableName, alias, conditions) {
-    return this._join(' left join ', tableName, alias, conditions);
+  leftJoin: function (tableName, alias, conditions, fields) {
+    return this._join(' left join ', tableName, alias, conditions, fields);
   },
 
-  _join: function (type, tableName, alias, conditions) {
+  _join: function (type, tableName, alias, conditions, fields) {
     this._joints.push({
-      type: type,
-      tableName: tableName,
-      alias: alias,
+      fields,
+      type,
+      tableName,
+      alias,
       conditions: this._resolveConditions(conditions)
     });
 
@@ -44,10 +45,21 @@ module.exports = Class.extends({
   },
 
   getFromClause: function () {
-    return '`' + this._model.tableName + '` AS `' + this._alias + '`' +
-          _.map(this._joints, function (j) {
-            return j.type + '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions;
-          }).join(' ');
+    let firstAlias = '`' + this._model.tableName + '` AS `' + this._alias + '`';
+    let secondAlias =
+      _.map(this._joints, function (j) {
+        let rightClause;
+        if (!j.fields || _.isEmpty(j.fields) || !_.isArray(j.fields) || j.fields === '*' ) {
+          rightClause = '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions;
+        }
+        else {
+          rightClause = '(SELECT ' + _.map(j.fields, e => '`' + e + '`').join(',') + ' FROM ' + '`' + j.tableName + '`)' + 'AS `' + j.alias + '` on ' + j.conditions;
+        }
+
+        return j.type + rightClause;
+      }).join(' ');
+
+    return firstAlias + secondAlias;
   },
 
   getAdapterForSelect: function () {
