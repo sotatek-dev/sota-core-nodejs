@@ -53,7 +53,7 @@ module.exports = Class.extends({
           rightClause = '`' + j.tableName + '` AS `' + j.alias + '` on ' + j.conditions;
         }
         else {
-          rightClause = '(SELECT ' + _.map(j.fields, e => '`' + e + '`').join(',') + ' FROM ' + '`' + j.tableName + '`)' + 'AS `' + j.alias + '` on ' + j.conditions;
+          rightClause = '(SELECT ' + _.map(j.fields, e => '`' + e + '`').join(',') + ' FROM ' + '`' + j.tableName + '`)' + ' AS `' + j.alias + '` on ' + j.conditions;
         }
 
         return j.type + rightClause;
