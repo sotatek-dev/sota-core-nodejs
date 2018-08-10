@@ -306,13 +306,13 @@ module.exports = BaseAdapter.extends({
         return;
       }
 
-      if (typeof ret[0].count !== 'number') {
-        logger.error('Something went wrong. Count query doesn\'t return number: ' + sqlQuery);
-        callback(ErrorFactory.internal());
-        return;
-      }
+      // if (typeof ret[0].count !== 'number') {
+      //   logger.error('Something went wrong. Count query doesn\'t return number: ' + sqlQuery);
+      //   callback(ErrorFactory.internal());
+      //   return;
+      // }
 
-      callback(null, ret[0].count);
+      callback(null, parseInt(ret[0].count));
     });
   },
 
