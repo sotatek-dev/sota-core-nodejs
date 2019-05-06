@@ -9,6 +9,9 @@ const logger = log4js.getLogger('SotaCore');
  */
 module.exports.getLogger = function(loggerName) {
   return {
+    trace: function() {
+      return log4js.getLogger(loggerName).trace(...arguments);
+    },
     debug: function() {
       return log4js.getLogger(loggerName).debug(...arguments);
     },
