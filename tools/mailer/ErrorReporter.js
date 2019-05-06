@@ -1,38 +1,138 @@
-/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-var util        = require('util');
-var nodemailer  = require('nodemailer');
-var logger      = log4js.getLogger('ErrorReporter');
+/**
+ * Setup logger
+ */
+const log4js = require('./bootstrap/Logger')();
+const logger = log4js.getLogger('SotaCore');
+const util = require('util');
+const nodemailer = require('nodemailer');
+const moment = require('moment');
 
-module.exports = function (err, revision) {
-  if (!process.env.GOOGLE_MAILER_ACCOUNT || !process.env.GOOGLE_MAILER_PASSWORD) {
+/**
+ * Expose logger getter
+ */
+module.exports.getLogger = function(loggerName) {
+  return {
+    trace: function() {
+      return log4js.getLogger(loggerName).trace(...arguments);
+    },
+    debug: function() {
+      return log4js.getLogger(loggerName).debug(...arguments);
+    },
+    info: function() {
+      return log4js.getLogger(loggerName).info(...arguments);
+    },
+    warn: function() {
+      return log4js.getLogger(loggerName).warn(...arguments);
+    },
+    error: function() {
+      const errMsg = arguments[0];
+      notifyError('ERROR', errMsg);
+      return log4js.getLogger(loggerName).error(...arguments);
+    },
+    fatal: function() {
+      const errMsg = arguments[0];
+      notifyError('FATAL', errMsg);
+      return log4js.getLogger(loggerName).fatal(...arguments);
+    }
+  };
+};
+
+module.exports.configureLogger = function(config) {
+  log4js.configure(config);
+};
+
+/**
+ * Setup modules loader
+ */
+const modulesMap = require('./bootstrap/ModuleLoader')(__dirname);
+
+module.exports.load = function(moduleName) {
+  if (!modulesMap[moduleName] && !modulesMap[moduleName + '.js']) {
+    throw new Error(`Cannot get module: ${moduleName}`);
+  }
+
+  return modulesMap[moduleName] || modulesMap[moduleName + '.js'];
+};
+
+let instance = null;
+
+module.exports.createApp = function(options) {
+  if (instance !== null) {
+    throw new Error(`Only support 1 app instance at the same time for now.`);
+  }
+
+  const SotaApp = require('./SotaApp');
+  instance = new SotaApp(options);
+  return instance;
+};
+
+module.exports.createServer = function(options) {
+  if (instance !== null) {
+    throw new Error(`Only support 1 server instance at the same time for now.`);
+  }
+
+  const SotaServer = require('./SotaServer');
+  instance = new SotaServer(options);
+  return instance;
+};
+
+module.exports.getInstance = function() {
+  return instance;
+};
+
+// Expose some core's dependencies to application layer
+module.exports.redis = require('redis');
+module.exports.Class = require('sota-class').Class;
+module.exports.Inteface = require('sota-class').Inteface;
+
+let ERRORS_STASH = [];
+
+function notifyError(level, message) {
+  const timestamp = Date.now();
+  ERRORS_STASH.push({ timestamp, level, message });
+}
+
+setInterval(() => {
+  if (!ERRORS_STASH.length) {
     return;
   }
 
-  logger.trace('Reporting error: ' + err);
+  const account = process.env.GOOGLE_MAILER_ACCOUNT;
+  const password = process.env.GOOGLE_MAILER_PASSWORD;
+  const recipient = process.env.OPERATOR_MAIL_RECIPIENT;
 
-  var config = util.format(
-    'smtps://%s%40gmail.com:%s@smtp.gmail.com',
-    process.env.GOOGLE_MAILER_ACCOUNT,
-    process.env.GOOGLE_MAILER_PASSWORD
-  );
-
-  var transporter = nodemailer.createTransport(config);
-
-  // TODO: make these fields configurable
-  var mailOptions = {
-    from: '"SotaTek Tester" <sotatek.test@gmail.com>',
-    to: 'nguyenhuuan@gmail.com',
-    subject: '[Exclusiv] Error happens - rev:' + revision.substring(0, 7),
-    text: 'In revision: ' + revision.substring(0, 7) + '\n' + util.inspect(err)
-  };
-
-  transporter.sendMail(mailOptions, done);
-};
-
-function done(err, info) {
-  if (err) {
-    return logger.error('Send mail failed: ' + util.inspect(err));
+  if (!account || !password || !recipient) {
+    return;
   }
 
-  logger.trace('Email about error sent: ' + info.response);
-}
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: account,
+      pass: password
+    }
+  });
+
+  const appName = process.env.APP_NAME || 'SotaTek WebApp';
+  const content = ERRORS_STASH.reduce((memo, val) => {
+    return memo + '<br />\n' + `${moment(val.timestamp).format()} <b>[${val.level}]</b> ${val.message}`;
+  }, '');
+
+  // TODO: make these fields configurable
+  const mailOptions = {
+    from: `"SotaTek Error Notifier" <${account}>`,
+    to: recipient,
+    subject: `${appName}: Error Notifier`,
+    html: content
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error(`SEND EMAIL ERROR:`);
+      console.error(err);
+    } else {
+      console.log(`SEND EMAIL FINISH: ${JSON.stringify(info)}`);
+    }
+    ERRORS_STASH = [];
+  });
+}, 60000);
