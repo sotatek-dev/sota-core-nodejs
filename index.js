@@ -3,6 +3,7 @@
  */
 const log4js = require('./bootstrap/Logger')();
 const logger = log4js.getLogger('SotaCore');
+const util = require('util');
 
 /**
  * Expose logger getter
