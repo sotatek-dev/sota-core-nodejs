@@ -5,6 +5,7 @@ const log4js = require('./bootstrap/Logger')();
 const logger = log4js.getLogger('SotaCore');
 const util = require('util');
 const nodemailer = require('nodemailer');
+const moment = require('moment');
 
 /**
  * Expose logger getter
@@ -87,7 +88,8 @@ module.exports.Inteface = require('sota-class').Inteface;
 let ERRORS_STASH = [];
 
 function notifyError(level, message) {
-  ERRORS_STASH.push({ level, message });
+  const timestamp = Date.now();
+  ERRORS_STASH.push({ timestamp, level, message });
 }
 
 setInterval(() => {
@@ -95,35 +97,42 @@ setInterval(() => {
     return;
   }
 
-  if (
-    !process.env.GOOGLE_MAILER_ACCOUNT ||
-    !process.env.GOOGLE_MAILER_PASSWORD ||
-    !process.env.OPERATOR_MAIL_RECIPIENT
-  ) {
+  const account = process.env.GOOGLE_MAILER_ACCOUNT;
+  const password = process.env.GOOGLE_MAILER_PASSWORD;
+  const recipient = process.env.OPERATOR_MAIL_RECIPIENT;
+
+  if (!account || !password || !recipient) {
     return;
   }
 
-  const config = util.format(
-    'smtps://%s%40gmail.com:%s@smtp.gmail.com',
-    process.env.GOOGLE_MAILER_ACCOUNT,
-    process.env.GOOGLE_MAILER_PASSWORD
-  );
-
-  const transporter = nodemailer.createTransport(config);
-  const appName = process.env.APP_NAME || 'SotaTek WebApp';
-  const text = ERRORS_STASH.reduce((memo, currenValue) => {
-    return memo + '<br />\n' + `[${currenValue.level}] ${currenValue.message}`;
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: account,
+      pass: password
+    }
   });
+
+  const appName = process.env.APP_NAME || 'SotaTek WebApp';
+  const content = ERRORS_STASH.reduce((memo, val) => {
+    return memo + '<br />\n' + `${moment(val.timestamp).format()} <b>[${val.level}]</b> ${val.message}`;
+  }, '');
 
   // TODO: make these fields configurable
   const mailOptions = {
-    from: '"SotaTek Error Notifier" <sotatek.test@gmail.com>',
-    to: process.env.OPERATOR_MAIL_RECIPIENT,
+    from: `"SotaTek Error Notifier" <${account}>`,
+    to: recipient,
     subject: `${appName}: Error Notifier`,
-    text
+    html: content
   };
 
-  transporter.sendMail(mailOptions, () => {
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error(`SEND EMAIL ERROR:`);
+      console.error(err);
+    } else {
+      console.log(`SEND EMAIL FINISH: ${JSON.stringify(info)}`);
+    }
     ERRORS_STASH = [];
   });
 }, 60000);
