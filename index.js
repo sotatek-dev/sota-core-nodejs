@@ -11,28 +11,37 @@ const moment = require('moment');
  * Expose logger getter
  */
 module.exports.getLogger = function(loggerName) {
+  const logger = log4js.getLogger(loggerName);
   return {
     trace: function() {
-      return log4js.getLogger(loggerName).trace(...arguments);
+      return logger.trace(...arguments);
     },
     debug: function() {
-      return log4js.getLogger(loggerName).debug(...arguments);
+      return logger.debug(...arguments);
     },
     info: function() {
-      return log4js.getLogger(loggerName).info(...arguments);
+      return logger.info(...arguments);
     },
     warn: function() {
-      return log4js.getLogger(loggerName).warn(...arguments);
+      return logger.warn(...arguments);
     },
-    error: function() {
-      const errMsg = arguments[0];
+    error: function(errMsg, ...params) {
+      if (errMsg instanceof Error) {
+        errMsg = util.inspect(errMsg);
+      }
+
       notifyError('ERROR', errMsg);
-      return log4js.getLogger(loggerName).error(...arguments);
+      return logger.error(errMsg, params);
     },
-    fatal: function() {
-      const errMsg = arguments[0];
+    fatal: function(errMsg, ...params) {
+      let errMsg = arguments[0];
+
+      if (errMsg instanceof Error) {
+        errMsg = util.inspect(errMsg);
+      }
+
       notifyError('FATAL', errMsg);
-      return log4js.getLogger(loggerName).fatal(...arguments);
+      return logger.fatal(errMsg, params);
     }
   };
 };
