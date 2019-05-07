@@ -30,7 +30,7 @@ module.exports.getLogger = function(loggerName) {
         errMsg = util.inspect(errMsg);
       }
 
-      notifyError('ERROR', errMsg);
+      logError('ERROR', errMsg);
       return logger.error(errMsg, params);
     },
     fatal: function(errMsg, ...params) {
@@ -40,7 +40,7 @@ module.exports.getLogger = function(loggerName) {
         errMsg = util.inspect(errMsg);
       }
 
-      notifyError('FATAL', errMsg);
+      logError('FATAL', errMsg);
       return logger.fatal(errMsg, params);
     }
   };
@@ -96,12 +96,12 @@ module.exports.Inteface = require('sota-class').Inteface;
 
 let ERRORS_STASH = [];
 
-function notifyError(level, message) {
+function logError(level, message) {
   const timestamp = Date.now();
   ERRORS_STASH.push({ timestamp, level, message });
 }
 
-setInterval(() => {
+function sendErrorToOperator(callback) {
   if (!ERRORS_STASH.length) {
     return;
   }
@@ -143,5 +143,17 @@ setInterval(() => {
       console.log(`SEND EMAIL FINISH: ${JSON.stringify(info)}`);
     }
     ERRORS_STASH = [];
+
+    if (typeof callback === 'function') {
+      callback();
+    }
   });
-}, 60000);
+}
+
+setInterval(sendErrorToOperator, 60000);
+
+module.exports.exitGracefullyDueToError = function() {
+  sendErrorToOperator(() => {
+    process.exit(1);
+  });
+};
