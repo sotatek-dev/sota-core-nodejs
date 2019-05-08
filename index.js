@@ -34,8 +34,6 @@ module.exports.getLogger = function(loggerName) {
       return logger.error(errMsg, params);
     },
     fatal: function(errMsg, ...params) {
-      let errMsg = arguments[0];
-
       if (errMsg instanceof Error) {
         errMsg = util.inspect(errMsg);
       }
