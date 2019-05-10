@@ -101,6 +101,7 @@ function logError(level, message) {
 
 function sendErrorToOperator(callback) {
   if (!ERRORS_STASH.length) {
+    callback();
     return;
   }
 
@@ -109,6 +110,7 @@ function sendErrorToOperator(callback) {
   const recipient = process.env.OPERATOR_MAIL_RECIPIENT;
 
   if (!account || !password || !recipient) {
+    callback();
     return;
   }
 
@@ -140,6 +142,7 @@ function sendErrorToOperator(callback) {
     } else {
       console.log(`SEND EMAIL FINISH: ${JSON.stringify(info)}`);
     }
+
     ERRORS_STASH = [];
 
     if (typeof callback === 'function') {
