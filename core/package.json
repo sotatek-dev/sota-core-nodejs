@@ -44,7 +44,7 @@
     "redis": "2.6.3",
     "request": "2.79.0",
     "sinon": "^1.17.6",
-    "socket.io": "^1.5.1",
+    "socket.io": "^2.4.0",
     "socket.io-redis": "3.0.0",
     "sota-class": "^1.0.2",
     "superagent": "3.4.1",
