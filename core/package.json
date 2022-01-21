@@ -28,7 +28,7 @@
     "jsonwebtoken": "7.1.9",
     "jwt-simple": "^0.5.0",
     "lodash": "^4.16.6",
-    "log4js": "^1.0.1",
+    "log4js": "^6.4.0",
     "mime-types": "2.1.13",
     "moment": "^2.16.0",
     "morgan": "^1.7.0",
