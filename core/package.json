@@ -12,7 +12,7 @@
   "author": "An Nguyen <nguyenhuuan@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.1.2",
+    "async": "^2.6.4",
     "aws-sdk": "2.7.20",
     "bcryptjs": "^2.3.0",
     "bluebird": "3.4.6",
